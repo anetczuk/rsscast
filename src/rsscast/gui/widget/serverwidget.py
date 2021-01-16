@@ -27,9 +27,11 @@ import logging
 from PyQt5 import QtCore
 from PyQt5.QtCore import pyqtSignal
 
-from rsscast.gui.dataobject import DataObject
+# from rsscast.gui.dataobject import DataObject
 
 from .. import uiloader
+from rsscast.rss.rssserver import RSSServerManager
+from rsscast.gui.dataobject import DataObject
 
 
 UiTargetClass, QtBaseClass = uiloader.load_ui_from_class_name( __file__ )
@@ -38,7 +40,7 @@ UiTargetClass, QtBaseClass = uiloader.load_ui_from_class_name( __file__ )
 _LOGGER = logging.getLogger(__name__)
 
 
-class FeedWidget( QtBaseClass ):           # type: ignore
+class ServerWidget( QtBaseClass ):           # type: ignore
 
 #     fileChanged   = pyqtSignal()
 
@@ -47,13 +49,13 @@ class FeedWidget( QtBaseClass ):           # type: ignore
         self.ui = UiTargetClass()
         self.ui.setupUi(self)
         
-#         self.dataObject = None
+        self.server = RSSServerManager()
 
     def connectData(self, dataObject: DataObject):
-        self.ui.feedTableView.connectData( dataObject )
-#         self.dataObject = dataObject
-#         self.dataObject.feedChanged.connect( self.refreshList )
-#         self.refreshList()
+        self.server.attachData( dataObject )
 
-#     def refreshList(self):
-#         pass
+    def startServer(self):
+        self.server.start()
+
+    def stopServer(self):
+        self.server.stop()

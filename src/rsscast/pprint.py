@@ -21,39 +21,23 @@
 # SOFTWARE.
 #
 
-import os
-import logging
+def pprint(variable, indent=0):
+    if variable is None:
+        print('\t' * indent + "None")
+        return
+    if not variable:
+        ## empty container
+        print('\t' * indent + "Empty")
+        return
 
-from PyQt5 import QtCore
-from PyQt5.QtCore import pyqtSignal
-
-from rsscast.gui.dataobject import DataObject
-
-from .. import uiloader
-
-
-UiTargetClass, QtBaseClass = uiloader.load_ui_from_class_name( __file__ )
-
-
-_LOGGER = logging.getLogger(__name__)
-
-
-class FeedWidget( QtBaseClass ):           # type: ignore
-
-#     fileChanged   = pyqtSignal()
-
-    def __init__(self, parentWidget=None):
-        super().__init__(parentWidget)
-        self.ui = UiTargetClass()
-        self.ui.setupUi(self)
-        
-#         self.dataObject = None
-
-    def connectData(self, dataObject: DataObject):
-        self.ui.feedTableView.connectData( dataObject )
-#         self.dataObject = dataObject
-#         self.dataObject.feedChanged.connect( self.refreshList )
-#         self.refreshList()
-
-#     def refreshList(self):
-#         pass
+    if isinstance( variable, dict ):
+        for key, value in variable.items():
+            print('\t' * indent + str(key) + ":")
+            pprint( value, indent + 1 )
+    elif isinstance( variable, list ):
+        for i in range(0, len(variable)):
+            value = variable[i]
+            print('\t' * indent + "[" + str(i) + "]:")
+            pprint( value, indent + 1 )
+    else:
+        print('\t' * (indent + 1) + str(variable))

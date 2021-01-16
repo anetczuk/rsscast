@@ -28,13 +28,13 @@ import sys
 import argparse
 import logging
 
-# from PyQt5.QtWidgets import QApplication, QMessageBox
+from PyQt5.QtWidgets import QApplication, QMessageBox
 
 import rsscast.logger as logger
 
-# from rsscast.gui.mainwindow import MainWindow
-# from rsscast.gui.sigint import setup_interrupt_handling
-# from rsscast.gui.appwindow import AppWindow
+from rsscast.gui.mainwindow import MainWindow
+from rsscast.gui.sigint import setup_interrupt_handling
+from rsscast.gui.appwindow import AppWindow
 
 
 logger.configure()
@@ -42,37 +42,35 @@ _LOGGER = logging.getLogger(__name__)
 
 
 def run_app( args ):
-    return 2
+    ## GUI
+    app = QApplication( sys.argv )
+    app.setApplicationName("RSSCast")
+    app.setOrganizationName("arnet")
+    ### app.setOrganizationDomain("www.my-org.com")
+    app.setQuitOnLastWindowClosed( False )
 
-#     ## GUI
-#     app = QApplication( sys.argv )
-#     app.setApplicationName("RSSCast")
-#     app.setOrganizationName("arnet")
-#     ### app.setOrganizationDomain("www.my-org.com")
-#     app.setQuitOnLastWindowClosed( False )
-#
-#     setup_interrupt_handling()
-#
-#     try:
-#         window = MainWindow()
-#         window.loadData()
-#         window.loadSettings()
-#
-#         if args.minimized is True or window.appSettings.startMinimized is True:
-#             ## starting minimized
-#             pass
-#         else:
-#             window.show()
-#
-#         exitCode = app.exec_()
-#
-#         if exitCode == 0:
-#             window.saveAll()
-#
-#         return exitCode
-#     except BaseException as e:
-#         QMessageBox.critical( None, AppWindow.appTitle, str(e) + "\n\nInvestigate application logs for details" )
-#         raise
+    setup_interrupt_handling()
+
+    try:
+        window = MainWindow()
+        window.loadData()
+        window.loadSettings()
+
+        if args.minimized is True or window.appSettings.startMinimized is True:
+            ## starting minimized
+            pass
+        else:
+            window.show()
+
+        exitCode = app.exec_()
+
+        if exitCode == 0:
+            window.saveAll()
+
+        return exitCode
+    except BaseException as e:
+        QMessageBox.critical( None, AppWindow.appTitle, str(e) + "\n\nInvestigate application logs for details" )
+        raise
 
 
 def create_parser( parser: argparse.ArgumentParser = None ):

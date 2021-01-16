@@ -20,10 +20,27 @@
       <property name="currentIndex">
        <number>0</number>
       </property>
-      <widget class="QWidget" name="statusTab">
+      <widget class="QWidget" name="serverTab">
        <attribute name="title">
-        <string>Status</string>
+        <string>Server</string>
        </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="ServerWidget" name="serverWidget" native="true"/>
+        </item>
+       </layout>
       </widget>
       <widget class="QWidget" name="feedTab">
        <attribute name="title">
@@ -226,6 +243,12 @@
    <class>FeedWidget</class>
    <extends>QWidget</extends>
    <header>rsscast.gui.widget.feedwidget</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ServerWidget</class>
+   <extends>QWidget</extends>
+   <header>rsscast.gui.widget.serverwidget</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

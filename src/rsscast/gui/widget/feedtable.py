@@ -31,8 +31,7 @@ from PyQt5.QtCore import QAbstractTableModel
 from PyQt5.QtWidgets import QTableView
 from PyQt5.QtGui import QColor
 
-from rsscast.gui.datatypes import WorkLogData, WorkLogEntry
-from rsscast.gui.dataobject import DataObject, create_entry_contextmenu
+from rsscast.gui.dataobject import DataObject, FeedContainer, FeedEntry
 
 from .. import guistate
 
@@ -42,9 +41,9 @@ _LOGGER = logging.getLogger(__name__)
 
 class FeedTableModel( QAbstractTableModel ):
 
-    def __init__(self, data: WorkLogData):
+    def __init__(self, data: FeedContainer):
         super().__init__()
-        self._rawData: WorkLogData = data
+        self._rawData: FeedContainer = data
 
     # pylint: disable=R0201
     def getItem(self, itemIndex: QModelIndex):
@@ -52,7 +51,7 @@ class FeedTableModel( QAbstractTableModel ):
             return itemIndex.internalPointer()
         return None
 
-    def setContent(self, data: WorkLogData):
+    def setContent(self, data: FeedContainer):
         self.beginResetModel()
         self._rawData = data
         self.endResetModel()
@@ -80,7 +79,7 @@ class FeedTableModel( QAbstractTableModel ):
     def index(self, row, column, parent: QModelIndex):
         if not self.hasIndex(row, column, parent):
             return QModelIndex()
-        entry = self._rawData.getEntry( row )
+        entry = self._rawData.get( row )
         return self.createIndex(row, column, entry)
 
     def data(self, index: QModelIndex, role=Qt.DisplayRole):
@@ -88,7 +87,7 @@ class FeedTableModel( QAbstractTableModel ):
             return None
 
         if role == Qt.DisplayRole:
-            entry = self._rawData.getEntry( index.row() )
+            entry = self._rawData.get( index.row() )
             rawData = self.attribute( entry, index.column() )
             if rawData is None:
                 return "-"
@@ -102,12 +101,12 @@ class FeedTableModel( QAbstractTableModel ):
             return strData
 
         if role == Qt.UserRole:
-            entry = self._rawData.getEntry( index.row() )
+            entry = self._rawData.get( index.row() )
             rawData = self.attribute( entry, index.column() )
             return rawData
 
         if role == Qt.EditRole:
-            entry = self._rawData.getEntry( index.row() )
+            entry = self._rawData.get( index.row() )
             rawData = self.attribute( entry, index.column() )
             return rawData
 
@@ -115,20 +114,6 @@ class FeedTableModel( QAbstractTableModel ):
             if index.column() == 4:
                 return Qt.AlignLeft | Qt.AlignVCenter
             return Qt.AlignHCenter | Qt.AlignVCenter
-
-#         if role == Qt.ForegroundRole:
-#             entry = self._rawData.getEntry( index.row() )
-#             return get_entry_fgcolor( entry )
-
-        if role == Qt.BackgroundRole:
-            colorIndex = self._getBGColorIndex( index.row() )
-            if colorIndex == 0:
-                return QColor( "#FFCC00" )
-            if colorIndex == 1:
-                return QColor( "#F7C200" )
-            if colorIndex == 2:
-                return QColor( "white" )
-            return QColor( "#F7F5F3" )
 
         return None
 
@@ -151,123 +136,18 @@ class FeedTableModel( QAbstractTableModel ):
                 return index
         return None
 
-    def attribute(self, entry: WorkLogEntry, index):
+    def attribute(self, entry: FeedEntry, index):
         if index == 0:
-            return entry.startTime
+            return entry.feedName
         elif index == 1:
-            return entry.endTime
+            return entry.feedId
         elif index == 2:
-            return entry.getDuration()
-        elif index == 3:
-            return entry.work
-        elif index == 4:
-            return entry.description
+            return entry.url
         return None
 
     @staticmethod
     def attributeLabels():
-        return ( "Start time", "End time", "Duration", "Work", "Description" )
-    
-    ## 0 -- weekend 1
-    ## 1 -- weekend 2
-    ## 2 -- white
-    ## 3 -- gray
-    def _getBGColorIndex(self, rowIndex):
-        entry = self._rawData.getEntry( rowIndex )
-        weekday = entry.startTime.weekday()
-        if weekday == 5:
-            return 0
-        if weekday == 6:
-            return 1
-        if rowIndex == 0:
-            ## first row
-            return 2
-        
-        prevColorIndex = self._getBGColorIndex( rowIndex - 1 )
-        
-        entryDays     = (entry.startTime - datetime(1970,1,1)).days
-        prevEntry     = self._rawData.getEntry( rowIndex - 1 )
-        prevEntryDays = (prevEntry.startTime - datetime(1970,1,1)).days
-        
-        if entryDays == prevEntryDays:
-            ## the same day -- the same color
-            return prevColorIndex
-        
-        ## other day -- other color
-        if prevColorIndex == 2:
-            return 3
-        return 2
-
-
-## ===========================================================
-
-
-class FeedSortFilterProxyModel( QtCore.QSortFilterProxyModel ):
-
-    def __init__(self, parentObject=None):
-        super().__init__(parentObject)
-        self._monthDate = None
-        self._workOnly  = False
-
-    @property
-    def monthDate(self) -> date:
-        return self._monthDate
-
-    @monthDate.setter
-    def monthDate(self, newValue: date):
-        self._monthDate = date( year=newValue.year, month=newValue.month, day=1 )
-        self.invalidateFilter()
-
-    @property
-    def workOnly(self):
-        return self._workOnly
-
-    @workOnly.setter
-    def workOnly(self, newValue):
-        self._workOnly = newValue
-        self.invalidateFilter()
-
-    def setMonth(self, year: int, month: int):
-        self.monthDate = date( year=year, month=month, day=1 )
-
-    def filterAcceptsRow(self, sourceRow, sourceParent: QModelIndex):
-        if self._workOnly:
-            workIndex = self.sourceModel().index( sourceRow, 3, sourceParent )
-            workState = self.sourceModel().data(workIndex, QtCore.Qt.EditRole)
-            if workState is False:
-                return False
-
-        startIndex = self.sourceModel().index( sourceRow, 0, sourceParent )
-        endIndex   = self.sourceModel().index( sourceRow, 1, sourceParent )
-        startData = self.sourceModel().data(startIndex, QtCore.Qt.EditRole)
-        endData   = self.sourceModel().data(endIndex, QtCore.Qt.EditRole)
-        if startData is None or endData is None:
-            return True
-
-        if self._monthDate is None:
-            return True
-
-        if endData > startData:
-            if startData.year > self._monthDate.year or endData.year < self._monthDate.year:
-                return False
-            if startData.year == self._monthDate.year:
-                if startData.month > self._monthDate.month:
-                    return False
-            if endData.year == self._monthDate.year:
-                if endData.month < self._monthDate.month:
-                    return False
-        else:
-            ## negative duration case
-            if startData.year < self._monthDate.year or endData.year > self._monthDate.year:
-                return False
-            if startData.year == self._monthDate.year:
-                if startData.month < self._monthDate.month:
-                    return False
-            if endData.year == self._monthDate.year:
-                if endData.month > self._monthDate.month:
-                    return False
-
-        return True
+        return ( "Name" ,"Id", "URL" )
 
 
 ## ===========================================================
@@ -275,7 +155,7 @@ class FeedSortFilterProxyModel( QtCore.QSortFilterProxyModel ):
 
 class FeedTable( QTableView ):
 
-    selectedItem    = pyqtSignal( WorkLogEntry )
+    selectedItem    = pyqtSignal( FeedEntry )
     itemUnselected  = pyqtSignal()
 
     def __init__(self, parentWidget=None):
@@ -297,18 +177,9 @@ class FeedTable( QTableView ):
         self.verticalHeader().hide()
 
         self.dataModel = FeedTableModel( None )
-        self.proxyModel = FeedSortFilterProxyModel(self)
+        self.proxyModel = QtCore.QSortFilterProxyModel(self)
         self.proxyModel.setSourceModel( self.dataModel )
         self.setModel( self.proxyModel )
-
-    def getMonth(self):
-        return self.proxyModel.monthDate
-
-    def setMonth(self, year: int, month: int):
-        self.proxyModel.setMonth( year, month )
-
-    def filterWorkEntries(self, showWorkOnly):
-        self.proxyModel.workOnly = showWorkOnly
 
     def loadSettings(self, settings):
         wkey = guistate.get_widget_key(self, "tablesettings")
@@ -327,16 +198,16 @@ class FeedTable( QTableView ):
 
     def connectData(self, dataObject: DataObject ):
         self.dataObject = dataObject
-        self.dataObject.entryChanged.connect( self.refreshData )
+        self.dataObject.feedChanged.connect( self.refreshData )
         self.refreshData()
 
     def refreshData(self):
-        history: WorkLogData = self.dataObject.history
-        self.dataModel.setContent( history )
+        feed: FeedContainer = self.dataObject.feed
+        self.dataModel.setContent( feed )
         self.clearSelection()
 #         _LOGGER.debug( "entries: %s\n%s", type(history), history.printData() )
 
-    def refreshEntry(self, entry: WorkLogEntry=None):
+    def refreshEntry(self, entry: FeedEntry=None):
         if entry is None:
             ## unable to refresh entry row -- refresh whole model
             self.refreshData()
@@ -353,25 +224,44 @@ class FeedTable( QTableView ):
             return
         self.proxyModel.dataChanged.emit( taskIndex, lastColIndex )
 
-    def getIndex(self, entry: WorkLogEntry, column: int = 0):
+    def getIndex(self, entry: FeedEntry, column: int = 0):
         modelIndex = self.dataModel.getIndex( entry, column=column )
         if modelIndex is None:
             return None
         proxyIndex = self.proxyModel.mapFromSource( modelIndex )
         return proxyIndex
 
-    def getItem(self, itemIndex: QModelIndex ) -> WorkLogEntry:
+    def getItem(self, itemIndex: QModelIndex ) -> FeedEntry:
         sourceIndex = self.proxyModel.mapToSource( itemIndex )
         return self.dataModel.getItem( sourceIndex )
 
     def contextMenuEvent( self, event ):
         evPos               = event.pos()
-        entry: WorkLogEntry = None
+        entry: FeedEntry = None
         mIndex = self.indexAt( evPos )
         if mIndex is not None:
             entry = self.getItem( mIndex )
 
-        create_entry_contextmenu( self, self.dataObject, entry )
+#         create_entry_contextmenu( self, self.dataObject, entry )
+
+        contextMenu      = QtWidgets.QMenu( self )
+        addAction        = contextMenu.addAction("Add Entry")
+        editAction       = contextMenu.addAction("Edit Entry")
+        removeAction     = contextMenu.addAction("Remove Entry")
+
+        if entry is None:
+            editAction.setEnabled( False )
+            removeAction.setEnabled( False )
+
+        globalPos = QtGui.QCursor.pos()
+        action = contextMenu.exec_( globalPos )
+    
+#         if action == addAction:
+#             self.dataObject.addEntryNew( addEntry )
+#         elif action == editAction:
+#             dataObject.editEntry( editEntry )
+#         elif action == removeAction:
+#             dataObject.removeEntry( editEntry )
 
     def currentChanged(self, current, previous):
         super().currentChanged( current, previous )
@@ -383,7 +273,7 @@ class FeedTable( QTableView ):
 
     def mouseDoubleClickEvent( self, event ):
         evPos               = event.pos()
-        entry: WorkLogEntry = None
+        entry: FeedEntry = None
         mIndex = self.indexAt( evPos )
         if mIndex is not None:
             entry = self.getItem( mIndex )

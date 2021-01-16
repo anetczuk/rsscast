@@ -120,3 +120,17 @@ class EmptyLineFormatter(logging.Formatter):
             # empty
             return msg
         return super().format( record )
+
+
+def get_all_loggers():
+    loggers = [logging.getLogger(name) for name in logging.root.manager.loggerDict]
+    return loggers
+
+
+def get_all_handlers():
+    handlers = []
+    handlers.append( logging.root.handlers )
+    for name in logging.root.manager.loggerDict:
+        loggerObj = logging.getLogger(name)
+        handlers.append( loggerObj.handlers )
+    return handlers

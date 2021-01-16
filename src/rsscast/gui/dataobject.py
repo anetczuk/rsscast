@@ -58,10 +58,12 @@ _LOGGER = logging.getLogger(__name__)
 
 
 
-class FeedData():
+class FeedEntry():
 
     def __init__(self):
-        pass
+        self.feedName = None
+        self.feedId   = None
+        self.url      = None
 
 
 class FeedContainer( persist.Versionable ):
@@ -70,7 +72,7 @@ class FeedContainer( persist.Versionable ):
     _class_version = 0
 
     def __init__(self):
-        self.feedList: List[  FeedData ] = []
+        self.feedList: List[  FeedEntry ] = []
 
     def _convertstate_(self, dict_, dictVersion_ ):
         _LOGGER.info( "converting object from version %s to %s", dictVersion_, self._class_version )
@@ -88,6 +90,22 @@ class FeedContainer( persist.Versionable ):
 
         # pylint: disable=W0201
         self.__dict__ = dict_
+
+    def size(self):
+        return len( self.feedList )
+
+    def get(self, index):
+        return self.feedList[ index ]
+    
+    def getList(self):
+        return self.feedList
+
+    def addFeed(self, feedName: str, feedId: str, feedUrl: str):
+        feed = FeedEntry()
+        feed.feedName = feedName
+        feed.feedId = feedId
+        feed.url = feedUrl
+        self.feedList.append( feed )
 
 
 class UserContainer():
@@ -145,7 +163,7 @@ class UserContainer():
 
 class DataObject( QObject ):
 
-#     walletDataChanged   = pyqtSignal()
+    feedChanged = pyqtSignal()
 
     def __init__(self, parent: QWidget=None):
         super().__init__( parent )
@@ -170,3 +188,11 @@ class DataObject( QObject ):
     @notes.setter
     def notes(self, newData: Dict[str, str]):
         self.userContainer.notes = newData
+
+    @property
+    def feed(self) -> FeedContainer:
+        return self.userContainer.feed
+
+    def addFeed(self, feedName: str, feedId: str, feedUrl: str):
+        self.userContainer.feed.addFeed( feedName, feedId, feedUrl )
+        self.feedChanged.emit()

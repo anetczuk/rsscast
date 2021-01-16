@@ -22,38 +22,20 @@
 #
 
 import os
-import logging
-
-from PyQt5 import QtCore
-from PyQt5.QtCore import pyqtSignal
-
-from rsscast.gui.dataobject import DataObject
-
-from .. import uiloader
 
 
-UiTargetClass, QtBaseClass = uiloader.load_ui_from_class_name( __file__ )
+script_dir = os.path.dirname(__file__)
 
 
-_LOGGER = logging.getLogger(__name__)
+def get_data_root_path() -> str:
+    return script_dir
 
 
-class FeedWidget( QtBaseClass ):           # type: ignore
+def get_data_path( fileName: str ) -> str:
+    return os.path.join( script_dir, fileName )
 
-#     fileChanged   = pyqtSignal()
 
-    def __init__(self, parentWidget=None):
-        super().__init__(parentWidget)
-        self.ui = UiTargetClass()
-        self.ui.setupUi(self)
-        
-#         self.dataObject = None
-
-    def connectData(self, dataObject: DataObject):
-        self.ui.feedTableView.connectData( dataObject )
-#         self.dataObject = dataObject
-#         self.dataObject.feedChanged.connect( self.refreshList )
-#         self.refreshList()
-
-#     def refreshList(self):
-#         pass
+def read_data( fileName: str ) -> str:
+    filePath = get_data_path( fileName )
+    with open(filePath, 'r') as file:
+        return file.read()

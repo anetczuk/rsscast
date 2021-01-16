@@ -2,7 +2,7 @@
 #
 # MIT License
 #
-# Copyright (c) 2020 Arkadiusz Netczuk <dev.arnet@gmail.com>
+# Copyright (c) 2021 Arkadiusz Netczuk <dev.arnet@gmail.com>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -37,11 +37,18 @@ import sys
 import logging
 import argparse
 
-from PyQt5.QtWidgets import QApplication
-
 import rsscast.logger as logger
-from rsscast.gui.sigint import setup_interrupt_handling
-from rsscast.gui.mainwindow import MainWindow
+
+# from PyQt5.QtWidgets import QApplication
+
+from rsscast.rss.rssserver import generate_feed, start_server
+
+# from rsscast.rss.rssclient import read_rss, parse_rss
+
+from testrsscast.data import get_data_path, read_data
+
+# from stockmonitor.gui.sigint import setup_interrupt_handling
+# from stockmonitor.gui.mainwindow import MainWindow
 
 
 ## ============================= main section ===================================
@@ -52,52 +59,23 @@ if __name__ != '__main__':
 
 
 parser = argparse.ArgumentParser(description='RSS Cast Example')
-parser.add_argument('-lud', '--loadUserData', action='store_const', const=True, default=False, help='Load user data' )
-parser.add_argument('--minimized', action='store_const', const=True, default=False, help='Start minimized' )
+# parser.add_argument('-lud', '--loadUserData', action='store_const', const=True, default=False, help='Load user data' )
+# parser.add_argument('--minimized', action='store_const', const=True, default=False, help='Start minimized' )
 
 args = parser.parse_args()
 
 
-logFile = logger.get_logging_output_file()
-logger.configure( logFile )
+# logFile = logger.get_logging_output_file()
+# logger.configure( logFile )
+logger.configure_console()
 
 _LOGGER = logging.getLogger(__name__)
 
+# print( "handlers: ", logger.get_all_handlers() )
 
-_LOGGER.debug( "Starting the application" )
+# fileContent = read_data( "yt_scifun.rss" )
+# fileContent = read_data( "yt_konfederacja.rss" )
 
+start_server()
 
-app = QApplication(sys.argv)
-app.setApplicationName("RSSCast")
-app.setOrganizationName("arnet")
-app.setQuitOnLastWindowClosed( False )
-
-setup_interrupt_handling()
-
-window = MainWindow()
-window.setWindowTitleSuffix( "Preview" )
-window.disableSaving()
-window.setWindowTitle( window.windowTitle() )
-
-if args.loadUserData:
-    window.loadData()
-else:
-    window.data.addFeed( "Youtube Latino", "xxx", "https://www.youtube.com/feeds/videos.xml?channel_id=UCBrGE6cmFbcwzlwAyIDMGpw" )
-
-window.loadSettings()
-window.startServer()
-window.refreshView()
-
-window.show()
-# if args.minimized is True or window.appSettings.startMinimized is True:
-#     ## starting minimized
-#     pass
-# else:
-#     window.show()
-
-exitCode = app.exec_()
-
-if exitCode == 0:
-    window.saveSettings()
-
-sys.exit( exitCode )
+# generate_feed()

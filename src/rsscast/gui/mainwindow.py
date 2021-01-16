@@ -39,6 +39,7 @@ from . import guistate
 from .dataobject import DataObject
 
 from .widget.settingsdialog import SettingsDialog, AppSettings
+from rsscast.gui import sigint
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -92,6 +93,7 @@ class MainWindow( QtBaseClass ):           # type: ignore
         self.trayIcon = trayicon.TrayIcon(self)
         self._setIconTheme( trayicon.TrayIconTheme.WHITE )
 
+        self.ui.serverWidget.connectData( self.data )
         self.ui.feedWidget.connectData( self.data )
 
         ## ================== connecting signals ==================
@@ -109,6 +111,8 @@ class MainWindow( QtBaseClass ):           # type: ignore
         self.setWindowTitle()
 
         self.setStatusMessage( "Ready", timeout=10000 )
+        
+        sigint.add_interrupt_handling( self.close_handler )
 
     def loadData(self):
         """Load user related data (e.g. favs, notes)."""
@@ -147,6 +151,12 @@ class MainWindow( QtBaseClass ):           # type: ignore
         settingsDir = settingsDir[0:-4]       ## remove extension
         settingsDir += "-data"
         return settingsDir
+    
+    def startServer(self):
+        self.ui.serverWidget.startServer()
+    
+    def stopServer(self):
+        self.ui.serverWidget.stopServer()
 
     ## ====================================================================
 
@@ -260,6 +270,10 @@ class MainWindow( QtBaseClass ):           # type: ignore
         _LOGGER.info("saving application state")
         self.saveSettings()
         self.saveData()
+        
+    #def close_handler(self, signum, frame):
+    def close_handler( self, *arg ):
+        self.stopServer()
 
     ## ====================================================================
 
