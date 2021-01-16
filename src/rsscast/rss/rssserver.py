@@ -33,6 +33,7 @@ from rsscast.synchronized import synchronized
 from rsscast.gui.dataobject import DataObject, FeedEntry
 from typing import List
 import requests
+import requests_file
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -108,6 +109,7 @@ class RSSRequestHandler(BaseHTTPRequestHandler):
 
         _LOGGER.info( "reading %s", feed.url )
         session = requests.Session()
+        session.mount( 'file://', requests_file.FileAdapter() )
 #     session.config['keep_alive'] = False
 #     response = requests.get( urlpath, timeout=5 )
         response = session.get( feed.url, timeout=5 )

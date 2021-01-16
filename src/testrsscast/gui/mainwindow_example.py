@@ -82,7 +82,8 @@ window.setWindowTitle( window.windowTitle() )
 if args.loadUserData:
     window.loadData()
 else:
-    window.data.addFeed( "Youtube Latino", "xxx", "https://www.youtube.com/feeds/videos.xml?channel_id=UCBrGE6cmFbcwzlwAyIDMGpw" )
+    window.data.addFeed( "Youtube Latino Short", "xxx", "file:///media/hdd-stuff/home/bob/Stuff/python/rsscast/src/testrsscast/data/yt_latino_short.rss" )
+    window.data.addFeed( "Youtube Latino", "yyy", "https://www.youtube.com/feeds/videos.xml?channel_id=UCBrGE6cmFbcwzlwAyIDMGpw" )
 
 window.loadSettings()
 window.startServer()
