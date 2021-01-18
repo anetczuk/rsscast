@@ -28,12 +28,59 @@ import pycurl
 from io import BytesIO
 from urllib.parse import urlencode
 import json
+# import youtube_dl
 
 
 _LOGGER = logging.getLogger(__name__)
 
 
 def convert_yt( link, output, mimicHuman=True ):
+#     return convert_yt_dwnldr( link, output )
+    return convert_yt_yt1s( link, output, mimicHuman )
+    
+      
+## ===================================================================
+
+
+def convert_yt_dwnldr( link, output, mimicHuman=True ):
+#     ydl_opts = {
+#         'format': 'bestaudio/best',
+#         'postprocessors': [{
+#             'key': 'FFmpegExtractAudio',
+#             'preferredcodec': 'mp3',
+#             'preferredquality': '192',
+#         }],
+#     }
+#     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+#         ydl.download( ['https://www.youtube.com/watch?v=BaW_jenozKc'] )
+    
+    
+    ydl_opts = {}
+    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+        ydl.download( [link] )
+        
+        
+#     ydl = youtube_dl.YoutubeDL({'outtmpl': '%(id)s.%(ext)s'})
+#     
+#     with ydl:
+#         result = ydl.extract_info( link )
+#     
+#     if 'entries' in result:
+#         # Can be a playlist or a list of videos
+#         video = result['entries'][0]
+#     else:
+#         # Just a video
+#         video = result
+#     
+#     print(video)
+#     video_url = video['url']
+#     print(video_url)
+
+
+## ===================================================================
+    
+    
+def convert_yt_yt1s( link, output, mimicHuman=True ):
     _LOGGER.info( "converting video: %s to %s", link, output )
 
     dataBuffer = BytesIO()
