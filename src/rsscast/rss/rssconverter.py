@@ -45,6 +45,9 @@ _LOGGER = logging.getLogger(__name__)
 def convert_rss( host, feedId, feedUrl ):
     _LOGGER.info( "feed %s: reading url %s", feedId, feedUrl )
     content = read_url( feedUrl )
+    channelPath = get_channel_output_dir( feedId )
+    sourceRSS = os.path.abspath( os.path.join(channelPath, "source.rss") )
+    write_text( content, sourceRSS )
     convert_rss_content( host, feedId, content )
     
     
@@ -59,8 +62,7 @@ def convert_rss_content( host, feedId, feedContent ):
     feedId = feedId.replace(":", "_")
     feedId = re.sub( r"\s+", "", feedId )
     
-    channelPath = os.path.abspath( os.path.join(DATA_DIR, "feed", feedId) )
-    os.makedirs( channelPath, exist_ok=True )
+    channelPath = get_channel_output_dir( feedId )
     
     items_result = ""
     for post in parsedDict.entries:
@@ -72,9 +74,14 @@ def convert_rss_content( host, feedId, feedContent ):
         postLink = post['link']
         postLocalPath = "%s/%s.mp3" % ( channelPath, videoId )
         enclosureURL  = "http://%s/feed/%s/%s.mp3" % ( host, feedId, videoId )      ## must have absolute path
+        postTitle = post['title']
         
         if not os.path.exists(postLocalPath):
-            convert_yt( postLink, postLocalPath )
+            converted = convert_yt( postLink, postLocalPath )
+            if converted is False:
+                ## skip elements that failed to convert
+                _LOGGER.info( "feed %s: unable to convert video '%s' -- skipped", feedId, postTitle )
+                continue
         else:
             _LOGGER.info( "feed %s: local conversion of %s found in %s", feedId, postLink, postLocalPath )
         
@@ -88,7 +95,7 @@ def convert_rss_content( host, feedId, feedContent ):
         
         item_result = f"""
         <item>
-            <title>{post['title']}</title>
+            <title>{postTitle}</title>
             <link>{post['link']}</link>
             <pubDate>{post['published']}</pubDate>
             <guid>{post['id']}</guid>
@@ -133,5 +140,15 @@ def convert_rss_content( host, feedId, feedContent ):
 
     rssOutput = "%s/rss" % channelPath
     _LOGGER.info( "feed %s: writing converted rss output to %s", feedId, rssOutput )
-    with open(rssOutput, 'wt') as fp:
-        fp.write( result )
+    write_text( result, rssOutput )
+
+
+def get_channel_output_dir( feedId ):
+    channelPath = os.path.abspath( os.path.join(DATA_DIR, "feed", feedId) )
+    os.makedirs( channelPath, exist_ok=True )
+    return channelPath
+
+
+def write_text( content, outputPath ):
+    with open( outputPath, 'wt' ) as fp:
+        fp.write( content )
