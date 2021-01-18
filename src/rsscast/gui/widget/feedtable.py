@@ -110,10 +110,10 @@ class FeedTableModel( QAbstractTableModel ):
             rawData = self.attribute( entry, index.column() )
             return rawData
 
-        if role == Qt.TextAlignmentRole:
-            if index.column() == 4:
-                return Qt.AlignLeft | Qt.AlignVCenter
-            return Qt.AlignHCenter | Qt.AlignVCenter
+#         if role == Qt.TextAlignmentRole:
+#             if index.column() == 4:
+#                 return Qt.AlignLeft | Qt.AlignVCenter
+#             return Qt.AlignHCenter | Qt.AlignVCenter
 
         return None
 
