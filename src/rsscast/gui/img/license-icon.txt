@@ -1,0 +1,4 @@
+Icon taken from:
+https://commons.wikimedia.org/wiki/File:Generic_Feed-icon.svg
+
+Published under Mozilla's MPL / GPL / LGPL tri-license.

@@ -33,7 +33,7 @@ from .. import trayicon
 class AppSettings():
 
     def __init__(self):
-        self.trayIcon = trayicon.TrayIconTheme.WHITE
+        self.trayIcon = trayicon.TrayIconTheme.ORANGE
         self.startMinimized = False
 
     def loadSettings(self, settings):
@@ -42,7 +42,7 @@ class AppSettings():
         trayName = settings.value("trayIcon", None, type=str)
         self.trayIcon = trayicon.TrayIconTheme.findByName( trayName )
         if self.trayIcon is None:
-            self.trayIcon = trayicon.TrayIconTheme.WHITE
+            self.trayIcon = trayicon.TrayIconTheme.ORANGE
 
         self.startMinimized = settings.value("startMinimized", None, type=bool)
         if self.startMinimized is None:

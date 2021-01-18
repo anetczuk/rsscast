@@ -93,7 +93,7 @@ class MainWindow( QtBaseClass ):           # type: ignore
         ## =============================================================
 
         self.trayIcon = trayicon.TrayIcon(self)
-        self._setIconTheme( trayicon.TrayIconTheme.WHITE )
+        self._setIconTheme( trayicon.TrayIconTheme.ORANGE )
 
         self.ui.serverWidget.connectData( self.data )
         self.ui.feedWidget.connectData( self.data )
@@ -108,7 +108,7 @@ class MainWindow( QtBaseClass ):           # type: ignore
         #qApp.aboutToQuit.connect( self.saveOnQuit )
 
 #         self.applySettings()
-#         self.trayIcon.show()
+        self.trayIcon.show()
 
         self.setWindowTitle()
 

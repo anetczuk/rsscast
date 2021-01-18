@@ -36,8 +36,9 @@ _LOGGER = logging.getLogger(__name__)
 
 @unique
 class TrayIconTheme(Enum):
-    WHITE         = ('feed-white.png')
-    BLACK         = ('feed-black.png')
+    ORANGE        = ( 'rss-icon-orange.png', 'rss-icon-gray.png' )
+    BLACK         = ( 'rss-icon-black.png', 'rss-icon-gray.png' )
+    WHITE         = ( 'rss-icon-white.png', 'rss-icon-white-gray.png' )
 
     @classmethod
     def findByName(cls, name):
@@ -61,6 +62,7 @@ class TrayIconTheme(Enum):
 def load_main_icon( theme: TrayIconTheme ):
     fileName = theme.value[0]
     iconPath = resources.get_image_path( fileName )
+#     _LOGGER.info( "opening icon: %s", iconPath )
     return QIcon( iconPath )
 
 
