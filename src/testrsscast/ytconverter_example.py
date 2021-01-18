@@ -34,99 +34,24 @@ except ImportError as error:
     pass
 
 import sys
-import logging
 import argparse
 
-# from PyQt5.QtWidgets import QApplication
-
 import rsscast.logger as logger
+from rsscast.rss.ytconverter import convert_yt
 
-from rsscast.ytconverter import convert_yt
-
-# from rsscast.rss.rssclient import read_rss, parse_rss
-# 
-# from testrsscast.data import get_data_path, read_data
-
-# from stockmonitor.gui.sigint import setup_interrupt_handling
-# from stockmonitor.gui.mainwindow import MainWindow
-
-
-## ============================= main section ===================================
-# curl 'https://www.go-mp3.com/en2?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DpLcg_SXWTv4'
 
 if __name__ != '__main__':
     sys.exit(0)
 
 
-parser = argparse.ArgumentParser(description='RSS Cast Example')
-# parser.add_argument('-lud', '--loadUserData', action='store_const', const=True, default=False, help='Load user data' )
-# parser.add_argument('--minimized', action='store_const', const=True, default=False, help='Start minimized' )
+parser = argparse.ArgumentParser(description='YouTube convert example')
 
 args = parser.parse_args()
 
 
-# logFile = logger.get_logging_output_file()
-# logger.configure( logFile )
 logger.configure_console()
 
-_LOGGER = logging.getLogger(__name__)
 
+converted = convert_yt( "https://www.youtube.com/watch?v=BLRUiVXeZKU", "/tmp/yt_example.mp3" )
 
-# convert_yt( "https://www.youtube.com/watch?v=pLcg_SXWTv4", "/tmp/xxx.mp3" )
-convert_yt( "https://www.youtube.com/watch?v=QW2_1McgKiw", "/tmp/xxx2.mp3" )
-
-# fileContent = read_data( "yt_scifun.rss" )
-# # fileContent = read_data( "yt_konfederacja.rss" )
-# parse_rss( fileContent )
-
-
-
-#         read_rss( "https://www.youtube.com/feeds/videos.xml?channel_id=UCbbz3_jH582xS93hxszPvjQ" )
-
-# read_rss( "http://www.youtube.com/feeds/videos.xml?user=TheNWOChannelTV" )
-
-# read_rss( "http://rss.cnn.com/rss/edition.rss" )
-#         read_rss( "https://blogs.nasa.gov/stationreport/feed/" )
-
-# read_rss( "http://www.google.pl" )
-# read_rss( "http://www.onet.pl" )
-#         read_rss( 'https://www.nasa.gov/rss/dyn/lg_image_of_the_day.rss' )
-
-
-# _LOGGER.debug( "Starting the application" )
-# 
-# 
-# app = QApplication(sys.argv)
-# app.setApplicationName("StockMonitor")
-# app.setOrganizationName("arnet")
-# app.setQuitOnLastWindowClosed( False )
-# 
-# setup_interrupt_handling()
-# 
-# window = MainWindow()
-# window.setWindowTitleSuffix( "Preview" )
-# window.disableSaving()
-# window.setWindowTitle( window.windowTitle() )
-# if args.loadUserData:
-#     window.loadData()
-# else:
-#     window.data.addFav("abc", ["ALR"])
-#     window.data.addFav("abc", ["CDR"])
-#     window.data.wallet.add("CDR", 10, 300)
-#     window.data.wallet.add("XXX", 10, 300)
-# window.loadSettings()
-# window.refreshView()
-# 
-# window.show()
-# # if args.minimized is True or window.appSettings.startMinimized is True:
-# #     ## starting minimized
-# #     pass
-# # else:
-# #     window.show()
-# 
-# exitCode = app.exec_()
-# 
-# if exitCode == 0:
-#     window.saveSettings()
-# 
-# sys.exit( exitCode )
+print("converted:", converted)
