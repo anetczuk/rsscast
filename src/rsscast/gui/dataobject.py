@@ -21,8 +21,9 @@
 # SOFTWARE.
 #
 
+import os
 import logging
-from typing import Dict
+from typing import Dict, List
 import glob
 
 from datetime import datetime
@@ -55,7 +56,6 @@ from rsscast import persist
 
 
 _LOGGER = logging.getLogger(__name__)
-
 
 
 class FeedEntry():
@@ -97,7 +97,7 @@ class FeedContainer( persist.Versionable ):
     def get(self, index):
         return self.feedList[ index ]
     
-    def getList(self):
+    def getList(self) -> List[  FeedEntry ]:
         return self.feedList
 
     def addFeed(self, feedName: str, feedId: str, feedUrl: str):

@@ -7,3 +7,8 @@ Convert (forward) Youtube RSS channels to podcast RSS.
 
 - YouCast
 - podsync
+
+
+## References:
+
+- https://www.rssboard.org/rss-profile

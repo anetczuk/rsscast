@@ -42,6 +42,7 @@ from PyQt5.QtWidgets import QApplication
 import rsscast.logger as logger
 from rsscast.gui.sigint import setup_interrupt_handling
 from rsscast.gui.mainwindow import MainWindow
+from testrsscast.data import get_data_path
 
 
 ## ============================= main section ===================================
@@ -82,8 +83,9 @@ window.setWindowTitle( window.windowTitle() )
 if args.loadUserData:
     window.loadData()
 else:
-    window.data.addFeed( "Youtube Latino Short", "xxx", "file:///media/hdd-stuff/home/bob/Stuff/python/rsscast/src/testrsscast/data/yt_latino_short.rss" )
-    window.data.addFeed( "Youtube Latino", "yyy", "https://www.youtube.com/feeds/videos.xml?channel_id=UCBrGE6cmFbcwzlwAyIDMGpw" )
+    ytLatinoPath = "file://" + get_data_path( "yt_latino_short.rss" )
+    window.data.addFeed( "Youtube Latino Short", "test/xxx", ytLatinoPath )
+    window.data.addFeed( "Konfederacja TV", "konfederacja", "http://www.youtube.com/feeds/videos.xml?user=TheNWOChannelTV" )
 
 window.loadSettings()
 window.startServer()

@@ -121,7 +121,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="stockRefreshPB">
+       <widget class="QPushButton" name="refreshPB">
         <property name="text">
          <string>Refresh</string>
         </property>

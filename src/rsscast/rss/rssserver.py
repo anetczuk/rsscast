@@ -27,132 +27,45 @@ import threading
 
 from feedgen.feed import FeedGenerator
 import socketserver
-from http.server import BaseHTTPRequestHandler
+from http.server import BaseHTTPRequestHandler, SimpleHTTPRequestHandler
 
 from rsscast.synchronized import synchronized
-from rsscast.gui.dataobject import DataObject, FeedEntry
 from typing import List
 import requests
 import requests_file
+from rsscast.rss.rssconverter import convert_rss
+import posixpath
+import urllib.parse
+import os
+import socket
 
 
 _LOGGER = logging.getLogger(__name__)
 
 
-class RSSRequestHandler(BaseHTTPRequestHandler):
 
-    def do_GET(self):
-        _LOGGER.info( "request line: %s command: %s path: %s address: %s", self.requestline, self.command, self.path, self.address_string() )
-        self._handlePath()
+## implementation allows to pass custom base path
+class RootedHTTPRequestHandler(SimpleHTTPRequestHandler):
 
-    def do_HEAD(self):
-        self._set_headers()
-
-    def do_POST(self):
-        # Doesn't do anything with posted data
-        self._handlePath()
-
-    def _set_headers(self):
-        self.send_response(200)
-        self.send_header("Content-type", "text/html")
-        self.end_headers()
+    def translate_path(self, path):
+        base_path = self.server.base_path
+        if base_path is None:
+            ## no base path given -- standard implementation
+            return super().translate_path( path )
         
-    ## =====================================================================
-
-    def _handlePath( self ):
-        #  os.path.splitext(path)
-        if self.path == "/":
-            self._listContent()
-            return
-        if self.path.startswith( "/feed/" ):
-            subPath = self.path[ 6: ]
-            self._feed( subPath )
-            return
-        
-        self._respond404()
-
-    def _listContent(self):
-        _LOGGER.info( "listing table of content" )
-        
-        self._set_headers()
-        
-        entriesContent = ""
-        feedList = self.getFeedList()
-        if not feedList:
-            entriesContent = "no entries"
-        else:
-            for feed in feedList:
-                entriesContent += "<a href='feed/%s'>%s</a></br>" % ( feed.feedId, feed.feedName )
-
-        content = f"""<html>
-    <body>
-{entriesContent}
-    </body>
-</html>
-"""
-        encoded = content.encode("utf8")                                # NOTE: must return a bytes object!
-        self.wfile.write( encoded )
-    
-    def _feed(self, subPath):
-        """This just generates an HTML document that includes `message`
-        in the body. Override, or re-write this do do more interesting stuff.
-        """
-        
-        feed = self.getFeed( subPath )
-        if not feed:
-            self._respond404()
-            return
-        
-        _LOGGER.info( "generating feed for %s", feed.feedId )
-        
-        self._set_headers()
-
-        _LOGGER.info( "reading %s", feed.url )
-        session = requests.Session()
-        session.mount( 'file://', requests_file.FileAdapter() )
-#     session.config['keep_alive'] = False
-#     response = requests.get( urlpath, timeout=5 )
-        response = session.get( feed.url, timeout=5 )
-        self._writeString( response.text )
-
-    def getFeed(self, subPath) -> FeedEntry:
-        feedList = self.getFeedList()
-        if not feedList:
-            return None
-        
-        for feed in feedList:
-            if feed.feedId == subPath:
-                return feed
-        return None
-
-    def getFeedList(self) -> List[ FeedEntry ]:
-        data = self.server.dataObject
-        if data is None:
-            return []
-        return data.feed.getList()
-    
-    def _respond404(self):
-        self.send_response(404)
-        self.send_header("Content-type", "text/html")
-        self.end_headers()
-        
-        content = f"""<html>
-    <body>
-        404 resource not found
-    </body>
-</html>
-"""
-        self._writeString( content )
-    
-    def _writeString(self, content):
-        encoded = content.encode("utf8")                                # NOTE: must return a bytes object!
-        self.wfile.write( encoded )
-
-    ## =====================================================================
-
-    def log_message(self, format, *args):
-        ## prevent logging
-        return
+        path = posixpath.normpath(urllib.parse.unquote(path))
+        words = path.split('/')
+        words = filter(None, words)
+        path = base_path
+        for word in words:
+            _, word = os.path.splitdrive(word)
+#             drive, word = os.path.splitdrive(word)
+            _, word = os.path.split(word)
+#             head, word = os.path.split(word)
+            if word in (os.curdir, os.pardir):
+                continue
+            path = os.path.join(path, word)
+        return path
 
 
 ## ======================================================
@@ -162,7 +75,7 @@ class RSSServer( socketserver.TCPServer ):
 
     def __init__(self, server_address, RequestHandlerClass, bind_and_activate=True):
         super().__init__( server_address, RequestHandlerClass, bind_and_activate )
-        self.dataObject = None
+        self.base_path = None
 
 
 ## ======================================================
@@ -171,26 +84,40 @@ class RSSServer( socketserver.TCPServer ):
 class RSSServerManager():
 
     PORT = 8080
-    Handler = RSSRequestHandler
-#     Handler = http.server.SimpleHTTPRequestHandler
+    Handler = RootedHTTPRequestHandler
+#     Handler = SimpleHTTPRequestHandler
     
     def __init__(self):
         socketserver.TCPServer.allow_reuse_address = True
         self._service = None
         self._thread = None
+        self._rootDir = None
         
-        self.dataObject = None
+    @staticmethod
+    def getPrimaryIp():
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        try:
+            # doesn't even have to be reachable
+            s.connect(('10.255.255.255', 1))
+            IP = s.getsockname()[0] + ":" + str(RSSServerManager.PORT)
+        except Exception:
+            IP = '127.0.0.1' + ":" + str(RSSServerManager.PORT)
+        finally:
+            s.close()
+        return IP
 
-    def attachData(self, dataObject: DataObject):
-        self.dataObject = dataObject
-        if self._service is not None:
-            self._service.dataObject = dataObject
+#         hostname = socket.gethostname()
+#         local_ip = socket.gethostbyname(hostname)
+#         return local_ip
+    
+#         return socket.gethostbyname( socket.getfqdn() )
 
     @synchronized
-    def start(self):
+    def start(self, rootDir=None):
         if self._service is not None:
             ## already started
             return
+        self._rootDir = rootDir
         self._thread = threading.Thread(target=self._run, args=())
         self._thread.start()
     
@@ -206,8 +133,9 @@ class RSSServerManager():
 
     def _run(self):
         with RSSServer(("", RSSServerManager.PORT), RSSServerManager.Handler) as httpd:
+#         with socketserver.TCPServer(("", RSSServerManager.PORT), RSSServerManager.Handler) as httpd:
             self._service = httpd
-            self._service.dataObject = self.dataObject
+            self._service.base_path = self._rootDir
             try:
                 _LOGGER.info("serving at port %s", RSSServerManager.PORT)
                 httpd.allow_reuse_address = True
@@ -224,41 +152,3 @@ class RSSServerManager():
         if self._service is None:
             return
         self._service.shutdown()
-
-## ============================================================
-
-
-def start_server():
-    PORT = 8080
-    Handler = RSSRequestHandler
-#     Handler = http.server.SimpleHTTPRequestHandler
-    
-#     logger.configure_console()
-    
-    socketserver.TCPServer.allow_reuse_address = True
-    
-    with socketserver.TCPServer(("", PORT), Handler) as httpd:
-        try:
-            print("serving at port", PORT)
-            httpd.allow_reuse_address = True
-            httpd.serve_forever()
-#             httpd.handle_request()
-        finally:
-            httpd.shutdown()
-            httpd.server_close()
-    
-
-## podcast: https://feedgen.kiesow.be/
-def generate_feed():
-    fg = FeedGenerator()
-    fg.id('http://lernfunk.de/media/654321')
-    fg.title('Some Testfeed')
-    fg.author( {'name':'John Doe','email':'john@example.de'} )
-    fg.link( href='http://example.com', rel='alternate' )
-    fg.logo('http://ex.com/logo.jpg')
-    fg.subtitle('This is a cool feed!')
-    fg.link( href='http://larskiesow.de/test.atom', rel='self' )
-    fg.language('en')
-    
-    return fg.rss_str(pretty=True) # Get the RSS feed as string
-    #print( "feed:\n", rssfeed )

@@ -10,6 +10,7 @@
   <uri>https://www.youtube.com/channel/UCBrGE6cmFbcwzlwAyIDMGpw</uri>
  </author>
  <published>2013-10-07T19:27:52+00:00</published>
+ 
  <entry>
   <id>yt:video:DXU6PBpv-eI</id>
   <yt:videoId>DXU6PBpv-eI</yt:videoId>
@@ -33,6 +34,7 @@
    </media:community>
   </media:group>
  </entry>
+ 
  <entry>
   <id>yt:video:kztwPl8QQTA</id>
   <yt:videoId>kztwPl8QQTA</yt:videoId>
@@ -56,6 +58,7 @@
    </media:community>
   </media:group>
  </entry>
+ 
  <entry>
   <id>yt:video:omY5FahfTrI</id>
   <yt:videoId>omY5FahfTrI</yt:videoId>

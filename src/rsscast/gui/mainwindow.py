@@ -40,6 +40,8 @@ from .dataobject import DataObject
 
 from .widget.settingsdialog import SettingsDialog, AppSettings
 from rsscast.gui import sigint
+from rsscast.rss.rssconverter import convert_rss
+from rsscast.rss.rssserver import RSSServerManager
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -63,7 +65,7 @@ class MainWindow( QtBaseClass ):           # type: ignore
 
         self.refreshAction = QtWidgets.QAction(self)
         self.refreshAction.setShortcuts( QtGui.QKeySequence.Refresh )
-        self.refreshAction.triggered.connect( self.refreshStockDataForce )
+        self.refreshAction.triggered.connect( self.refreshDataForce )
         self.addAction( self.refreshAction )
 
 #         self.tickTimer = QtCore.QTimer( self )
@@ -98,7 +100,7 @@ class MainWindow( QtBaseClass ):           # type: ignore
 
         ## ================== connecting signals ==================
 
-        self.ui.stockRefreshPB.clicked.connect( self.refreshStockDataForce )
+        self.ui.refreshPB.clicked.connect( self.refreshDataForce )
 
         self.ui.notesWidget.dataChanged.connect( self._handleNotesChange )
 
@@ -177,9 +179,19 @@ class MainWindow( QtBaseClass ):           # type: ignore
     def refreshView(self):
         self.ui.notesWidget.setNotes( self.data.notes )
 
-    def refreshStockDataForce(self):
-        self.refreshAction.setEnabled( False )
-        self.ui.stockRefreshPB.setEnabled( False )
+    def refreshDataForce(self):
+#         self.refreshAction.setEnabled( False )
+#         self.ui.refreshPB.setEnabled( False )
+        
+        try:
+            hostIp = RSSServerManager.getPrimaryIp()
+            feedList: List[ FeedEntry ] = self.data.feed.getList()
+            for feed in feedList:
+                _LOGGER.info( "refreshing feed %s: %s", feed.feedName, feed.url )
+                convert_rss( hostIp, feed.feedId, feed.url )
+            _LOGGER.info( "refreshing done" )
+        except:
+            _LOGGER.exception( "unable to refresh data" )
 
 #     def _updateStockTimestamp(self):
 #         ## update stock timestamp

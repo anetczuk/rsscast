@@ -37,9 +37,16 @@ import sys
 import logging
 import argparse
 
-import rsscast.logger as logger
+# from PyQt5.QtWidgets import QApplication
 
+import rsscast.logger as logger
+from rsscast.rss.rssconverter import convert_rss_content
+
+from testrsscast.data import get_data_path, read_data
 from rsscast.rss.rssserver import RSSServerManager
+
+# from stockmonitor.gui.sigint import setup_interrupt_handling
+# from stockmonitor.gui.mainwindow import MainWindow
 
 
 ## ============================= main section ===================================
@@ -58,11 +65,65 @@ args = parser.parse_args()
 
 # logFile = logger.get_logging_output_file()
 # logger.configure( logFile )
+
 logger.configure_console()
 
 _LOGGER = logging.getLogger(__name__)
 
-_LOGGER.info("host primary ip: %s", RSSServerManager.getPrimaryIp() )
 
-server = RSSServerManager()
-server.start()
+hostAddress = RSSServerManager.getPrimaryIp()
+
+fileContent = read_data( "yt_latino_short.rss" )
+# fileContent = read_data( "yt_konfederacja.rss" )
+convert_rss_content( hostAddress, "test/abc", fileContent )
+
+
+#         read_rss( "https://www.youtube.com/feeds/videos.xml?channel_id=UCbbz3_jH582xS93hxszPvjQ" )
+
+# read_rss( "http://www.youtube.com/feeds/videos.xml?user=TheNWOChannelTV" )
+
+# read_rss( "http://rss.cnn.com/rss/edition.rss" )
+#         read_rss( "https://blogs.nasa.gov/stationreport/feed/" )
+
+# read_rss( "http://www.google.pl" )
+# read_rss( "http://www.onet.pl" )
+#         read_rss( 'https://www.nasa.gov/rss/dyn/lg_image_of_the_day.rss' )
+
+
+# _LOGGER.debug( "Starting the application" )
+# 
+# 
+# app = QApplication(sys.argv)
+# app.setApplicationName("StockMonitor")
+# app.setOrganizationName("arnet")
+# app.setQuitOnLastWindowClosed( False )
+# 
+# setup_interrupt_handling()
+# 
+# window = MainWindow()
+# window.setWindowTitleSuffix( "Preview" )
+# window.disableSaving()
+# window.setWindowTitle( window.windowTitle() )
+# if args.loadUserData:
+#     window.loadData()
+# else:
+#     window.data.addFav("abc", ["ALR"])
+#     window.data.addFav("abc", ["CDR"])
+#     window.data.wallet.add("CDR", 10, 300)
+#     window.data.wallet.add("XXX", 10, 300)
+# window.loadSettings()
+# window.refreshView()
+# 
+# window.show()
+# # if args.minimized is True or window.appSettings.startMinimized is True:
+# #     ## starting minimized
+# #     pass
+# # else:
+# #     window.show()
+# 
+# exitCode = app.exec_()
+# 
+# if exitCode == 0:
+#     window.saveSettings()
+# 
+# sys.exit( exitCode )

@@ -21,43 +21,38 @@
 # SOFTWARE.
 #
 
-import os
+import unittest
 import logging
+# import datetime
+# import pandas
 
-from PyQt5 import QtCore
-from PyQt5.QtCore import pyqtSignal
-
-# from rsscast.gui.dataobject import DataObject
-
-from .. import uiloader
-from rsscast.rss.rssserver import RSSServerManager
-from rsscast.gui.dataobject import DataObject
-from rsscast import DATA_DIR
-
-
-UiTargetClass, QtBaseClass = uiloader.load_ui_from_class_name( __file__ )
+from rsscast.rss.rssclient import read_rss
+from testrsscast.data import get_data_path
 
 
 _LOGGER = logging.getLogger(__name__)
 
 
-class ServerWidget( QtBaseClass ):           # type: ignore
+class RssClientTest(unittest.TestCase):
 
-#     fileChanged   = pyqtSignal()
-
-    def __init__(self, parentWidget=None):
-        super().__init__(parentWidget)
-        self.ui = UiTargetClass()
-        self.ui.setupUi(self)
-        
-        self.server = RSSServerManager()
-
-    def connectData(self, dataObject: DataObject):
-        ## do nothing
+    def setUp(self):
+        ## Called before testfunction is executed
         pass
 
-    def startServer(self):
-        self.server.start( DATA_DIR )
+    def tearDown(self):
+        ## Called after testfunction was executed
+        pass
 
-    def stopServer(self):
-        self.server.stop()
+#     def test_read_rss_localfile(self):
+#         filePath = get_data_path( "station.xml" )
+#         read_rss( filePath )
+
+    def test_read_rss_url(self):
+#         read_rss( "https://www.youtube.com/feeds/videos.xml?channel_id=UCbbz3_jH582xS93hxszPvjQ" )
+        
+        read_rss( "http://rss.cnn.com/rss/edition.rss" )
+#         read_rss( "https://blogs.nasa.gov/stationreport/feed/" )
+        
+#         read_rss( "http://www.onet.pl" )
+#         read_rss( 'https://www.nasa.gov/rss/dyn/lg_image_of_the_day.rss' )
+#         read_rss( filePath )
