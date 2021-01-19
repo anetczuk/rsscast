@@ -39,7 +39,6 @@ from . import guistate
 from .dataobject import DataObject
 
 from .widget.settingsdialog import SettingsDialog, AppSettings
-from rsscast.gui import sigint
 from rsscast.rss.rssconverter import convert_rss
 from rsscast.rss.rssserver import RSSServerManager
 
@@ -105,7 +104,7 @@ class MainWindow( QtBaseClass ):           # type: ignore
         self.ui.notesWidget.dataChanged.connect( self._handleNotesChange )
 
         #qApp.saveStateRequest.connect( self.saveSession )
-        #qApp.aboutToQuit.connect( self.saveOnQuit )
+        qApp.aboutToQuit.connect( self._handleAppQuit )
 
 #         self.applySettings()
         self.trayIcon.show()
@@ -113,8 +112,6 @@ class MainWindow( QtBaseClass ):           # type: ignore
         self.setWindowTitle()
 
         self.setStatusMessage( "Ready", timeout=10000 )
-        
-        sigint.add_interrupt_handling( self.close_handler )
 
     def loadData(self):
         """Load user related data (e.g. favs, notes)."""
@@ -246,18 +243,6 @@ class MainWindow( QtBaseClass ):           # type: ignore
     def getIconTheme(self) -> trayicon.TrayIconTheme:
         return self.appSettings.trayIcon
 
-    # Override closeEvent, to intercept the window closing event
-    def closeEvent(self, event):
-        _LOGGER.info("received close event, saving session: %s", qApp.isSavingSession() )
-        if qApp.isSavingSession():
-            ## closing application due to system shutdown
-            self.saveAll()
-            return
-        ## windows close requested by user -- hide the window
-        event.ignore()
-        self.hide()
-        self.trayIcon.show()
-
     def showEvent(self, _):
         self.trayIcon.updateLabel()
 
@@ -270,22 +255,44 @@ class MainWindow( QtBaseClass ):           # type: ignore
             w.setVisible( state )
         super().setVisible( state )
 
+    # Override closeEvent, to intercept the window closing event
+    def closeEvent(self, event):
+        _LOGGER.info("received close event, saving session: %s", qApp.isSavingSession() )
+        if qApp.isSavingSession():
+            ## closing application due to system shutdown
+            self._handleOSShutdown()
+            return
+        ## windows close requested by user -- hide the window
+        event.ignore()
+        self.hide()
+        self.trayIcon.show()
+
     ## ====================================================================
 
     # pylint: disable=R0201
     def closeApplication(self):
-        _LOGGER.info("received close request")
-        ##self.close()
+        """Close application -- triggered from File->Exit menu"""
+        _LOGGER.info("received exit request")
         qApp.quit()
+
+    ## executes on "QApplication::quit()"
+    def _handleAppQuit(self):
+        """Handle successful quit of application.
+        
+        Received on 'QApplication::quit()' and on SIGINT signal.
+        """
+        _LOGGER.info( "received 'aboutToQuit()' signal")
+        self.stopServer()
+        
+    def _handleOSShutdown(self):
+        """Received 'close' event while OS shutting down"""
+        self.saveAll()
+        self.stopServer()
 
     def saveAll(self):
         _LOGGER.info("saving application state")
         self.saveSettings()
         self.saveData()
-        
-    #def close_handler(self, signum, frame):
-    def close_handler( self, *arg ):
-        self.stopServer()
 
     ## ====================================================================
 
