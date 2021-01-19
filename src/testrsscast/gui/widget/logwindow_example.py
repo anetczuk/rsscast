@@ -40,11 +40,9 @@ import argparse
 # from PyQt5 import QtCore
 from PyQt5.QtWidgets import QApplication
 
-import stockmonitor.logger as logger
-from stockmonitor.gui.sigint import setup_interrupt_handling
-from stockmonitor.gui.widget.logwidget import create_window
-# from stockmonitor.gui.resources import get_root_path
-# from stockmonitor.gui.utils import render_to_pixmap
+import rsscast.logger as logger
+from rsscast.gui.sigint import setup_interrupt_handling
+from rsscast.gui.widget.logwidget import create_window
 
 
 ## ============================= main section ===================================

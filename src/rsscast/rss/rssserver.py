@@ -22,26 +22,21 @@
 #
 
 # import feedparser
+import os
 import logging
 import threading
 
-from feedgen.feed import FeedGenerator
+import socket
 import socketserver
-from http.server import BaseHTTPRequestHandler, SimpleHTTPRequestHandler
+import urllib.parse
+import posixpath
+
+from http.server import SimpleHTTPRequestHandler
 
 from rsscast.synchronized import synchronized
-from typing import List
-import requests
-import requests_file
-from rsscast.rss.rssconverter import convert_rss
-import posixpath
-import urllib.parse
-import os
-import socket
 
 
 _LOGGER = logging.getLogger(__name__)
-
 
 
 ## implementation allows to pass custom base path
@@ -100,7 +95,7 @@ class RSSServerManager():
             # doesn't even have to be reachable
             s.connect(('10.255.255.255', 1))
             IP = s.getsockname()[0] + ":" + str(RSSServerManager.PORT)
-        except Exception:
+        except BaseException:
             IP = '127.0.0.1' + ":" + str(RSSServerManager.PORT)
         finally:
             s.close()
@@ -128,7 +123,7 @@ class RSSServerManager():
             return
         _LOGGER.info( "stopping feed server" )
         serverThread = self._thread     ## self._thread will be null-ed soon
-        self._shutdown_service()
+        self._shutdownService()
         serverThread.join()
 
     def _run(self):
@@ -148,7 +143,7 @@ class RSSServerManager():
         _LOGGER.info( "server thread ended" )
 
     @synchronized
-    def _shutdown_service(self):
+    def _shutdownService(self):
         if self._service is None:
             return
         self._service.shutdown()

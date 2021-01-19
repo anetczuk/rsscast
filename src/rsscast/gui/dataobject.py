@@ -21,16 +21,10 @@
 # SOFTWARE.
 #
 
-import os
 import logging
 from typing import Dict, List
 import glob
 
-from datetime import datetime
-
-from pandas.core.frame import DataFrame
-
-from PyQt5.QtCore import Qt
 from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtWidgets import QWidget, QUndoStack
 

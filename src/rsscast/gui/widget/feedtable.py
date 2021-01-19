@@ -22,14 +22,14 @@
 #
 
 import logging
-from datetime import datetime, date, time, timedelta
+from datetime import datetime, time, timedelta
 
-from PyQt5 import QtCore, QtGui
+from PyQt5 import QtCore
 from PyQt5.QtCore import Qt, QModelIndex
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtCore import QAbstractTableModel
 from PyQt5.QtWidgets import QTableView
-from PyQt5.QtGui import QColor
+# from PyQt5.QtGui import QColor
 
 from rsscast.gui.dataobject import DataObject, FeedContainer, FeedEntry
 
@@ -147,7 +147,7 @@ class FeedTableModel( QAbstractTableModel ):
 
     @staticmethod
     def attributeLabels():
-        return ( "Name" ,"Id", "URL" )
+        return ( "Name", "Id", "URL" )
 
 
 ## ===========================================================
@@ -236,32 +236,33 @@ class FeedTable( QTableView ):
         return self.dataModel.getItem( sourceIndex )
 
     def contextMenuEvent( self, event ):
-        evPos               = event.pos()
-        entry: FeedEntry = None
-        mIndex = self.indexAt( evPos )
-        if mIndex is not None:
-            entry = self.getItem( mIndex )
-
-#         create_entry_contextmenu( self, self.dataObject, entry )
-
-        contextMenu      = QtWidgets.QMenu( self )
-        addAction        = contextMenu.addAction("Add Entry")
-        editAction       = contextMenu.addAction("Edit Entry")
-        removeAction     = contextMenu.addAction("Remove Entry")
-
-        if entry is None:
-            editAction.setEnabled( False )
-            removeAction.setEnabled( False )
-
-        globalPos = QtGui.QCursor.pos()
-        action = contextMenu.exec_( globalPos )
-
-#         if action == addAction:
-#             self.dataObject.addEntryNew( addEntry )
-#         elif action == editAction:
-#             dataObject.editEntry( editEntry )
-#         elif action == removeAction:
-#             dataObject.removeEntry( editEntry )
+        pass
+#         evPos            = event.pos()
+#         entry: FeedEntry = None
+#         mIndex = self.indexAt( evPos )
+#         if mIndex is not None:
+#             entry = self.getItem( mIndex )
+#
+# #         create_entry_contextmenu( self, self.dataObject, entry )
+#
+#         contextMenu      = QtWidgets.QMenu( self )
+#         addAction        = contextMenu.addAction("Add Entry")
+#         editAction       = contextMenu.addAction("Edit Entry")
+#         removeAction     = contextMenu.addAction("Remove Entry")
+#
+#         if entry is None:
+#             editAction.setEnabled( False )
+#             removeAction.setEnabled( False )
+#
+#         globalPos = QtGui.QCursor.pos()
+#         action = contextMenu.exec_( globalPos )
+#
+# #         if action == addAction:
+# #             self.dataObject.addEntryNew( addEntry )
+# #         elif action == editAction:
+# #             dataObject.editEntry( editEntry )
+# #         elif action == removeAction:
+# #             dataObject.removeEntry( editEntry )
 
     def currentChanged(self, current, previous):
         super().currentChanged( current, previous )

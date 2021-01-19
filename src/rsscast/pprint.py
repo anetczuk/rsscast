@@ -21,6 +21,7 @@
 # SOFTWARE.
 #
 
+
 def pprint(variable, indent=0):
     if variable is None:
         print('\t' * indent + "None")
@@ -35,6 +36,7 @@ def pprint(variable, indent=0):
             print('\t' * indent + str(key) + ":")
             pprint( value, indent + 1 )
     elif isinstance( variable, list ):
+        # pylint: disable=C0200
         for i in range(0, len(variable)):
             value = variable[i]
             print('\t' * indent + "[" + str(i) + "]:")

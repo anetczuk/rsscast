@@ -23,17 +23,13 @@
 
 import os
 import logging
-import feedparser
-import time
-import urllib.request
-import requests
-import logging
-from rsscast.pprint import pprint
-from rsscast.rss.rssclient import read_rss, read_url
 import re
-import sys
-from rsscast.rss.ytconverter import convert_yt
+import requests
+import requests_file
+import feedparser
+
 from rsscast import DATA_DIR
+from rsscast.rss.ytconverter import convert_yt
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -88,10 +84,10 @@ def convert_rss_content( host, feedId, feedContent ):
         mediaThumbnailNode = ""
         if 'media_thumbnail' in post:
             thumbnail = post['media_thumbnail'][0]
+            # pylint: disable=C0301
             mediaThumbnailNode = f"""<media:thumbnail url="{thumbnail['url']}" width="{thumbnail['width']}" height="{thumbnail['height']}"/>"""
 
         description = post.get('summary', '')
-
 
         item_result = f"""
         <item>
@@ -141,6 +137,16 @@ def convert_rss_content( host, feedId, feedContent ):
     rssOutput = "%s/rss" % channelPath
     _LOGGER.info( "feed %s: writing converted rss output to %s", feedId, rssOutput )
     write_text( result, rssOutput )
+
+
+def read_url( urlpath ):
+    session = requests.Session()
+    session.mount( 'file://', requests_file.FileAdapter() )
+#     session.config['keep_alive'] = False
+#     response = requests.get( urlpath, timeout=5 )
+    response = session.get( urlpath, timeout=5 )
+#     response = requests.get( urlpath, timeout=5, hooks={'response': print_url} )
+    return response.text
 
 
 def get_channel_output_dir( feedId ):

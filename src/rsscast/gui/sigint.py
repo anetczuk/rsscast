@@ -8,9 +8,9 @@ As stated on the website (https://coldfix.eu/about/), content and source code
 is published under CC BY and CC0 license respectively.
 """
 
-
 import signal
 import logging
+from typing import List, Callable
 
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QApplication
@@ -19,7 +19,7 @@ from PyQt5.QtWidgets import QApplication
 _LOGGER = logging.getLogger(__name__)
 
 
-interrupt_handlers = []                 ## list of handlers
+interrupt_handlers: List[ Callable ] = []                 ## list of handlers
 
 
 def _list_handler(signum, frame):
@@ -31,7 +31,8 @@ def _list_handler(signum, frame):
 # Define this as a global function to make sure it is not garbage
 # collected when going out of scope:
 # def _interrupt_handler(signum, frame):
-def _exit_qt_handler(signum, _):
+# def _exit_qt_handler( *args ):
+def _exit_qt_handler( *_ ):
     """Handle KeyboardInterrupt: quit application."""
     QApplication.exit(2)
 
@@ -67,8 +68,9 @@ def add_interrupt_handling( handler ):
     ## first call
     interrupt_handlers.append( handler )
 
-    """Set up handling of KeyboardInterrupt (Ctrl-C) for PyQt."""
+    ## Set up handling of KeyboardInterrupt (Ctrl-C) for PyQt.
     signal.signal( signal.SIGINT, _list_handler )
+
     # Regularly run some (any) python code, so the signal handler gets a
     # chance to be executed:
     safe_timer(100)

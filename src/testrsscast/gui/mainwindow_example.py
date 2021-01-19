@@ -85,7 +85,8 @@ if args.loadUserData:
 else:
     ytLatinoPath = "file://" + get_data_path( "yt_latino_short.rss" )
     window.data.addFeed( "Youtube Latino Short", "test/xxx", ytLatinoPath )
-    window.data.addFeed( "Konfederacja TV", "konfederacja", "http://www.youtube.com/feeds/videos.xml?user=TheNWOChannelTV" )
+    window.data.addFeed( "Konfederacja TV", "konfederacja",
+                         "http://www.youtube.com/feeds/videos.xml?user=TheNWOChannelTV" )
 
 window.loadSettings()
 window.startServer()

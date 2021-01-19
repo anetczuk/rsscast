@@ -24,7 +24,6 @@
 import os
 import sys
 import logging
-import logging.handlers as handlers
 
 
 script_dir = os.path.dirname(__file__)
@@ -53,7 +52,8 @@ def configure( logFile=None, logLevel=None ):
         logLevel = logging.DEBUG
 
     ## rotation of log files, 1048576 equals to 1MB
-    fileHandler    = handlers.RotatingFileHandler( filename=log_file, mode="a+", maxBytes=1048576, backupCount=999 )
+    fileHandler    = logging.handlers.RotatingFileHandler( filename=log_file, mode="a+",
+                                                           maxBytes=1048576, backupCount=999 )
     ## fileHandler    = logging.FileHandler( filename=log_file, mode="a+" )
     consoleHandler = logging.StreamHandler( stream=sys.stdout )
 
@@ -128,9 +128,9 @@ def get_all_loggers():
 
 
 def get_all_handlers():
-    handlers = []
-    handlers.append( logging.root.handlers )
+    logHandlers = []
+    logHandlers.append( logging.root.handlers )
     for name in logging.root.manager.loggerDict:
         loggerObj = logging.getLogger(name)
-        handlers.append( loggerObj.handlers )
-    return handlers
+        logHandlers.append( loggerObj.handlers )
+    return logHandlers

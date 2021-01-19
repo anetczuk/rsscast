@@ -24,10 +24,10 @@
 import time
 import random
 import logging
-import pycurl
 from io import BytesIO
 from urllib.parse import urlencode
 import json
+import pycurl
 # import youtube_dl
 
 
@@ -92,7 +92,6 @@ def convert_yt_yt1s( link, output, mimicHuman=True ):
         session.setopt( pycurl.TIMEOUT, 60 )
 #         c.setopt( c.VERBOSE, 1 )
 
-        ## curl 'https://yt1s.com/api/ajaxSearch/index' --data-raw 'q=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DpLcg_SXWTv4&vt=mp3'
         params = {'q': link,
                   'vt': 'mp3'}
 
@@ -118,7 +117,6 @@ def convert_yt_yt1s( link, output, mimicHuman=True ):
         vidId = data["vid"]
         kId   = data["kc"]
 
-        ## curl 'https://yt1s.com/api/ajaxConvert/convert' --data-raw 'vid=pLcg_SXWTv4&k=0%2Ba7V0LXcb6gRoiCCcFsmBZtPRF1HVTO5l7v3sVU68OOmDifQvf%2F9GuSOD%2BGm6QzqQmoi1znEYRc27l2tA%3D%3D'
         params = {'vid': vidId,
                   'k': kId}
         dataBuffer = curl_post( session, "https://yt1s.com/api/ajaxConvert/convert", params )

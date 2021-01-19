@@ -21,18 +21,13 @@
 # SOFTWARE.
 #
 
-import os
 import logging
 
-from PyQt5 import QtCore
-from PyQt5.QtCore import pyqtSignal
-
-# from rsscast.gui.dataobject import DataObject
+from rsscast import DATA_DIR
+from rsscast.gui.dataobject import DataObject
+from rsscast.rss.rssserver import RSSServerManager
 
 from .. import uiloader
-from rsscast.rss.rssserver import RSSServerManager
-from rsscast.gui.dataobject import DataObject
-from rsscast import DATA_DIR
 
 
 UiTargetClass, QtBaseClass = uiloader.load_ui_from_class_name( __file__ )

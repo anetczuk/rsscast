@@ -23,15 +23,18 @@
 
 import logging
 # import datetime
+from typing import List
 
 from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtWidgets import QDialog
 from PyQt5.QtWidgets import qApp
 
+from rsscast.gui.dataobject import FeedEntry
 from rsscast.gui.appwindow import AppWindow
 from rsscast.gui.widget import logwidget
 from rsscast.gui.trayicon import load_main_icon
-from rsscast.gui.utils import set_label_url
+from rsscast.rss.rssconverter import convert_rss
+from rsscast.rss.rssserver import RSSServerManager
 
 from . import uiloader
 from . import trayicon
@@ -39,8 +42,6 @@ from . import guistate
 from .dataobject import DataObject
 
 from .widget.settingsdialog import SettingsDialog, AppSettings
-from rsscast.rss.rssconverter import convert_rss
-from rsscast.rss.rssserver import RSSServerManager
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -187,7 +188,7 @@ class MainWindow( QtBaseClass ):           # type: ignore
                 _LOGGER.info( "refreshing feed %s: %s", feed.feedName, feed.url )
                 convert_rss( hostIp, feed.feedId, feed.url )
             _LOGGER.info( "refreshing done" )
-        except:
+        except BaseException:
             _LOGGER.exception( "unable to refresh data" )
 
 #     def _updateStockTimestamp(self):
@@ -271,7 +272,7 @@ class MainWindow( QtBaseClass ):           # type: ignore
 
     # pylint: disable=R0201
     def closeApplication(self):
-        """Close application -- triggered from File->Exit menu"""
+        """Close application -- triggered from File->Exit menu."""
         _LOGGER.info("received exit request")
         qApp.quit()
 
@@ -285,7 +286,7 @@ class MainWindow( QtBaseClass ):           # type: ignore
         self.stopServer()
 
     def _handleOSShutdown(self):
-        """Received 'close' event while OS shutting down"""
+        """Received 'close' event while OS shutting down."""
         self.saveAll()
         self.stopServer()
 

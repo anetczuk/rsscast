@@ -41,12 +41,9 @@ import argparse
 
 import rsscast.logger as logger
 from rsscast.rss.rssconverter import convert_rss_content
-
-from testrsscast.data import get_data_path, read_data
 from rsscast.rss.rssserver import RSSServerManager
 
-# from stockmonitor.gui.sigint import setup_interrupt_handling
-# from stockmonitor.gui.mainwindow import MainWindow
+from testrsscast.data import read_data
 
 
 ## ============================= main section ===================================
