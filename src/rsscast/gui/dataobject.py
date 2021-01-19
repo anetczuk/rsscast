@@ -41,7 +41,7 @@ from rsscast import persist
 # from rsscast.dataaccess.globalindexesdata import GlobalIndexesData
 # from rsscast.dataaccess.gpw.gpwcurrentdata import GpwCurrentStockData,\
 #     GpwCurrentIndexesData
-# 
+#
 # import rsscast.gui.threadlist as threadlist
 # from rsscast.gui.command.addfavgroupcommand import AddFavGroupCommand
 # from rsscast.gui.command.deletefavgroupcommand import DeleteFavGroupCommand
@@ -96,7 +96,7 @@ class FeedContainer( persist.Versionable ):
 
     def get(self, index):
         return self.feedList[ index ]
-    
+
     def getList(self) -> List[  FeedEntry ]:
         return self.feedList
 

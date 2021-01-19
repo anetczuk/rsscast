@@ -255,7 +255,7 @@ class FeedTable( QTableView ):
 
         globalPos = QtGui.QCursor.pos()
         action = contextMenu.exec_( globalPos )
-    
+
 #         if action == addAction:
 #             self.dataObject.addEntryNew( addEntry )
 #         elif action == editAction:

@@ -49,25 +49,25 @@ def convert_rss( host, feedId, feedUrl ):
     sourceRSS = os.path.abspath( os.path.join(channelPath, "source.rss") )
     write_text( content, sourceRSS )
     convert_rss_content( host, feedId, content )
-    
-    
+
+
 def convert_rss_content( host, feedId, feedContent ):
     _LOGGER.info( "feed %s: parsing rss", feedId )
     parsedDict = feedparser.parse( feedContent )
-    
+
     _LOGGER.info( "feed %s: detected entries %s", feedId, len(parsedDict.entries) )
 #     pprint( parsedDict.feed )
 #     pprint( parsedDict.entries )
-    
+
     feedId = feedId.replace(":", "_")
     feedId = re.sub( r"\s+", "", feedId )
-    
+
     channelPath = get_channel_output_dir( feedId )
-    
+
     items_result = ""
     for post in parsedDict.entries:
 #         pprint( post )
-        
+
 #         videoId = post['yt_videoid']
         videoId = post['id']
         videoId = videoId.replace(":", "_")
@@ -75,7 +75,7 @@ def convert_rss_content( host, feedId, feedContent ):
         postLocalPath = "%s/%s.mp3" % ( channelPath, videoId )
         enclosureURL  = "http://%s/feed/%s/%s.mp3" % ( host, feedId, videoId )      ## must have absolute path
         postTitle = post['title']
-        
+
         if not os.path.exists(postLocalPath):
             converted = convert_yt( postLink, postLocalPath )
             if converted is False:
@@ -84,15 +84,15 @@ def convert_rss_content( host, feedId, feedContent ):
                 continue
         else:
             _LOGGER.info( "feed %s: local conversion of %s found in %s", feedId, postLink, postLocalPath )
-        
+
         mediaThumbnailNode = ""
         if 'media_thumbnail' in post:
             thumbnail = post['media_thumbnail'][0]
             mediaThumbnailNode = f"""<media:thumbnail url="{thumbnail['url']}" width="{thumbnail['width']}" height="{thumbnail['height']}"/>"""
-        
+
         description = post.get('summary', '')
-        
-        
+
+
         item_result = f"""
         <item>
             <title>{postTitle}</title>
@@ -103,20 +103,20 @@ def convert_rss_content( host, feedId, feedContent ):
             <description>{description}</description>
 
             <content:encoded></content:encoded>
-            
+
             <enclosure url="{enclosureURL}" type="audio/mpeg" />
         </item>
 """
         items_result += item_result
-    
+
 #     rssData = dict()
 #     rssData['rss_feed_title'] = parsedDict['feed']['title']
 #    ## example: """{rss_feed_title}""".format( **rssData )
-    
+
     parsedFeed = parsedDict['feed']
     feedLink = parsedFeed.get('href', "")
     feedPublished = parsedFeed.get('published', "")
-    
+
     result = f"""<rss version="2.0"
  xmlns:content="http://purl.org/rss/1.0/modules/content/"
  xmlns:media="http://search.yahoo.com/mrss/"

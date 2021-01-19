@@ -63,10 +63,10 @@ def add_interrupt_handling( handler ):
         ## not empty
         interrupt_handlers.append( handler )
         return
-    
+
     ## first call
     interrupt_handlers.append( handler )
-    
+
     """Set up handling of KeyboardInterrupt (Ctrl-C) for PyQt."""
     signal.signal( signal.SIGINT, _list_handler )
     # Regularly run some (any) python code, so the signal handler gets a

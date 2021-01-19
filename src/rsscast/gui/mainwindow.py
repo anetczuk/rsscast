@@ -150,10 +150,10 @@ class MainWindow( QtBaseClass ):           # type: ignore
         settingsDir = settingsDir[0:-4]       ## remove extension
         settingsDir += "-data"
         return settingsDir
-    
+
     def startServer(self):
         self.ui.serverWidget.startServer()
-    
+
     def stopServer(self):
         self.ui.serverWidget.stopServer()
 
@@ -179,7 +179,7 @@ class MainWindow( QtBaseClass ):           # type: ignore
     def refreshDataForce(self):
 #         self.refreshAction.setEnabled( False )
 #         self.ui.refreshPB.setEnabled( False )
-        
+
         try:
             hostIp = RSSServerManager.getPrimaryIp()
             feedList: List[ FeedEntry ] = self.data.feed.getList()
@@ -278,12 +278,12 @@ class MainWindow( QtBaseClass ):           # type: ignore
     ## executes on "QApplication::quit()"
     def _handleAppQuit(self):
         """Handle successful quit of application.
-        
+
         Received on 'QApplication::quit()' and on SIGINT signal.
         """
         _LOGGER.info( "received 'aboutToQuit()' signal")
         self.stopServer()
-        
+
     def _handleOSShutdown(self):
         """Received 'close' event while OS shutting down"""
         self.saveAll()

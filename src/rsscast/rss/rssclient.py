@@ -43,8 +43,8 @@ tmp_dir = os.path.abspath( script_dir + "/../../../tmp/" ) + "/"
 
 # def print_url(r, *args, **kwargs):
 #     print(r.url)
-    
-    
+
+
 def read_url( urlpath ):
     session = requests.Session()
     session.mount( 'file://', requests_file.FileAdapter() )
@@ -63,29 +63,29 @@ def read_rss( urlpath ):
     response = session.get( urlpath, timeout=5 )
 #     response = requests.get( urlpath, timeout=5, hooks={'response': print_url} )
 #     print("xxxxxxxx1\n>%s<" % response.text)
-    
+
     parse_rss( response.text )
-    
-    
+
+
 # #     req = urllib.request.Request(
-# #         urlpath, 
-# #         data=None, 
+# #         urlpath,
+# #         data=None,
 # #         headers={
 # #             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'
 # #         }
 # #     )
-#     
-#     
+#
+#
 # #     req = urllib.request.Request(urlpath, headers={'User-Agent': 'Mozilla/5.0'})
-# #     
+# #
 # # #     with urllib.request.urlopen(req, timeout=10) as response:
 # #     with urllib.request.urlopen(req) as response:
 # #         print("xxxxxxxx1")
 # # #         html = response.read()
 # # #         print("xxxxxxxx2", html)
 # #         return
-#     
-#     
+#
+#
 # #     urllib.request.urlretrieve( urlpath, "aaa.txt" )
 # #     print("xxxxxxxx0-a:", urlpath)
 # #     with urllib.request.urlopen(    urlpath,
@@ -106,12 +106,12 @@ def read_rss( urlpath ):
 
 def parse_rss( content ):
     parsedDict = feedparser.parse( content )
-     
+
 #     print("xxxxxxx\n", parsedDict['feed']['title'] )
-     
+
 #     pprint( parsedDict )
 #     pprint( parsedDict.entries )
-     
+
     ## print all posts
 #     count = 1
 #     blockcount = 1

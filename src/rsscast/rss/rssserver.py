@@ -52,7 +52,7 @@ class RootedHTTPRequestHandler(SimpleHTTPRequestHandler):
         if base_path is None:
             ## no base path given -- standard implementation
             return super().translate_path( path )
-        
+
         path = posixpath.normpath(urllib.parse.unquote(path))
         words = path.split('/')
         words = filter(None, words)
@@ -86,13 +86,13 @@ class RSSServerManager():
     PORT = 8080
     Handler = RootedHTTPRequestHandler
 #     Handler = SimpleHTTPRequestHandler
-    
+
     def __init__(self):
         socketserver.TCPServer.allow_reuse_address = True
         self._service = None
         self._thread = None
         self._rootDir = None
-        
+
     @staticmethod
     def getPrimaryIp():
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -109,7 +109,7 @@ class RSSServerManager():
 #         hostname = socket.gethostname()
 #         local_ip = socket.gethostbyname(hostname)
 #         return local_ip
-    
+
 #         return socket.gethostbyname( socket.getfqdn() )
 
     @synchronized
@@ -120,7 +120,7 @@ class RSSServerManager():
         self._rootDir = rootDir
         self._thread = threading.Thread(target=self._run, args=())
         self._thread.start()
-    
+
     @synchronized
     def stop(self):
         if self._service is None:
@@ -146,7 +146,7 @@ class RSSServerManager():
                 self._service = None
                 self._thread = None
         _LOGGER.info( "server thread ended" )
-        
+
     @synchronized
     def _shutdown_service(self):
         if self._service is None:

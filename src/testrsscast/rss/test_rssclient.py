@@ -49,10 +49,10 @@ class RssClientTest(unittest.TestCase):
 
     def test_read_rss_url(self):
 #         read_rss( "https://www.youtube.com/feeds/videos.xml?channel_id=UCbbz3_jH582xS93hxszPvjQ" )
-        
+
         read_rss( "http://rss.cnn.com/rss/edition.rss" )
 #         read_rss( "https://blogs.nasa.gov/stationreport/feed/" )
-        
+
 #         read_rss( "http://www.onet.pl" )
 #         read_rss( 'https://www.nasa.gov/rss/dyn/lg_image_of_the_day.rss' )
 #         read_rss( filePath )

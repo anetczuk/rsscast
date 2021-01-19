@@ -49,7 +49,7 @@ class ServerWidget( QtBaseClass ):           # type: ignore
         super().__init__(parentWidget)
         self.ui = UiTargetClass()
         self.ui.setupUi(self)
-        
+
         self.server = RSSServerManager()
 
     def connectData(self, dataObject: DataObject):

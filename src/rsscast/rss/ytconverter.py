@@ -37,8 +37,8 @@ _LOGGER = logging.getLogger(__name__)
 def convert_yt( link, output, mimicHuman=True ):
 #     return convert_yt_dwnldr( link, output )
     return convert_yt_yt1s( link, output, mimicHuman )
-    
-      
+
+
 ## ===================================================================
 
 
@@ -53,33 +53,33 @@ def convert_yt( link, output, mimicHuman=True ):
 # #     }
 # #     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
 # #         ydl.download( ['https://www.youtube.com/watch?v=BaW_jenozKc'] )
-#     
-#     
+#
+#
 #     ydl_opts = {}
 #     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
 #         ydl.download( [link] )
-#         
-#         
+#
+#
 # #     ydl = youtube_dl.YoutubeDL({'outtmpl': '%(id)s.%(ext)s'})
-# #     
+# #
 # #     with ydl:
 # #         result = ydl.extract_info( link )
-# #     
+# #
 # #     if 'entries' in result:
 # #         # Can be a playlist or a list of videos
 # #         video = result['entries'][0]
 # #     else:
 # #         # Just a video
 # #         video = result
-# #     
+# #
 # #     print(video)
 # #     video_url = video['url']
 # #     print(video_url)
 
 
 ## ===================================================================
-    
-    
+
+
 ## converting YT videos using webpage https://yt1s.com
 def convert_yt_yt1s( link, output, mimicHuman=True ):
     _LOGGER.info( "converting video: %s to %s", link, output )
@@ -90,16 +90,16 @@ def convert_yt_yt1s( link, output, mimicHuman=True ):
         session.setopt( pycurl.USERAGENT, "curl/7.58.0" )
         session.setopt( pycurl.FOLLOWLOCATION, True )        ## follow redirects
         session.setopt( pycurl.TIMEOUT, 60 )
-#         c.setopt( c.VERBOSE, 1 )        
-        
+#         c.setopt( c.VERBOSE, 1 )
+
         ## curl 'https://yt1s.com/api/ajaxSearch/index' --data-raw 'q=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DpLcg_SXWTv4&vt=mp3'
         params = {'q': link,
                   'vt': 'mp3'}
-        
+
         dataBuffer = curl_post( session, "https://yt1s.com/api/ajaxSearch/index", params )
         bodyOutput = dataBuffer.getvalue().decode('utf-8')
 #         _LOGGER.info( "response:\n%s", bodyOutput )
-        
+
         data = json.loads( bodyOutput )
         jsonStatus = data['status']
         if jsonStatus != "ok":
@@ -110,19 +110,19 @@ def convert_yt_yt1s( link, output, mimicHuman=True ):
             ## happens always for delayed premieres
             _LOGGER.warning( "invalid status:\n%s", bodyOutput )
             return False
-        
+
         if mimicHuman:
             randTime = random.uniform( 3.0, 6.0 )
             time.sleep( randTime )
-        
+
         vidId = data["vid"]
         kId   = data["kc"]
-        
+
         ## curl 'https://yt1s.com/api/ajaxConvert/convert' --data-raw 'vid=pLcg_SXWTv4&k=0%2Ba7V0LXcb6gRoiCCcFsmBZtPRF1HVTO5l7v3sVU68OOmDifQvf%2F9GuSOD%2BGm6QzqQmoi1znEYRc27l2tA%3D%3D'
         params = {'vid': vidId,
                   'k': kId}
         dataBuffer = curl_post( session, "https://yt1s.com/api/ajaxConvert/convert", params )
-        bodyOutput = dataBuffer.getvalue().decode('utf-8')        
+        bodyOutput = dataBuffer.getvalue().decode('utf-8')
 #         _LOGGER.info( "response:\n%s", bodyOutput )
 
         if mimicHuman:
@@ -140,27 +140,27 @@ def convert_yt_yt1s( link, output, mimicHuman=True ):
             ## {"status":"ok","mess":"","c_status":"CONVERTING","b_id":"6004d4c0d684ebb22f8b45ab","e_time":39}
             _LOGGER.warning( "invalid status:\n%s", bodyOutput )
             return False
-        
+
         dlink = data["dlink"]
 #         print( "grabbing file:", dlink )
         _LOGGER.info( "grabbing file: %s", dlink )
         curl_download( session, dlink, output )
-        
+
         ## done -- returning
         return True
-        
+
 #         except Exception as err:
 #             logging.exception("Unexpected exception")
 #             return ""
     finally:
         session.close()
-        
+
     return False
 
 
 def curl_post( session, targetUrl, dataDict ):
     _LOGGER.info( "accessing url: %s params: %s", targetUrl, dataDict )
-    
+
     dataBuffer = BytesIO()
 #     try:
     session.setopt( pycurl.URL, targetUrl )

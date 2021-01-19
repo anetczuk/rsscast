@@ -46,7 +46,7 @@ class FeedWidget( QtBaseClass ):           # type: ignore
         super().__init__(parentWidget)
         self.ui = UiTargetClass()
         self.ui.setupUi(self)
-        
+
 #         self.dataObject = None
 
     def connectData(self, dataObject: DataObject):

@@ -91,15 +91,15 @@ convert_rss_content( hostAddress, "test/abc", fileContent )
 
 
 # _LOGGER.debug( "Starting the application" )
-# 
-# 
+#
+#
 # app = QApplication(sys.argv)
 # app.setApplicationName("StockMonitor")
 # app.setOrganizationName("arnet")
 # app.setQuitOnLastWindowClosed( False )
-# 
+#
 # setup_interrupt_handling()
-# 
+#
 # window = MainWindow()
 # window.setWindowTitleSuffix( "Preview" )
 # window.disableSaving()
@@ -113,17 +113,17 @@ convert_rss_content( hostAddress, "test/abc", fileContent )
 #     window.data.wallet.add("XXX", 10, 300)
 # window.loadSettings()
 # window.refreshView()
-# 
+#
 # window.show()
 # # if args.minimized is True or window.appSettings.startMinimized is True:
 # #     ## starting minimized
 # #     pass
 # # else:
 # #     window.show()
-# 
+#
 # exitCode = app.exec_()
-# 
+#
 # if exitCode == 0:
 #     window.saveSettings()
-# 
+#
 # sys.exit( exitCode )
