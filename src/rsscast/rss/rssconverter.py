@@ -24,6 +24,7 @@
 import os
 import logging
 import re
+import html
 import requests
 import requests_file
 import feedparser
@@ -71,6 +72,7 @@ def convert_rss_content( host, feedId, feedContent ):
         postLocalPath = "%s/%s.mp3" % ( channelPath, videoId )
         enclosureURL  = "http://%s/feed/%s/%s.mp3" % ( host, feedId, videoId )      ## must have absolute path
         postTitle = post['title']
+        postTitle = html.escape( postTitle )
 
         if not os.path.exists(postLocalPath):
             converted = convert_yt( postLink, postLocalPath )
@@ -88,6 +90,7 @@ def convert_rss_content( host, feedId, feedContent ):
             mediaThumbnailNode = f"""<media:thumbnail url="{thumbnail['url']}" width="{thumbnail['width']}" height="{thumbnail['height']}"/>"""
 
         description = post.get('summary', '')
+        # description = html.escape( description )
 
         item_result = f"""
         <item>
