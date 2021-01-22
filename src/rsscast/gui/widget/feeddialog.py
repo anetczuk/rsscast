@@ -22,8 +22,9 @@
 #
 
 import logging
+import copy
 
-from rsscast.gui.dataobject import DataObject
+from rsscast.gui.datatypes import FeedEntry
 
 from .. import uiloader
 
@@ -34,15 +35,32 @@ UiTargetClass, QtBaseClass = uiloader.load_ui_from_class_name( __file__ )
 _LOGGER = logging.getLogger(__name__)
 
 
-class FeedWidget( QtBaseClass ):           # type: ignore
+class FeedDialog( QtBaseClass ):           # type: ignore
 
-    def __init__(self, parentWidget=None):
+    def __init__(self, entry: FeedEntry, parentWidget=None):
         super().__init__(parentWidget)
         self.ui = UiTargetClass()
         self.ui.setupUi(self)
 
-    def connectData(self, dataObject: DataObject):
-        self.ui.feedTableView.connectData( dataObject )
+        self.entry: FeedEntry = None
 
-    def refreshView(self):
-        self.ui.feedTableView.refreshData()
+        self.finished.connect( self._done )
+
+        self.setObject( entry )
+
+    def setObject(self, entry: FeedEntry):
+        if entry is not None:
+            self.entry = copy.deepcopy( entry )
+        else:
+            self.entry = FeedEntry()
+
+        self.ui.nameLE.setText( self.entry.feedName )
+        self.ui.idLE.setText( self.entry.feedId )
+        self.ui.urlLE.setText( self.entry.url )
+
+#         self.adjustSize()
+
+    def _done(self, _):
+        self.entry.feedName = self.ui.nameLE.text()
+        self.entry.feedId = self.ui.idLE.text()
+        self.entry.url = self.ui.urlLE.text()

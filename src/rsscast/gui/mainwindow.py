@@ -29,7 +29,7 @@ from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtWidgets import QDialog
 from PyQt5.QtWidgets import qApp
 
-from rsscast.gui.dataobject import FeedEntry
+from rsscast.gui.datatypes import FeedEntry
 from rsscast.gui.appwindow import AppWindow
 from rsscast.gui.widget import logwidget
 from rsscast.gui.trayicon import load_main_icon
@@ -175,6 +175,7 @@ class MainWindow( QtBaseClass ):           # type: ignore
             self.trayIcon.setToolTip( newTitle )
 
     def refreshView(self):
+        self.ui.feedWidget.refreshView()
         self.ui.notesWidget.setNotes( self.data.notes )
 
     def refreshDataForce(self):

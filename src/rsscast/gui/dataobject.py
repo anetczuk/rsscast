@@ -22,13 +22,17 @@
 #
 
 import logging
-from typing import Dict, List
-import glob
+from typing import Dict
 
+from PyQt5 import QtWidgets
 from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtWidgets import QWidget, QUndoStack
 
-from rsscast import persist
+from rsscast.gui.widget.feeddialog import FeedDialog
+from rsscast.gui.command.addentrycommand import AddEntryCommand
+from rsscast.gui.datatypes import UserContainer, FeedContainer
+from rsscast.gui.command.editentrycommand import EditEntryCommand
+from rsscast.gui.command.removeentrycommand import RemoveEntryCommand
 # from rsscast.dataaccess.gpw.gpwdata import GpwIndicatorsData
 # from rsscast.dataaccess.dividendsdata import DividendsCalendarData
 # from rsscast.dataaccess.finreportscalendardata import PublishedFinRepsCalendarData, FinRepsCalendarData
@@ -52,109 +56,6 @@ from rsscast import persist
 _LOGGER = logging.getLogger(__name__)
 
 
-class FeedEntry():
-
-    def __init__(self):
-        self.feedName = None
-        self.feedId   = None
-        self.url      = None
-
-
-class FeedContainer( persist.Versionable ):
-
-    ## 0 - first version
-    _class_version = 0
-
-    def __init__(self):
-        self.feedList: List[  FeedEntry ] = []
-
-    def _convertstate_(self, dict_, dictVersion_ ):
-        _LOGGER.info( "converting object from version %s to %s", dictVersion_, self._class_version )
-
-        if dictVersion_ is None:
-            dictVersion_ = 0
-
-        if dictVersion_ < 0:
-            ## nothing to do
-            dictVersion_ = 0
-
-#         if dictVersion_ == 0:
-#             dict_["stockList"] = dict()
-#             dictVersion_ = 1
-
-        # pylint: disable=W0201
-        self.__dict__ = dict_
-
-    def size(self):
-        return len( self.feedList )
-
-    def get(self, index):
-        return self.feedList[ index ]
-
-    def getList(self) -> List[  FeedEntry ]:
-        return self.feedList
-
-    def addFeed(self, feedName: str, feedId: str, feedUrl: str):
-        feed = FeedEntry()
-        feed.feedName = feedName
-        feed.feedId = feedId
-        feed.url = feedUrl
-        self.feedList.append( feed )
-
-
-class UserContainer():
-
-    ## 0 - first version
-    ## 1 - feed container
-    _class_version = 1
-
-    def __init__(self):
-        self.notes = { "notes": "" }        ## default notes
-        self.feed  = FeedContainer()
-
-    def store( self, outputDir ):
-        changed = False
-
-        outputFile = outputDir + "/version.obj"
-        if persist.store_object( self._class_version, outputFile ) is True:
-            changed = True
-
-        outputFile = outputDir + "/notes.obj"
-        if persist.store_object( self.notes, outputFile ) is True:
-            changed = True
-
-        outputFile = outputDir + "/feed.obj"
-        if persist.store_object( self.feed, outputFile ) is True:
-            changed = True
-
-        ## backup data
-        objFiles = glob.glob( outputDir + "/*.obj" )
-        storedZipFile = outputDir + "/data.zip"
-        persist.backup_files( objFiles, storedZipFile )
-
-        return changed
-
-    def load( self, inputDir ):
-        inputFile = inputDir + "/version.obj"
-        mngrVersion = persist.load_object( inputFile, self._class_version )
-        if mngrVersion != self. _class_version:
-            _LOGGER.info( "converting object from version %s to %s", mngrVersion, self._class_version )
-            ## do nothing for now
-
-        inputFile = inputDir + "/notes.obj"
-        self.notes = persist.load_object( inputFile, self._class_version )
-        if self.notes is None:
-            self.notes = { "notes": "" }
-
-        inputFile = inputDir + "/feed.obj"
-        self.feed = persist.load_object( inputFile, self._class_version )
-        if self.feed is None:
-            self.feed = FeedContainer()
-
-
-## ====================================================================
-
-
 class DataObject( QObject ):
 
     feedChanged = pyqtSignal()
@@ -174,6 +75,7 @@ class DataObject( QObject ):
 
     def load( self, inputDir ):
         self.userContainer.load( inputDir )
+        self.feedChanged.emit()
 
     @property
     def notes(self) -> Dict[str, str]:
@@ -187,6 +89,40 @@ class DataObject( QObject ):
     def feed(self) -> FeedContainer:
         return self.userContainer.feed
 
-    def addFeed(self, feedName: str, feedId: str, feedUrl: str):
-        self.userContainer.feed.addFeed( feedName, feedId, feedUrl )
+    def pushUndo(self, undoCommand):
+        self.undoStack.push( undoCommand )
+
+    ## ================================================================
+
+    def addEntry(self, feedName: str, feedId: str, feedUrl: str):
+        self.userContainer.feed.addFeedNew( feedName, feedId, feedUrl )
         self.feedChanged.emit()
+
+    def addEntryNew(self):
+        parentWidget = self.parent()
+        entryDialog = FeedDialog( None, parentWidget )
+        entryDialog.setModal( True )
+        dialogCode = entryDialog.exec_()
+        if dialogCode == QtWidgets.QDialog.Rejected:
+            return
+        _LOGGER.debug( "adding entry: %s", entryDialog.entry.printData() )
+        command = AddEntryCommand( self, entryDialog.entry )
+        self.pushUndo( command )
+
+    def editEntry(self, entry):
+        if entry is None:
+            return
+        parentWidget = self.parent()
+        entryDialog = FeedDialog( entry, parentWidget )
+        entryDialog.setModal( True )
+        dialogCode = entryDialog.exec_()
+        if dialogCode == QtWidgets.QDialog.Rejected:
+            return
+        command = EditEntryCommand( self, entry, entryDialog.entry )
+        self.pushUndo( command )
+
+    def removeEntry(self, entry):
+        if entry is None:
+            return
+        command = RemoveEntryCommand( self, entry )
+        self.pushUndo( command )

@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2021 Arkadiusz Netczuk <dev.arnet@gmail.com>
+# Copyright (c) 2020 Arkadiusz Netczuk <dev.arnet@gmail.com>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -23,26 +23,29 @@
 
 import logging
 
-from rsscast.gui.dataobject import DataObject
+from PyQt5.QtWidgets import QUndoCommand
 
-from .. import uiloader
-
-
-UiTargetClass, QtBaseClass = uiloader.load_ui_from_class_name( __file__ )
+from rsscast.gui.datatypes import FeedContainer
 
 
 _LOGGER = logging.getLogger(__name__)
 
 
-class FeedWidget( QtBaseClass ):           # type: ignore
+class AddEntryCommand( QUndoCommand ):
 
-    def __init__(self, parentWidget=None):
-        super().__init__(parentWidget)
-        self.ui = UiTargetClass()
-        self.ui.setupUi(self)
+    def __init__(self, dataObject, newEntry, parentCommand=None):
+        super().__init__(parentCommand)
 
-    def connectData(self, dataObject: DataObject):
-        self.ui.feedTableView.connectData( dataObject )
+        self.data = dataObject
+        self.feedContainer: FeedContainer = self.data.feed
+        self.newEntry = newEntry
 
-    def refreshView(self):
-        self.ui.feedTableView.refreshData()
+        self.setText( "Add Entry: " + str(newEntry.feedName) )
+
+    def redo(self):
+        self.feedContainer.addFeed( self.newEntry )
+        self.data.feedChanged.emit()
+
+    def undo(self):
+        self.feedContainer.removeFeed( self.newEntry )
+        self.data.feedChanged.emit()
