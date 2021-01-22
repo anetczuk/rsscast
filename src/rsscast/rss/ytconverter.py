@@ -21,6 +21,9 @@
 # SOFTWARE.
 #
 
+import os
+import tempfile
+from shutil import copyfile
 import time
 import random
 import logging
@@ -142,8 +145,12 @@ def convert_yt_yt1s( link, output, mimicHuman=True ):
 
         dlink = data["dlink"]
 #         print( "grabbing file:", dlink )
-        _LOGGER.info( "grabbing file: %s", dlink )
+        _LOGGER.info( "grabbing file: %s to %s", dlink, output )
         curl_download( session, dlink, output )
+
+        if mimicHuman:
+            randTime = random.uniform( 3.0, 6.0 )
+            time.sleep( randTime )
 
         ## done -- returning
         return True
@@ -190,8 +197,14 @@ def curl_download( session, sourceUrl, outputFile, repeatsOnFail=0 ):
 
 
 def curl_download_raw( session, sourceUrl, outputFile ):
-    session.setopt( pycurl.URL, sourceUrl )
-    with open( outputFile, 'wb' ) as f:
+    fd, path = tempfile.mkstemp()
+    try:
+        session.setopt( pycurl.URL, sourceUrl )
         session.setopt( pycurl.POST, 0)
-        session.setopt( session.WRITEFUNCTION, f.write )
-        session.perform()
+        with os.fdopen(fd, 'wb') as tmp:
+            session.setopt( session.WRITEFUNCTION, tmp.write )
+            session.perform()
+        copyfile( path, outputFile )
+    finally:
+        _LOGGER.info( "removing temporary file: %s", path )
+        os.remove( path )
