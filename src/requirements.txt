@@ -1,3 +1,4 @@
 feedparser
 requests_file
+pycurl
 #youtube-dl
