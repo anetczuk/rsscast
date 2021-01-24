@@ -107,20 +107,6 @@
        </spacer>
       </item>
       <item>
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>Last refresh:</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="refreshTimeLabel">
-        <property name="text">
-         <string>None</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QPushButton" name="refreshPB">
         <property name="text">
          <string>Refresh</string>
@@ -236,7 +222,7 @@
   <customwidget>
    <class>NotesWidget</class>
    <extends>QWidget</extends>
-   <header>rsscast.gui.widget.noteswidget</header>
+   <header>stockmonitor.gui.widget.noteswidget</header>
    <container>1</container>
   </customwidget>
   <customwidget>
