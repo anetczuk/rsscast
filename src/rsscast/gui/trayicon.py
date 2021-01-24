@@ -66,6 +66,13 @@ def load_main_icon( theme: TrayIconTheme ):
     return QIcon( iconPath )
 
 
+def load_disconnect_icon( theme: TrayIconTheme ):
+    fileName = theme.value[1]
+    iconPath = resources.get_image_path( fileName )
+#     _LOGGER.info( "opening icon: %s", iconPath )
+    return QIcon( iconPath )
+
+
 class TrayIcon(QSystemTrayIcon):
     def __init__(self, parent):
         super().__init__(parent)
@@ -90,7 +97,7 @@ class TrayIcon(QSystemTrayIcon):
         timeout = 10000
         ## under xfce4 there is problem with balloon icon -- it changes tray icon, so
         ## it cannot be changed back to proper one. Workaround is to use NoIcon parameter
-        self.showMessage("Stock Monitor", message, QSystemTrayIcon.NoIcon, timeout)
+        self.showMessage("RSS Cast", message, QSystemTrayIcon.NoIcon, timeout)
 
     def drawNumber( self, number, numColor=QColor("red") ):
         self.drawString( number, fontSize=256 + 128, color=numColor )

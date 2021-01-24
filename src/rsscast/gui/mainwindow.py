@@ -32,7 +32,7 @@ from PyQt5.QtWidgets import qApp
 from rsscast.gui.datatypes import FeedEntry
 from rsscast.gui.appwindow import AppWindow
 from rsscast.gui.widget import logwidget
-from rsscast.gui.trayicon import load_main_icon
+from rsscast.gui.trayicon import load_main_icon, load_disconnect_icon
 from rsscast.rss.rssconverter import convert_rss
 from rsscast.rss.rssserver import RSSServerManager
 
@@ -68,10 +68,6 @@ class MainWindow( QtBaseClass ):           # type: ignore
         self.refreshAction.triggered.connect( self.refreshDataForce )
         self.addAction( self.refreshAction )
 
-#         self.tickTimer = QtCore.QTimer( self )
-#         self.tickTimer.timeout.connect( self.updateTrayIndicator )
-#         self.tickTimer.start( 60 * 1000 )                           ## every minute
-
         ## =============================================================
 
         undoStack = self.data.undoStack
@@ -93,7 +89,7 @@ class MainWindow( QtBaseClass ):           # type: ignore
         ## =============================================================
 
         self.trayIcon = trayicon.TrayIcon(self)
-        self._setIconTheme( trayicon.TrayIconTheme.ORANGE )
+        self.setIconTheme( trayicon.TrayIconTheme.ORANGE )
 
         self.ui.serverWidget.connectData( self.data )
         self.ui.feedWidget.connectData( self.data )
@@ -102,6 +98,8 @@ class MainWindow( QtBaseClass ):           # type: ignore
 
         self.ui.refreshPB.clicked.connect( self.refreshDataForce )
 
+        self.ui.serverWidget.statusChanged.connect( self.updateTrayIndicator )
+        self.ui.serverWidget.statusChanged.connect( self.updateTrayToolTip )
         self.ui.notesWidget.dataChanged.connect( self._handleNotesChange )
 
         #qApp.saveStateRequest.connect( self.saveSession )
@@ -171,8 +169,7 @@ class MainWindow( QtBaseClass ):           # type: ignore
         if len(newTitle) < 1:
             newTitle = AppWindow.appTitle
         super().setWindowTitle( newTitle )
-        if hasattr(self, 'trayIcon'):
-            self.trayIcon.setToolTip( newTitle )
+        self.updateTrayToolTip()
 
     def refreshView(self):
         self.ui.serverWidget.refreshWidget()
@@ -224,15 +221,26 @@ class MainWindow( QtBaseClass ):           # type: ignore
         except ValueError:
             statusBar.showMessage( firstStatus, timeout )
 
+    def updateTrayToolTip(self):
+        if hasattr(self, 'trayIcon') is False:
+            return
+        toolTip = self.windowTitle()
+        if self.ui.serverWidget.isServerStarted():
+            toolTip += "\n" + "Server started"
+            self.trayIcon.setToolTip( toolTip )
+        else:
+            toolTip += "\n" + "Server stopped"
+            self.trayIcon.setToolTip( toolTip )
+
+    def getIconTheme(self) -> trayicon.TrayIconTheme:
+        return self.appSettings.trayIcon
+
     def setIconTheme(self, theme: trayicon.TrayIconTheme):
         _LOGGER.debug("setting tray theme: %r", theme)
-        self._setIconTheme( theme )
-        self.updateTrayIndicator()
-
-    def _setIconTheme(self, theme: trayicon.TrayIconTheme):
+        self.appSettings.trayIcon = theme
         appIcon = load_main_icon( theme )
         self.setWindowIcon( appIcon )
-        self.trayIcon.setIcon( appIcon )
+        self.updateTrayIndicator()
 
         ## update charts icon
 #         chartIcon = load_chart_icon( theme )
@@ -241,10 +249,13 @@ class MainWindow( QtBaseClass ):           # type: ignore
 #             w.setWindowIcon( chartIcon )
 
     def updateTrayIndicator(self):
-        pass
-
-    def getIconTheme(self) -> trayicon.TrayIconTheme:
-        return self.appSettings.trayIcon
+        theme = self.appSettings.trayIcon
+        if self.ui.serverWidget.isServerStarted():
+            appIcon = load_main_icon( theme )
+            self.trayIcon.setIcon( appIcon )
+        else:
+            appIcon = load_disconnect_icon( theme )
+            self.trayIcon.setIcon( appIcon )
 
     def showEvent(self, _):
         self.trayIcon.updateLabel()

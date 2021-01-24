@@ -41,7 +41,8 @@ _LOGGER = logging.getLogger(__name__)
 
 class ServerWidget( QtBaseClass ):           # type: ignore
 
-    statusChanged = pyqtSignal()
+    _internalStatusChanged = pyqtSignal()
+    statusChanged          = pyqtSignal()
 
     def __init__(self, parentWidget=None):
         super().__init__(parentWidget)
@@ -56,13 +57,20 @@ class ServerWidget( QtBaseClass ):           # type: ignore
         self.ui.startPB.clicked.connect( self.startServer )
         self.ui.stopPB.clicked.connect( self.stopServer )
 
-        self.statusChanged.connect( self.refreshWidget, QtCore.Qt.QueuedConnection )
+        self._internalStatusChanged.connect( self.statusChanged, QtCore.Qt.QueuedConnection )
+        self.statusChanged.connect( self.refreshWidget )
 
         self.refreshWidget()
 
     def connectData(self, dataObject: DataObject):
         ## do nothing
         pass
+
+    def isServerStarted(self):
+        status: RSSServerManager.Status = self.server.getStatus()
+        if status is RSSServerManager.Status.STARTED:
+            return True
+        return False
 
     def startServer(self):
         self.server.port = self.ui.portSB.value()
@@ -76,7 +84,7 @@ class ServerWidget( QtBaseClass ):           # type: ignore
     def refreshWidget(self):
         status: RSSServerManager.Status = self.server.getStatus()
         self.ui.statusLabel.setText( status.value )
-        if status is RSSServerManager.Status.STARTED:
+        if self.isServerStarted():
             self.ui.startPB.setEnabled( False )
             self.ui.stopPB.setEnabled( True )
         else:
@@ -84,7 +92,7 @@ class ServerWidget( QtBaseClass ):           # type: ignore
             self.ui.stopPB.setEnabled( False )
 
     def _serverStarted(self):
-        self.statusChanged.emit()
+        self._internalStatusChanged.emit()
 
     def _serverStopped(self):
-        self.statusChanged.emit()
+        self._internalStatusChanged.emit()
