@@ -175,6 +175,7 @@ class MainWindow( QtBaseClass ):           # type: ignore
             self.trayIcon.setToolTip( newTitle )
 
     def refreshView(self):
+        self.ui.serverWidget.refreshWidget()
         self.ui.feedWidget.refreshView()
         self.ui.notesWidget.setNotes( self.data.notes )
 

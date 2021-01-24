@@ -25,6 +25,8 @@
 import os
 import logging
 import threading
+from enum import Enum, unique
+from typing import Callable
 
 import socket
 import socketserver
@@ -78,6 +80,11 @@ class RSSServer( socketserver.TCPServer ):
 
 class RSSServerManager():
 
+    @unique
+    class Status(Enum):
+        STARTED        = 'Started'
+        STOPPED        = 'Stopped'
+
     PORT = 8080
     Handler = RootedHTTPRequestHandler
 #     Handler = SimpleHTTPRequestHandler
@@ -87,6 +94,8 @@ class RSSServerManager():
         self._service = None
         self._thread = None
         self._rootDir = None
+        self.startedCallback: Callable = None
+        self.stoppedCallback: Callable = None
 
     @staticmethod
     def getPrimaryIp():
@@ -106,6 +115,12 @@ class RSSServerManager():
 #         return local_ip
 
 #         return socket.gethostbyname( socket.getfqdn() )
+
+    @synchronized
+    def getStatus(self) -> 'RSSServerManager.Status':
+        if self._service is not None:
+            return RSSServerManager.Status.STARTED
+        return RSSServerManager.Status.STOPPED
 
     @synchronized
     def start(self, rootDir=None):
@@ -134,12 +149,14 @@ class RSSServerManager():
             try:
                 _LOGGER.info("serving at port %s", RSSServerManager.PORT)
                 httpd.allow_reuse_address = True
+                self._notifyStarted()
                 httpd.serve_forever()
     #             httpd.handle_request()
             finally:
                 self._service.server_close()
                 self._service = None
                 self._thread = None
+                self._notifyStopped()
         _LOGGER.info( "server thread ended" )
 
     @synchronized
@@ -147,3 +164,15 @@ class RSSServerManager():
         if self._service is None:
             return
         self._service.shutdown()
+
+    def _notifyStarted(self):
+        if not callable( self.startedCallback ):
+            return
+        # pylint: disable=E1102
+        self.startedCallback()
+
+    def _notifyStopped(self):
+        if not callable( self.stoppedCallback ):
+            return
+        # pylint: disable=E1102
+        self.stoppedCallback()

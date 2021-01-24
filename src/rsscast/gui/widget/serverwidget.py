@@ -23,6 +23,9 @@
 
 import logging
 
+from PyQt5 import QtCore
+from PyQt5.QtCore import pyqtSignal
+
 from rsscast import DATA_DIR
 from rsscast.gui.dataobject import DataObject
 from rsscast.rss.rssserver import RSSServerManager
@@ -38,7 +41,7 @@ _LOGGER = logging.getLogger(__name__)
 
 class ServerWidget( QtBaseClass ):           # type: ignore
 
-#     fileChanged   = pyqtSignal()
+    statusChanged = pyqtSignal()
 
     def __init__(self, parentWidget=None):
         super().__init__(parentWidget)
@@ -46,6 +49,15 @@ class ServerWidget( QtBaseClass ):           # type: ignore
         self.ui.setupUi(self)
 
         self.server = RSSServerManager()
+        self.server.startedCallback = self._serverStarted
+        self.server.stoppedCallback = self._serverStopped
+
+        self.ui.startPB.clicked.connect( self.startServer )
+        self.ui.stopPB.clicked.connect( self.stopServer )
+
+        self.statusChanged.connect( self.refreshWidget, QtCore.Qt.QueuedConnection )
+
+        self.refreshWidget()
 
     def connectData(self, dataObject: DataObject):
         ## do nothing
@@ -53,6 +65,24 @@ class ServerWidget( QtBaseClass ):           # type: ignore
 
     def startServer(self):
         self.server.start( DATA_DIR )
+        self.refreshWidget()
 
     def stopServer(self):
         self.server.stop()
+        self.refreshWidget()
+
+    def refreshWidget(self):
+        status: RSSServerManager.Status = self.server.getStatus()
+        self.ui.statusLabel.setText( status.value )
+        if status is RSSServerManager.Status.STARTED:
+            self.ui.startPB.setEnabled( False )
+            self.ui.stopPB.setEnabled( True )
+        else:
+            self.ui.startPB.setEnabled( True )
+            self.ui.stopPB.setEnabled( False )
+
+    def _serverStarted(self):
+        self.statusChanged.emit()
+
+    def _serverStopped(self):
+        self.statusChanged.emit()
