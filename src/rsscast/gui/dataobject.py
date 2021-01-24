@@ -33,24 +33,6 @@ from rsscast.gui.command.addentrycommand import AddEntryCommand
 from rsscast.gui.datatypes import UserContainer, FeedContainer
 from rsscast.gui.command.editentrycommand import EditEntryCommand
 from rsscast.gui.command.removeentrycommand import RemoveEntryCommand
-# from rsscast.dataaccess.gpw.gpwdata import GpwIndicatorsData
-# from rsscast.dataaccess.dividendsdata import DividendsCalendarData
-# from rsscast.dataaccess.finreportscalendardata import PublishedFinRepsCalendarData, FinRepsCalendarData
-# from rsscast.dataaccess.globalindexesdata import GlobalIndexesData
-# from rsscast.dataaccess.gpw.gpwcurrentdata import GpwCurrentStockData,\
-#     GpwCurrentIndexesData
-#
-# import rsscast.gui.threadlist as threadlist
-# from rsscast.gui.command.addfavgroupcommand import AddFavGroupCommand
-# from rsscast.gui.command.deletefavgroupcommand import DeleteFavGroupCommand
-# from rsscast.gui.command.renamefavgroupcommand import RenameFavGroupCommand
-# from rsscast.gui.command.addfavcommand import AddFavCommand
-# from rsscast.gui.command.deletefavcommand import DeleteFavCommand
-# from rsscast.gui.command.reorderfavgroupscommand import ReorderFavGroupsCommand
-# from rsscast.gui.datatypes import UserContainer, StockData,\
-#     GpwStockIntradayMap, GpwIndexIntradayMap, FavData, WalletData,\
-#     broker_commission, TransHistory, TransactionMatchMode
-# from rsscast.dataaccess.gpw.gpwespidata import GpwESPIData
 
 
 _LOGGER = logging.getLogger(__name__)

@@ -190,15 +190,6 @@ class MainWindow( QtBaseClass ):           # type: ignore
         except BaseException:
             _LOGGER.exception( "unable to refresh data" )
 
-#     def _updateStockTimestamp(self):
-#         ## update stock timestamp
-#         timestamp = self.data.gpwCurrentData.grabTimestamp
-#         if timestamp is None:
-#             self.ui.refreshTimeLabel.setText("None")
-#         else:
-#             dateString = timestamp.strftime( "%Y-%m-%d %H:%M:%S" )
-#             self.ui.refreshTimeLabel.setText( dateString )
-
     ## ====================================================================
 
     def _handleNotesChange(self):
