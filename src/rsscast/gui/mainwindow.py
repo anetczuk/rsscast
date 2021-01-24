@@ -25,6 +25,7 @@ import logging
 # import datetime
 from typing import List
 
+from PyQt5.QtCore import Qt
 from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtWidgets import QDialog
 from PyQt5.QtWidgets import qApp
@@ -33,6 +34,7 @@ from rsscast.gui.datatypes import FeedEntry
 from rsscast.gui.appwindow import AppWindow
 from rsscast.gui.widget import logwidget
 from rsscast.gui.trayicon import load_main_icon, load_disconnect_icon
+from rsscast.gui import threadlist
 from rsscast.rss.rssconverter import convert_rss
 from rsscast.rss.rssserver import RSSServerManager
 
@@ -177,18 +179,26 @@ class MainWindow( QtBaseClass ):           # type: ignore
         self.ui.notesWidget.setNotes( self.data.notes )
 
     def refreshDataForce(self):
-#         self.refreshAction.setEnabled( False )
-#         self.ui.refreshPB.setEnabled( False )
+        self.refreshAction.setEnabled( False )
+        self.ui.refreshPB.setEnabled( False )
 
-        try:
-            hostIp = RSSServerManager.getPrimaryIp()
-            feedList: List[ FeedEntry ] = self.data.feed.getList()
-            for feed in feedList:
-                _LOGGER.info( "refreshing feed %s: %s", feed.feedName, feed.url )
-                convert_rss( hostIp, feed.feedId, feed.url )
-            _LOGGER.info( "refreshing done" )
-        except BaseException:
-            _LOGGER.exception( "unable to refresh data" )
+#         threads = threadlist.QThreadList( self )
+#         threads = threadlist.SerialList( self )
+        threads = threadlist.QThreadMeasuredList( self )
+#         threads = threadlist.ProcessList( self )
+
+        threads.finished.connect( threads.deleteLater )
+        threads.finished.connect( self._refreshingFinished, Qt.QueuedConnection )
+
+        hostIp = RSSServerManager.getPrimaryIp()
+        feedList: List[ FeedEntry ] = self.data.feed.getList()
+        for feed in feedList:
+            threads.appendFunction( convert_rss, (hostIp, feed.feedId, feed.url) )
+        threads.start()
+
+    def _refreshingFinished(self):
+        self.refreshAction.setEnabled( True )
+        self.ui.refreshPB.setEnabled( True )
 
     ## ====================================================================
 
