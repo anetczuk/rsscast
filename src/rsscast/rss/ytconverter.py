@@ -115,7 +115,7 @@ def convert_yt_yt1s( link, output, mimicHuman=True ):
             return False
 
         if mimicHuman:
-            randTime = random.uniform( 3.0, 6.0 )
+            randTime = random.uniform( 2.0, 4.0 )
             time.sleep( randTime )
 
         vidId = data["vid"]
@@ -128,7 +128,7 @@ def convert_yt_yt1s( link, output, mimicHuman=True ):
 #         _LOGGER.info( "response:\n%s", bodyOutput )
 
         if mimicHuman:
-            randTime = random.uniform( 3.0, 6.0 )
+            randTime = random.uniform( 2.0, 4.0 )
             time.sleep( randTime )
 
         data = json.loads( bodyOutput )
@@ -149,7 +149,7 @@ def convert_yt_yt1s( link, output, mimicHuman=True ):
         curl_download( session, dlink, output )
 
         if mimicHuman:
-            randTime = random.uniform( 3.0, 6.0 )
+            randTime = random.uniform( 2.0, 4.0 )
             time.sleep( randTime )
 
         ## done -- returning
