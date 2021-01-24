@@ -52,6 +52,7 @@ class ServerWidget( QtBaseClass ):           # type: ignore
         self.server.startedCallback = self._serverStarted
         self.server.stoppedCallback = self._serverStopped
 
+        self.ui.portSB.setValue( RSSServerManager.DEFAULT_PORT )
         self.ui.startPB.clicked.connect( self.startServer )
         self.ui.stopPB.clicked.connect( self.stopServer )
 
@@ -64,6 +65,7 @@ class ServerWidget( QtBaseClass ):           # type: ignore
         pass
 
     def startServer(self):
+        self.server.port = self.ui.portSB.value()
         self.server.start( DATA_DIR )
         self.refreshWidget()
 

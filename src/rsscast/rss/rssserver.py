@@ -85,12 +85,13 @@ class RSSServerManager():
         STARTED        = 'Started'
         STOPPED        = 'Stopped'
 
-    PORT = 8080
+    DEFAULT_PORT = 8080
     Handler = RootedHTTPRequestHandler
 #     Handler = SimpleHTTPRequestHandler
 
     def __init__(self):
         socketserver.TCPServer.allow_reuse_address = True
+        self.port = RSSServerManager.DEFAULT_PORT
         self._service = None
         self._thread = None
         self._rootDir = None
@@ -103,9 +104,9 @@ class RSSServerManager():
         try:
             # doesn't even have to be reachable
             s.connect(('10.255.255.255', 1))
-            IP = s.getsockname()[0] + ":" + str(RSSServerManager.PORT)
+            IP = s.getsockname()[0] + ":" + str(RSSServerManager.DEFAULT_PORT)
         except BaseException:
-            IP = '127.0.0.1' + ":" + str(RSSServerManager.PORT)
+            IP = '127.0.0.1' + ":" + str(RSSServerManager.DEFAULT_PORT)
         finally:
             s.close()
         return IP
@@ -142,12 +143,12 @@ class RSSServerManager():
         serverThread.join()
 
     def _run(self):
-        with RSSServer(("", RSSServerManager.PORT), RSSServerManager.Handler) as httpd:
-#         with socketserver.TCPServer(("", RSSServerManager.PORT), RSSServerManager.Handler) as httpd:
+        with RSSServer(("", self.port), RSSServerManager.Handler) as httpd:
+#         with socketserver.TCPServer(("", self.port), RSSServerManager.Handler) as httpd:
             self._service = httpd
             self._service.base_path = self._rootDir
             try:
-                _LOGGER.info("serving at port %s", RSSServerManager.PORT)
+                _LOGGER.info("serving at port %s", self.port)
                 httpd.allow_reuse_address = True
                 self._notifyStarted()
                 httpd.serve_forever()
