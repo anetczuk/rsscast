@@ -111,7 +111,7 @@ def convert_yt_yt1s( link, output, mimicHuman=True ):
         jsonMess = data['mess']
         if jsonMess != "":
             ## happens always for delayed premieres
-            _LOGGER.warning( "invalid status:\n%s", bodyOutput )
+            _LOGGER.warning( "invalid status while converting %s:\n%s\npremiere?", link, bodyOutput )
             return False
 
         if mimicHuman:
@@ -155,9 +155,10 @@ def convert_yt_yt1s( link, output, mimicHuman=True ):
         ## done -- returning
         return True
 
-#         except Exception as err:
-#             logging.exception("Unexpected exception")
-#             return ""
+#    except Exception as err:
+#        logging.exception("Unexpected exception")
+#        return False
+
     finally:
         session.close()
 
