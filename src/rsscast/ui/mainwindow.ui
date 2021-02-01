@@ -222,7 +222,7 @@
   <customwidget>
    <class>NotesWidget</class>
    <extends>QWidget</extends>
-   <header>stockmonitor.gui.widget.noteswidget</header>
+   <header>rsscast.gui.widget.noteswidget</header>
    <container>1</container>
   </customwidget>
   <customwidget>
