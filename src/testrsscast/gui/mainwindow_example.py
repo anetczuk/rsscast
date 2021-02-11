@@ -83,10 +83,10 @@ window.setWindowTitle( window.windowTitle() )
 if args.loadUserData:
     window.loadData()
 else:
-    ytLatinoPath = "file://" + get_data_path( "yt_latino_short.rss" )
-    window.data.addFeed( "Youtube Latino Short", "test/xxx", ytLatinoPath )
-    window.data.addFeed( "Konfederacja TV", "konfederacja",
-                         "http://www.youtube.com/feeds/videos.xml?user=TheNWOChannelTV" )
+    window.data.addEntry( "Real Python", "realpython", 
+                          "http://www.youtube.com/feeds/videos.xml?channel_id=UCI0vQvr9aFn27yR6Ej6n5UA" )
+    window.data.addEntry( "Monty Python", "montypython",
+                          "http://www.youtube.com/feeds/videos.xml?user=MontyPython" )
 
 window.loadSettings()
 window.startServer()
