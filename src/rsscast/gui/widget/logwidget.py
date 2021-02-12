@@ -24,7 +24,7 @@
 import os
 import logging
 
-from PyQt5 import QtCore
+from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QApplication
 
@@ -52,7 +52,15 @@ class LogWidget( QtBaseClass ):           # type: ignore
         self.ui = UiTargetClass()
         self.ui.setupUi(self)
 
-        self.fileChanged.connect( self.updateLogView, QtCore.Qt.QueuedConnection )
+        self.fileChanged.connect( self._fileChanged, QtCore.Qt.QueuedConnection )
+        self.ui.autoScrollCB.stateChanged.connect( self._autoScrollChanged )
+        self.ui.autoScrollCB.setChecked( True )
+
+#         self.ui.textEdit.textChanged.connect( self._textChanged )
+
+        verticalBar = self.ui.textEdit.verticalScrollBar()
+        verticalBar.rangeChanged.connect( self._scrollRangeChanged )
+        verticalBar.valueChanged.connect( self._scrollValueChanged )
 
         self.logFile = get_logging_output_file()
 
@@ -60,42 +68,86 @@ class LogWidget( QtBaseClass ):           # type: ignore
         logging.getLogger('watchdog.observers.inotify_buffer').setLevel(logging.INFO)
 
         event_handler = PatternMatchingEventHandler( patterns=[self.logFile] )
-        event_handler.on_any_event = self._logFileChanged
+        event_handler.on_any_event = self._logFileCallback
 
         dirPath = os.path.dirname( self.logFile )
         self.observer = Observer()
-        self.observer.schedule( event_handler, path=dirPath, recursive=False )
+        self.observer.schedule( event_handler, path=dirPath, recursive=False )        
+      
+        self.updateLogView()
         self.observer.start()
 
-        self.updateLogView()
-
     def updateLogView(self):
+        ## method can be run from different threads
+        ## call method through Qt event queue to prevent
+        ## concurrent access control
+        QtCore.QTimer.singleShot( 1, self._updateText )
+            
+    def scrollDown(self):
         verticalBar = self.ui.textEdit.verticalScrollBar()
-        vertValue = verticalBar.value()
-        atBottom = vertValue == verticalBar.maximum()
-
+        verticalBar.triggerAction( QtWidgets.QAbstractSlider.SliderToMaximum )
+    
+    def _updateText(self):
+        verticalBar = self.ui.textEdit.verticalScrollBar()
+        currPos = verticalBar.value()
+#         print( "_updateText", "val:", currPos )
+        
         with open(self.logFile, "r") as myfile:
             fileText = myfile.read()
-            self.ui.textEdit.setText( str(fileText) )
+            self.ui.textEdit.setPlainText( str(fileText) )
+            
+        if self.ui.autoScrollCB.isChecked() == False:
+            verticalBar.setValue( currPos )
 
-        if atBottom:
-            verticalBar.setValue( verticalBar.maximum() )
+    def _autoScrollChanged(self):
+        if self.ui.autoScrollCB.isChecked():
+            verticalBar = self.ui.textEdit.verticalScrollBar()
+            verticalBar.setEnabled( False )
+            self.scrollDown()
         else:
-            verticalBar.setValue( vertValue )
+            verticalBar = self.ui.textEdit.verticalScrollBar()
+            verticalBar.setEnabled( True )
+
+#     def _textChanged(self):
+#         verticalBar = self.ui.textEdit.verticalScrollBar()
+#         print( "_textChanged", "val:", verticalBar.value() )
+
+    def _scrollRangeChanged(self, minVal, maxVal):
+        verticalBar = self.ui.textEdit.verticalScrollBar()
+#         print( "_scrollRangeChanged", "min:", minVal, "max:", maxVal, "val:", verticalBar.value() )
+        if self.ui.autoScrollCB.isChecked():
+            verticalBar.setValue( maxVal )
+
+    def _scrollValueChanged(self, value):
+        verticalBar = self.ui.textEdit.verticalScrollBar()
+#         print( "_scrollValueChanged", "val:", value, "max:", verticalBar.maximum() )
+        if self.ui.autoScrollCB.isChecked():
+            if value != verticalBar.maximum():
+                verticalBar.setValue( verticalBar.maximum() )
 
     # Override closeEvent, to intercept the window closing event
     def closeEvent(self, event):
         self.observer.stop()
         self.observer.join()
+        self.observer = None
         super().closeEvent( event )
         self.close()
 
-    def _logFileChanged(self, _):
+    def _logFileCallback(self, _):
+        if self.observer is None:
+            ## window closed -- ignore
+            return
         self.fileChanged.emit()
+
+    def _fileChanged(self):
+        self.updateLogView()
 
 
 def create_window( parent=None ):
     logWindow = AppWindow( parent )
+    newTitle = AppWindow.appTitle + " Log"
+    logWindow.setWindowTitle( newTitle )
+        
     widget = LogWidget( logWindow )
     logWindow.addWidget( widget )
     logWindow.move( 0, 0 )
