@@ -42,7 +42,6 @@ from PyQt5.QtWidgets import QApplication
 import rsscast.logger as logger
 from rsscast.gui.sigint import setup_interrupt_handling
 from rsscast.gui.mainwindow import MainWindow
-from testrsscast.data import get_data_path
 
 
 ## ============================= main section ===================================
@@ -83,7 +82,7 @@ window.setWindowTitle( window.windowTitle() )
 if args.loadUserData:
     window.loadData()
 else:
-    window.data.addEntry( "Real Python", "realpython", 
+    window.data.addEntry( "Real Python", "realpython",
                           "http://www.youtube.com/feeds/videos.xml?channel_id=UCI0vQvr9aFn27yR6Ej6n5UA" )
     window.data.addEntry( "Monty Python", "montypython",
                           "http://www.youtube.com/feeds/videos.xml?user=MontyPython" )
@@ -98,6 +97,8 @@ window.show()
 #     pass
 # else:
 #     window.show()
+
+#window.openLogsWindow()
 
 exitCode = app.exec_()
 

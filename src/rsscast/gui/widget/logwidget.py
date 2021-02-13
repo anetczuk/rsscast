@@ -24,7 +24,7 @@
 import os
 import logging
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QApplication
 
@@ -37,10 +37,71 @@ from rsscast.gui.appwindow import AppWindow
 from .. import uiloader
 
 
-UiTargetClass, QtBaseClass = uiloader.load_ui_from_class_name( __file__ )
-
-
 _LOGGER = logging.getLogger(__name__)
+
+
+class AutoScrollTextEdit( QtWidgets.QTextEdit ):
+
+    def __init__(self, parentWidget=None):
+        super().__init__(parentWidget)
+
+        self.autoScroll = False
+
+        self.setLineWrapMode( QtWidgets.QTextEdit.NoWrap )
+
+#         self.textChanged.connect( self._textChanged )
+
+        verticalBar = self.verticalScrollBar()
+        verticalBar.rangeChanged.connect( self._scrollRangeChanged )
+        verticalBar.valueChanged.connect( self._scrollValueChanged )
+
+    def setAutoScroll( self, state: bool ):
+        self.autoScroll = state
+        if self.autoScroll:
+            verticalBar = self.verticalScrollBar()
+            verticalBar.setEnabled( False )
+            self.scrollDown()
+        else:
+            verticalBar = self.verticalScrollBar()
+            verticalBar.setEnabled( True )
+
+    def setContent( self, content: str ):
+        verticalBar = self.verticalScrollBar()
+        currPos = verticalBar.value()
+#         print( "setContent", "val:", currPos )
+
+        self.setPlainText( content )
+
+        if self.autoScroll is False:
+            verticalBar.setValue( currPos )
+
+    def scrollDown(self):
+        verticalBar = self.verticalScrollBar()
+        verticalBar.triggerAction( QtWidgets.QAbstractSlider.SliderToMaximum )
+
+#     def _textChanged(self):
+#         verticalBar = self.verticalScrollBar()
+#         print( "_textChanged", "val:", verticalBar.value() )
+
+#     def _scrollRangeChanged(self, minVal, maxVal):
+    def _scrollRangeChanged(self, _, maxVal):
+        verticalBar = self.verticalScrollBar()
+#         print( "_scrollRangeChanged", "min:", minVal, "max:", maxVal, "val:", verticalBar.value() )
+        if self.autoScroll:
+            verticalBar.setValue( maxVal )
+
+    def _scrollValueChanged(self, value):
+        verticalBar = self.verticalScrollBar()
+#         print( "_scrollValueChanged", "val:", value, "max:", verticalBar.maximum() )
+        if self.autoScroll:
+            if value != verticalBar.maximum():
+                verticalBar.setValue( verticalBar.maximum() )
+
+
+## ======================================================================
+
+
+UiTargetClass, QtBaseClass = uiloader.load_ui_from_class_name( __file__ )
 
 
 class LogWidget( QtBaseClass ):           # type: ignore
@@ -56,11 +117,8 @@ class LogWidget( QtBaseClass ):           # type: ignore
         self.ui.autoScrollCB.stateChanged.connect( self._autoScrollChanged )
         self.ui.autoScrollCB.setChecked( True )
 
-#         self.ui.textEdit.textChanged.connect( self._textChanged )
-
-        verticalBar = self.ui.textEdit.verticalScrollBar()
-        verticalBar.rangeChanged.connect( self._scrollRangeChanged )
-        verticalBar.valueChanged.connect( self._scrollValueChanged )
+        self.ui.splitByThredCB.stateChanged.connect( self._splitThreadsChanged )
+#         self.ui.splitByThredCB.setChecked( True )
 
         self.logFile = get_logging_output_file()
 
@@ -72,8 +130,8 @@ class LogWidget( QtBaseClass ):           # type: ignore
 
         dirPath = os.path.dirname( self.logFile )
         self.observer = Observer()
-        self.observer.schedule( event_handler, path=dirPath, recursive=False )        
-      
+        self.observer.schedule( event_handler, path=dirPath, recursive=False )
+
         self.updateLogView()
         self.observer.start()
 
@@ -82,48 +140,67 @@ class LogWidget( QtBaseClass ):           # type: ignore
         ## call method through Qt event queue to prevent
         ## concurrent access control
         QtCore.QTimer.singleShot( 1, self._updateText )
-            
+
     def scrollDown(self):
-        verticalBar = self.ui.textEdit.verticalScrollBar()
-        verticalBar.triggerAction( QtWidgets.QAbstractSlider.SliderToMaximum )
-    
+        layoutItems = self.ui.logLayout.count()
+        for i in range(0, layoutItems):
+            itemWidget = self.ui.logLayout.itemAt( i ).widget()
+            if itemWidget is None:
+                continue
+            itemWidget.scrollDown()
+
     def _updateText(self):
-        verticalBar = self.ui.textEdit.verticalScrollBar()
-        currPos = verticalBar.value()
-#         print( "_updateText", "val:", currPos )
-        
+        if self.ui.splitByThredCB.isChecked() is False:
+            with open(self.logFile, "r") as myfile:
+                fileText = myfile.read()
+                content = str(fileText)
+                textEdit = self._getTextEdit( "full" )
+                textEdit.setContent( content )
+            return
+
+        threadsDict = {}
+
         with open(self.logFile, "r") as myfile:
-            fileText = myfile.read()
-            self.ui.textEdit.setPlainText( str(fileText) )
-            
-        if self.ui.autoScrollCB.isChecked() == False:
-            verticalBar.setValue( currPos )
+            linesContent = myfile.readlines()
+            recentThread = None
+            for line in linesContent:
+                fields = line.split()
+
+                threadName = "full"
+                threadLines = threadsDict.get( threadName, list() )
+                threadLines.append( line )
+                threadsDict[ threadName ] = threadLines
+
+                if len(fields) > 3:
+                    recentThread = fields[3]
+
+                if recentThread is None:
+                    continue
+
+                threadLines = threadsDict.get( recentThread, list() )
+                threadLines.append( line )
+                threadsDict[ recentThread ] = threadLines
+
+        for key, contentList in threadsDict.items():
+            textEdit = self._getTextEdit( key )
+            content = "".join( contentList )            ## newline char is in the end of each item of list (line)
+            textEdit.setContent( content )
+
+#         pprint( threadsDict )
+#         print( threadsDict.keys() )
 
     def _autoScrollChanged(self):
-        if self.ui.autoScrollCB.isChecked():
-            verticalBar = self.ui.textEdit.verticalScrollBar()
-            verticalBar.setEnabled( False )
-            self.scrollDown()
-        else:
-            verticalBar = self.ui.textEdit.verticalScrollBar()
-            verticalBar.setEnabled( True )
+        newState = self.ui.autoScrollCB.isChecked()
+        layoutItems = self.ui.logLayout.count()
+        for i in range(0, layoutItems):
+            itemWidget = self.ui.logLayout.itemAt( i ).widget()
+            if itemWidget is None:
+                continue
+            itemWidget.setAutoScroll( newState )
 
-#     def _textChanged(self):
-#         verticalBar = self.ui.textEdit.verticalScrollBar()
-#         print( "_textChanged", "val:", verticalBar.value() )
-
-    def _scrollRangeChanged(self, minVal, maxVal):
-        verticalBar = self.ui.textEdit.verticalScrollBar()
-#         print( "_scrollRangeChanged", "min:", minVal, "max:", maxVal, "val:", verticalBar.value() )
-        if self.ui.autoScrollCB.isChecked():
-            verticalBar.setValue( maxVal )
-
-    def _scrollValueChanged(self, value):
-        verticalBar = self.ui.textEdit.verticalScrollBar()
-#         print( "_scrollValueChanged", "val:", value, "max:", verticalBar.maximum() )
-        if self.ui.autoScrollCB.isChecked():
-            if value != verticalBar.maximum():
-                verticalBar.setValue( verticalBar.maximum() )
+    def _splitThreadsChanged(self):
+        self._clearTextWidgets()
+        self.updateLogView()
 
     # Override closeEvent, to intercept the window closing event
     def closeEvent(self, event):
@@ -142,12 +219,36 @@ class LogWidget( QtBaseClass ):           # type: ignore
     def _fileChanged(self):
         self.updateLogView()
 
+    def _clearTextWidgets(self):
+        textLayout = self.ui.logLayout
+        item = textLayout.takeAt( 0 )
+        while item is not None:
+            item.widget().deleteLater()
+            del item
+            item = textLayout.takeAt( 0 )
+
+    def _getTextEdit(self, name):
+        layoutItems = self.ui.logLayout.count()
+        for i in range(0, layoutItems):
+            itemWidget = self.ui.logLayout.itemAt( i ).widget()
+            if itemWidget is None:
+                continue
+            if itemWidget.objectName() == name:
+                return itemWidget
+
+        newTextEdit = AutoScrollTextEdit( self )
+        newTextEdit.setObjectName( name )
+        newState = self.ui.autoScrollCB.isChecked()
+        newTextEdit.setAutoScroll( newState )
+        self.ui.logLayout.addWidget( newTextEdit )
+        return newTextEdit
+
 
 def create_window( parent=None ):
     logWindow = AppWindow( parent )
     newTitle = AppWindow.appTitle + " Log"
     logWindow.setWindowTitle( newTitle )
-        
+
     widget = LogWidget( logWindow )
     logWindow.addWidget( widget )
     logWindow.move( 0, 0 )

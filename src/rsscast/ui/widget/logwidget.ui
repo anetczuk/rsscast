@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Log Widget</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1">
    <property name="leftMargin">
     <number>0</number>
    </property>
@@ -36,6 +36,13 @@
       </widget>
      </item>
      <item>
+      <widget class="QCheckBox" name="splitByThredCB">
+       <property name="text">
+        <string>Split by thread</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -51,14 +58,7 @@
     </layout>
    </item>
    <item>
-    <widget class="QTextEdit" name="textEdit">
-     <property name="lineWrapMode">
-      <enum>QTextEdit::NoWrap</enum>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
+    <layout class="QVBoxLayout" name="logLayout"/>
    </item>
   </layout>
  </widget>
