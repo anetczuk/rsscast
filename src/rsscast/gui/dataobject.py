@@ -46,7 +46,7 @@ class DataObject( QObject ):
         super().__init__( parent )
         self.parentWidget = parent
 
-        self.userContainer      = UserContainer()                   ## user data
+        self.userContainer = UserContainer()                   ## user data
 
         self.undoStack = QUndoStack(self)
 
