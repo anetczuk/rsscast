@@ -9,7 +9,7 @@ The goal is achieved using third party webside executing the conversion.
 
 ## Disclaimer
 
-Application uses `http.server` module. Accourding to module's home page:
+Application uses `http.server` module. According to module's home page:
  
 > `http.server` is not recommended for production. It only implements basic security checks.
 
