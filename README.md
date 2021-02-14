@@ -7,7 +7,13 @@ provide Youtube videos in form of audio feed. Application does not need any form
 The goal is achieved using third party webside executing the conversion. 
 
 
-By default each converted audio feed is available at address: _http://{local_ip}:8080/feed/{id}/rss_ 
+## Disclaimer
+
+Application uses `http.server` module. Accourding to module's home page:
+ 
+> `http.server` is not recommended for production. It only implements basic security checks.
+
+so it's advisable not to expose the server to public network.
 
 
 ## Screens
@@ -16,13 +22,22 @@ By default each converted audio feed is available at address: _http://{local_ip}
 [![Feed tab](doc/mainwindow-feed-small.png "Feed tab")](doc/mainwindow-feed-big.png)
 
 
-## Disclaimer
+## How it works?
 
-Application uses `http.server` module. Accourding to module's home page:
- 
-> `http.server` is not recommended for production. It only implements basic security checks.
+Application reads Youtube feeds taken from `Feed` table. Each feed is parsed and converted to proper RSS 
+compatible with podcast applications. From each video audio file is extracted. RSS and audio files are 
+stored locally and exposed to local network using configuration from `Server` tab.
 
-so it's advisable not to expose the server to public network.
+Published content by default can be seen on [http://localhost:8080](http://localhost:8080). 
+
+Meaning of _Feed_ table columns:
+- _Name_ -- descriptive name of given feed
+- _Id_ -- identifier of the feed to be distinguished
+- _Url_ -- source address of the feed
+
+For each feed there is converted RSS available under address `http://{host}:8080/feed/{feed_id}/rss`.
+
+For example `Id` field with value `examplechannel` will lead to following RSS: `http://localhost:8080/feed/examplechannel/rss`. 
 
 
 ## Similar projects
@@ -35,3 +50,4 @@ so it's advisable not to expose the server to public network.
 
 - https://www.rssboard.org/rss-profile
 - https://yt1s.com
+- https://docs.python.org/3/library/http.server.html
