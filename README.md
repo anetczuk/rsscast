@@ -16,6 +16,15 @@ By default each converted audio feed is available at address: _http://{local_ip}
 [![Feed tab](doc/mainwindow-feed-small.png "Feed tab")](doc/mainwindow-feed-big.png)
 
 
+## Disclaimer
+
+Application uses `http.server` module. Accourding to module's home page:
+ 
+> `http.server` is not recommended for production. It only implements basic security checks.
+
+so it's advisable not to expose the server to public network.
+
+
 ## Similar projects
 
 - YouCast
