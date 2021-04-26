@@ -6,4 +6,4 @@ set -eu
 SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
 
 
-pip3 install -r $SCRIPT_DIR/requirements.txt
+pip3 install --user -r $SCRIPT_DIR/requirements.txt

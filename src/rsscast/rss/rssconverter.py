@@ -86,27 +86,27 @@ def convert_rss_content( host, feedId, feedContent ):
         if 'media_thumbnail' in post:
             thumbnail = post['media_thumbnail'][0]
             # pylint: disable=C0301
-            mediaThumbnailNode = f"""<media:thumbnail url="{thumbnail['url']}" width="{thumbnail['width']}" height="{thumbnail['height']}"/>"""
+            mediaThumbnailNode = """<media:thumbnail url="%s" width="%s" height="%s"/>""" % (thumbnail['url'], thumbnail['width'], thumbnail['height'])
 
         description = post.get('summary', '')
         # description = html.escape( description )
 
         postTitle = html.escape( postTitle )
 
-        item_result = f"""
+        item_result = """
         <item>
-            <title>{postTitle}</title>
-            <link>{post['link']}</link>
-            <pubDate>{post['published']}</pubDate>
-            <guid>{post['id']}</guid>
-            {mediaThumbnailNode}
-            <description>{description}</description>
+            <title>%s</title>
+            <link>%s</link>
+            <pubDate>%s</pubDate>
+            <guid>%s</guid>
+            %s
+            <description>%s</description>
 
             <content:encoded></content:encoded>
 
-            <enclosure url="{enclosureURL}" type="audio/mpeg" />
+            <enclosure url="%s" type="audio/mpeg" />
         </item>
-"""
+""" % ( postTitle, post['link'], post['published'], post['id'], mediaThumbnailNode, description, enclosureURL )
         items_result += item_result
 
 #     rssData = dict()
@@ -117,26 +117,26 @@ def convert_rss_content( host, feedId, feedContent ):
     feedLink = parsedFeed.get('href', "")
     feedPublished = parsedFeed.get('published', "")
 
-    result = f"""<rss version="2.0"
+    result = """<rss version="2.0"
  xmlns:content="http://purl.org/rss/1.0/modules/content/"
  xmlns:media="http://search.yahoo.com/mrss/"
 >
     <channel>
-        <title>{parsedFeed['title']}</title>
-        <link>{feedLink}</link>
+        <title>%s</title>
+        <link>%s</link>
         <description></description>
-        <lastBuildDate>{feedPublished}</lastBuildDate>
+        <lastBuildDate>%s</lastBuildDate>
         <language></language>
         <copyright></copyright>
         <image>
             <url></url>
-            <title>{parsedFeed['title']}</title>
-            <link>{feedLink}</link>
+            <title>%s</title>
+            <link>%s</link>
         </image>
-{items_result}
+%s
     </channel>
 </rss>
-"""
+""" % ( parsedFeed['title'], feedLink, feedPublished, parsedFeed['title'], feedLink, items_result )
 
     rssOutput = "%s/rss" % channelPath
     _LOGGER.info( "feed %s: writing converted rss output to %s", feedId, rssOutput )

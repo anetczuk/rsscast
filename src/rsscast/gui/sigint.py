@@ -10,7 +10,6 @@ is published under CC BY and CC0 license respectively.
 
 import signal
 import logging
-from typing import List, Callable
 
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QApplication
@@ -19,7 +18,7 @@ from PyQt5.QtWidgets import QApplication
 _LOGGER = logging.getLogger(__name__)
 
 
-interrupt_handlers: List[ Callable ] = []                 ## list of handlers
+interrupt_handlers = []                 ## list of handlers
 
 
 def _list_handler(signum, frame):

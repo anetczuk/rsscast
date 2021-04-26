@@ -23,7 +23,6 @@
 
 import logging
 import glob
-from typing import List
 
 from rsscast import persist
 
@@ -48,7 +47,7 @@ class FeedContainer( persist.Versionable ):
     _class_version = 0
 
     def __init__(self):
-        self.feedList: List[  FeedEntry ] = []
+        self.feedList = []
 
     def _convertstate_(self, dict_, dictVersion_ ):
         _LOGGER.info( "converting object from version %s to %s", dictVersion_, self._class_version )
@@ -73,7 +72,7 @@ class FeedContainer( persist.Versionable ):
     def get(self, index):
         return self.feedList[ index ]
 
-    def getList(self) -> List[  FeedEntry ]:
+    def getList(self):
         return self.feedList
 
     def addFeedNew(self, feedName: str, feedId: str, feedUrl: str):

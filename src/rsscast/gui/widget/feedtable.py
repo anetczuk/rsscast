@@ -42,9 +42,9 @@ _LOGGER = logging.getLogger(__name__)
 
 class FeedTableModel( QAbstractTableModel ):
 
-    def __init__(self, data: FeedContainer):
+    def __init__(self, data):
         super().__init__()
-        self._rawData: FeedContainer = data
+        self._rawData = data
 
     # pylint: disable=R0201
     def getItem(self, itemIndex: QModelIndex):
@@ -52,7 +52,7 @@ class FeedTableModel( QAbstractTableModel ):
             return itemIndex.internalPointer()
         return None
 
-    def setContent(self, data: FeedContainer):
+    def setContent(self, data):
         self.beginResetModel()
         self._rawData = data
         self.endResetModel()
@@ -203,12 +203,12 @@ class FeedTable( QTableView ):
         self.refreshData()
 
     def refreshData(self):
-        feed: FeedContainer = self.dataObject.feed
+        feed = self.dataObject.feed
         self.dataModel.setContent( feed )
         self.clearSelection()
 #         _LOGGER.debug( "entries: %s\n%s", type(history), history.printData() )
 
-    def refreshEntry(self, entry: FeedEntry=None):
+    def refreshEntry(self, entry = None):
         if entry is None:
             ## unable to refresh entry row -- refresh whole model
             self.refreshData()
@@ -225,20 +225,20 @@ class FeedTable( QTableView ):
             return
         self.proxyModel.dataChanged.emit( taskIndex, lastColIndex )
 
-    def getIndex(self, entry: FeedEntry, column: int = 0):
+    def getIndex(self, entry, column = 0):
         modelIndex = self.dataModel.getIndex( entry, column=column )
         if modelIndex is None:
             return None
         proxyIndex = self.proxyModel.mapFromSource( modelIndex )
         return proxyIndex
 
-    def getItem(self, itemIndex: QModelIndex ) -> FeedEntry:
+    def getItem(self, itemIndex ):
         sourceIndex = self.proxyModel.mapToSource( itemIndex )
         return self.dataModel.getItem( sourceIndex )
 
     def contextMenuEvent( self, event ):
-        evPos            = event.pos()
-        entry: FeedEntry = None
+        evPos = event.pos()
+        entry = None
         mIndex = self.indexAt( evPos )
         if mIndex is not None:
             entry = self.getItem( mIndex )
@@ -273,8 +273,8 @@ class FeedTable( QTableView ):
             self.itemUnselected.emit()
 
     def mouseDoubleClickEvent( self, event ):
-        evPos               = event.pos()
-        entry: FeedEntry = None
+        evPos = event.pos()
+        entry = None
         mIndex = self.indexAt( evPos )
         if mIndex is not None:
             entry = self.getItem( mIndex )

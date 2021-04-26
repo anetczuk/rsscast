@@ -22,8 +22,6 @@
 #
 
 import logging
-# import datetime
-from typing import List
 
 from PyQt5.QtCore import Qt
 from PyQt5 import QtCore, QtWidgets, QtGui
@@ -54,7 +52,7 @@ UiTargetClass, QtBaseClass = uiloader.load_ui_from_module_path( __file__ )
 
 class MainWindow( QtBaseClass ):           # type: ignore
 
-    logger: logging.Logger = None
+    logger = None
 
     # pylint: disable=R0915
     def __init__(self):
@@ -191,7 +189,7 @@ class MainWindow( QtBaseClass ):           # type: ignore
         threads.finished.connect( self._refreshingFinished, Qt.QueuedConnection )
 
         hostIp = RSSServerManager.getPrimaryIp()
-        feedList: List[ FeedEntry ] = self.data.feed.getList()
+        feedList = self.data.feed.getList()
         for feed in feedList:
             threads.appendFunction( convert_rss, (hostIp, feed.feedId, feed.url) )
         threads.start()

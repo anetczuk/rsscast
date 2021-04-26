@@ -37,7 +37,7 @@ class EditEntryCommand( QUndoCommand ):
         super().__init__(parentCommand)
 
         self.data = dataObject
-        self.feedContainer: FeedContainer = self.data.feed
+        self.feedContainer = self.data.feed
         self.oldEntry = oldEntry
         self.newEntry = newEntry
 

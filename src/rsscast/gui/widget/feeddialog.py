@@ -42,7 +42,7 @@ class FeedDialog( QtBaseClass ):           # type: ignore
         self.ui = UiTargetClass()
         self.ui.setupUi(self)
 
-        self.entry: FeedEntry = None
+        self.entry = None
 
         self.finished.connect( self._done )
 

@@ -22,7 +22,6 @@
 #
 
 import logging
-from typing import Dict
 
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import QObject, pyqtSignal
@@ -60,15 +59,15 @@ class DataObject( QObject ):
         self.feedChanged.emit()
 
     @property
-    def notes(self) -> Dict[str, str]:
+    def notes(self):
         return self.userContainer.notes
 
     @notes.setter
-    def notes(self, newData: Dict[str, str]):
+    def notes(self, newData):
         self.userContainer.notes = newData
 
     @property
-    def feed(self) -> FeedContainer:
+    def feed(self):
         return self.userContainer.feed
 
     def pushUndo(self, undoCommand):
@@ -76,7 +75,7 @@ class DataObject( QObject ):
 
     ## ================================================================
 
-    def addEntry(self, feedName: str, feedId: str, feedUrl: str):
+    def addEntry(self, feedName, feedId, feedUrl):
         self.userContainer.feed.addFeedNew( feedName, feedId, feedUrl )
         self.feedChanged.emit()
 

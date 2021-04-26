@@ -1,4 +1,5 @@
-feedparser
+watchdog==0.10.6
 requests_file
+feedparser==5.2.1
 pycurl
-#youtube-dl
+##youtube-dl

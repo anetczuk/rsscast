@@ -67,7 +67,7 @@ class ServerWidget( QtBaseClass ):           # type: ignore
         pass
 
     def isServerStarted(self):
-        status: RSSServerManager.Status = self.server.getStatus()
+        status = self.server.getStatus()
         if status is RSSServerManager.Status.STARTED:
             return True
         return False
@@ -82,7 +82,7 @@ class ServerWidget( QtBaseClass ):           # type: ignore
         self.refreshWidget()
 
     def refreshWidget(self):
-        status: RSSServerManager.Status = self.server.getStatus()
+        status = self.server.getStatus()
         self.ui.statusLabel.setText( status.value )
         if self.isServerStarted():
             self.ui.startPB.setEnabled( False )

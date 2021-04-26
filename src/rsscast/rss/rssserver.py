@@ -26,7 +26,6 @@ import os
 import logging
 import threading
 from enum import Enum, unique
-from typing import Callable
 
 import socket
 import socketserver
@@ -74,6 +73,12 @@ class RSSServer( socketserver.TCPServer ):
         super().__init__( server_address, RequestHandlerClass, bind_and_activate )
         self.base_path = None
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, tb):
+        self.shutdown()
+
 
 ## ======================================================
 
@@ -95,8 +100,8 @@ class RSSServerManager():
         self._service = None
         self._thread = None
         self._rootDir = None
-        self.startedCallback: Callable = None
-        self.stoppedCallback: Callable = None
+        self.startedCallback = None
+        self.stoppedCallback = None
 
     @staticmethod
     def getPrimaryIp():

@@ -37,7 +37,7 @@ class AddEntryCommand( QUndoCommand ):
         super().__init__(parentCommand)
 
         self.data = dataObject
-        self.feedContainer: FeedContainer = self.data.feed
+        self.feedContainer = self.data.feed
         self.newEntry = newEntry
 
         self.setText( "Add Entry: " + str(newEntry.feedName) )
