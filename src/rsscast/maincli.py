@@ -27,7 +27,6 @@ import sys
 
 import argparse
 import logging
-from typing import List
 
 from PyQt5.QtCore import QCoreApplication
 
@@ -64,7 +63,7 @@ class CliApp:
 
     def refreshRSS(self):
         hostIp = RSSServerManager.getPrimaryIp()
-        feedList: List[ FeedEntry ] = self.data.feed.getList()
+        feedList = self.data.feed.getList()
         for feed in feedList:
             convert_rss( hostIp, feed.feedId, feed.url )
 
