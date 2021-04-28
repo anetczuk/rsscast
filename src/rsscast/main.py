@@ -32,21 +32,19 @@ from PyQt5.QtWidgets import QApplication, QMessageBox
 
 import rsscast.logger as logger
 
+from rsscast import maincli
 from rsscast.gui.mainwindow import MainWindow
 from rsscast.gui.sigint import setup_interrupt_handling
 from rsscast.gui.appwindow import AppWindow
 
 
-logger.configure()
 _LOGGER = logging.getLogger(__name__)
 
 
 def run_app( args ):
     ## GUI
     app = QApplication( sys.argv )
-    app.setApplicationName("RSSCast")
-    app.setOrganizationName("arnet")
-    ### app.setOrganizationDomain("www.my-org.com")
+    maincli.set_app_data( app )
     app.setQuitOnLastWindowClosed( False )
 
     setup_interrupt_handling()
@@ -77,10 +75,13 @@ def create_parser( parser: argparse.ArgumentParser = None ):
     if parser is None:
         parser = argparse.ArgumentParser(description='RSS Cast')
     parser.add_argument('--minimized', action='store_const', const=True, default=False, help='Start minimized' )
+    maincli.create_parser( parser )
     return parser
 
 
 def main( args=None ):
+    logger.configure()
+
     if args is None:
         parser = create_parser()
         args = parser.parse_args()
@@ -91,7 +92,10 @@ def main( args=None ):
     exitCode = 1
 
     try:
-        exitCode = run_app( args )
+        if maincli.run_cli( args ):
+            exitCode = 0
+        else:
+            exitCode = run_app( args )
 
     except BaseException:
         _LOGGER.exception("Exception occurred")

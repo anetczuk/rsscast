@@ -35,6 +35,7 @@ from rsscast.gui.trayicon import load_main_icon, load_disconnect_icon
 from rsscast.gui import threadlist
 from rsscast.rss.rssconverter import convert_rss
 from rsscast.rss.rssserver import RSSServerManager
+from rsscast.gui.resources import get_settings, get_user_data_path
 
 from . import uiloader
 from . import trayicon
@@ -114,7 +115,7 @@ class MainWindow( QtBaseClass ):           # type: ignore
 
     def loadData(self):
         """Load user related data (e.g. favs, notes)."""
-        dataPath = self.getDataPath()
+        dataPath = get_user_data_path()
         self.data.load( dataPath )
         self.refreshView()
 
@@ -133,7 +134,7 @@ class MainWindow( QtBaseClass ):           # type: ignore
     def _saveData(self):
         ## having separate slot allows to monkey patch / mock "_saveData()" method
         _LOGGER.info( "storing data" )
-        dataPath = self.getDataPath()
+        dataPath = get_user_data_path()
         self.data.notes = self.ui.notesWidget.getNotes()
         return self.data.store( dataPath )
 
@@ -142,13 +143,6 @@ class MainWindow( QtBaseClass ):           # type: ignore
             _LOGGER.info("saving data is disabled")
         _LOGGER.info("disabling saving data")
         self._saveData = save_data_mock           # type: ignore
-
-    def getDataPath(self):
-        settings = self.getSettings()
-        settingsDir = settings.fileName()
-        settingsDir = settingsDir[0:-4]       ## remove extension
-        settingsDir += "-data"
-        return settingsDir
 
     def startServer(self):
         self.ui.serverWidget.startServer()
@@ -328,7 +322,7 @@ class MainWindow( QtBaseClass ):           # type: ignore
 
     def loadSettings(self):
         """Load Qt related settings (e.g. layouts, sizes)."""
-        settings = self.getSettings()
+        settings = get_settings( self )
         self.logger.debug( "loading app state from %s", settings.fileName() )
 
         self.appSettings.loadSettings( settings )
@@ -339,7 +333,7 @@ class MainWindow( QtBaseClass ):           # type: ignore
         guistate.load_state( self, settings )
 
     def saveSettings(self):
-        settings = self.getSettings()
+        settings = get_settings( self )
         self.logger.debug( "saving app state to %s", settings.fileName() )
 
         self.appSettings.saveSettings( settings )
@@ -349,13 +343,6 @@ class MainWindow( QtBaseClass ):           # type: ignore
 
         ## force save to file
         settings.sync()
-
-    def getSettings(self):
-        ## store in home directory
-        orgName = qApp.organizationName()
-        appName = qApp.applicationName()
-        settings = QtCore.QSettings(QtCore.QSettings.IniFormat, QtCore.QSettings.UserScope, orgName, appName, self)
-        return settings
 
 
 MainWindow.logger = _LOGGER.getChild(MainWindow.__name__)

@@ -128,6 +128,7 @@ class RSSServerManager():
             return RSSServerManager.Status.STARTED
         return RSSServerManager.Status.STOPPED
 
+    # asynchronous call
     @synchronized
     def start(self, rootDir=None):
         if self._service is not None:
@@ -146,6 +147,12 @@ class RSSServerManager():
         serverThread = self._thread     ## self._thread will be null-ed soon
         self._shutdownService()
         serverThread.join()
+
+    ## busy execution
+    @synchronized
+    def execute(self, rootDir=None):
+        self._rootDir = rootDir
+        self._run()
 
     def _run(self):
         with RSSServer(("", self.port), RSSServerManager.Handler) as httpd:
