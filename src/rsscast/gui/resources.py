@@ -23,6 +23,9 @@
 
 import os
 
+from PyQt5 import QtCore
+from PyQt5.QtWidgets import qApp
+
 
 def get_image_path(imageName):
     imgDir = get_images_path()
@@ -43,3 +46,19 @@ def get_root_path():
         rootDir = rootDir + os.path.sep + '..'
     rootDir = os.path.abspath( rootDir )
     return rootDir
+
+
+def get_user_data_path():
+    settings = get_settings()
+    settingsDir = settings.fileName()
+    settingsDir = settingsDir[0:-4]       ## remove extension
+    settingsDir += "-data"
+    return settingsDir
+
+
+def get_settings( parent=None ):
+    ## store in home directory
+    orgName = qApp.organizationName()
+    appName = qApp.applicationName()
+    settings = QtCore.QSettings(QtCore.QSettings.IniFormat, QtCore.QSettings.UserScope, orgName, appName, parent)
+    return settings
