@@ -31,6 +31,7 @@ from io import BytesIO
 from urllib.parse import urlencode
 import json
 import pycurl
+# from rsscast.pprint import pprint
 # import youtube_dl
 
 
@@ -115,20 +116,26 @@ def convert_yt_yt1s( link, output, mimicHuman=True ):
             return False
 
         if mimicHuman:
-            randTime = random.uniform( 2.0, 4.0 )
+            randTime = random.uniform( 1.0, 3.0 )
             time.sleep( randTime )
 
-        vidId = data["vid"]
-        kId   = data["kc"]
+#         print( "response data:" )
+#         pprint( data )
 
-        params = {'vid': vidId,
-                  'k': kId}
+        ## video ID, eg: "EE4U9qpErW8"
+        vidId     = data["vid"]
+        
+        ## convert key, like: "0+azXhfVIrnzRYKBCptsmBJiPRF1HVqa5l7v3sVU68OOkmCBRvmw/2jfMz2F1b42/wu2h1L4EoRSl7BxuLz3jxPrCyVYC2cF9udBFCDoF7T5kZpCBy5X"
+        convertId = data['links']['mp3']['256']['k']
+
+        params = { 'vid': vidId,
+                   'k': convertId }
         dataBuffer = curl_post( session, "https://yt1s.com/api/ajaxConvert/convert", params )
         bodyOutput = dataBuffer.getvalue().decode('utf-8')
 #         _LOGGER.info( "response:\n%s", bodyOutput )
 
         if mimicHuman:
-            randTime = random.uniform( 2.0, 4.0 )
+            randTime = random.uniform( 1.0, 3.0 )
             time.sleep( randTime )
 
         data = json.loads( bodyOutput )
@@ -148,9 +155,9 @@ def convert_yt_yt1s( link, output, mimicHuman=True ):
         _LOGGER.info( "grabbing file: %s to %s", dlink, output )
         curl_download( session, dlink, output )
 
-        if mimicHuman:
-            randTime = random.uniform( 2.0, 4.0 )
-            time.sleep( randTime )
+#         if mimicHuman:
+#             randTime = random.uniform( 1.0, 3.0 )
+#             time.sleep( randTime )
 
         ## done -- returning
         return True
