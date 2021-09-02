@@ -30,7 +30,11 @@ import logging
 from io import BytesIO
 from urllib.parse import urlencode
 import json
+
 import pycurl
+# import urllib.request
+import requests
+
 # from rsscast.pprint import pprint
 # import youtube_dl
 
@@ -84,6 +88,17 @@ def convert_yt( link, output, mimicHuman=True ):
 ## ===================================================================
 
 
+def get_mp3_format_data( mp3FormatDict ):
+    if '256' in mp3FormatDict:
+        return mp3FormatDict['256']
+    keys = mp3FormatDict.keys()
+    if len( keys ) < 1:
+        raise Exception("There is no data in dictionary")
+    ## get first key
+    formatKey = next(iter( keys ))
+    return mp3FormatDict[ formatKey ]
+
+
 ## converting YT videos using webpage https://yt1s.com
 def convert_yt_yt1s( link, output, mimicHuman=True ):
     _LOGGER.info( "converting video: %s to %s", link, output )
@@ -126,7 +141,9 @@ def convert_yt_yt1s( link, output, mimicHuman=True ):
         vidId     = data["vid"]
         
         ## convert key, like: "0+azXhfVIrnzRYKBCptsmBJiPRF1HVqa5l7v3sVU68OOkmCBRvmw/2jfMz2F1b42/wu2h1L4EoRSl7BxuLz3jxPrCyVYC2cF9udBFCDoF7T5kZpCBy5X"
-        convertId = data['links']['mp3']['256']['k']
+        mp3Data   = data['links']['mp3']
+        mp3Format = get_mp3_format_data( mp3Data )
+        convertId = mp3Format['k']
 
         params = { 'vid': vidId,
                    'k': convertId }
@@ -139,6 +156,10 @@ def convert_yt_yt1s( link, output, mimicHuman=True ):
             time.sleep( randTime )
 
         data = json.loads( bodyOutput )
+        
+#         print( "response data:" )
+#         pprint( data )
+        
         jsonStatus = data['status']
         if jsonStatus != "ok":
             _LOGGER.warning( "invalid status:\n%s", bodyOutput )
@@ -151,9 +172,10 @@ def convert_yt_yt1s( link, output, mimicHuman=True ):
             return False
 
         dlink = data["dlink"]
-#         print( "grabbing file:", dlink )
+
         _LOGGER.info( "grabbing file: %s to %s", dlink, output )
-        curl_download( session, dlink, output )
+        simple_download( dlink, output )
+#         curl_download( session, dlink, output )
 
 #         if mimicHuman:
 #             randTime = random.uniform( 1.0, 3.0 )
@@ -216,3 +238,11 @@ def curl_download_raw( session, sourceUrl, outputFile ):
     finally:
         _LOGGER.info( "removing temporary file: %s", path )
         os.remove( path )
+
+
+def simple_download( sourceUrl, outputFile ):
+#     urllib.request.urlretrieve( sourceUrl, outputFile )
+
+    r = requests.get( sourceUrl )
+    with open( outputFile, 'wb' ) as output:
+        output.write( r.content )
