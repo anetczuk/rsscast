@@ -1,4 +1,5 @@
 feedparser
 requests_file
 pycurl
+watchdog
 #youtube-dl
