@@ -33,6 +33,7 @@ from rsscast.gui.command.addentrycommand import AddEntryCommand
 from rsscast.gui.datatypes import UserContainer, FeedContainer
 from rsscast.gui.command.editentrycommand import EditEntryCommand
 from rsscast.gui.command.removeentrycommand import RemoveEntryCommand
+from rsscast.gui.command.setenablestateentrycommand import SetEnableStateEntryCommand
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -107,4 +108,10 @@ class DataObject( QObject ):
         if entry is None:
             return
         command = RemoveEntryCommand( self, entry )
+        self.pushUndo( command )
+
+    def switchEntryEnableState(self, entry):
+        if entry is None:
+            return
+        command = SetEnableStateEntryCommand( self, entry )
         self.pushUndo( command )

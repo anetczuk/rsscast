@@ -187,6 +187,8 @@ class MainWindow( QtBaseClass ):           # type: ignore
         hostIp = RSSServerManager.getPrimaryIp()
         feedList: List[ FeedEntry ] = self.data.feed.getList()
         for feed in feedList:
+            if feed.enabled is False:
+                continue
             threads.appendFunction( convert_rss, (hostIp, feed.feedId, feed.url) )
         threads.start()
 

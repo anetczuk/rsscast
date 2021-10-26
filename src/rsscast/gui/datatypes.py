@@ -34,12 +34,14 @@ _LOGGER = logging.getLogger(__name__)
 class FeedEntry( persist.Versionable ):
 
     ## 0 - first version
-    _class_version = 0
+    ## 1 - add 'enabled' field
+    _class_version = 1
 
     def __init__(self):
         self.feedName = None
         self.feedId   = None
         self.url      = None
+        self.enabled  = True
 
     def _convertstate_( self, dict_, dictVersion_ ):
         _LOGGER.info( "converting object from version %s to %s", dictVersion_, self._class_version )
@@ -51,15 +53,15 @@ class FeedEntry( persist.Versionable ):
             ## nothing to do
             dictVersion_ = 0
 
-#         if dictVersion_ == 0:
-#             dict_["stockList"] = dict()
-#             dictVersion_ = 1
+        if dictVersion_ == 0:
+            dict_["enabled"] = True
+            dictVersion_ = 1
 
         # pylint: disable=W0201
         self.__dict__ = dict_
 
     def printData(self) -> str:
-        return str( self.feedName ) + " " + str( self.feedId ) + " " + str( self.url )
+        return str( self.feedName ) + " " + str( self.feedId ) + " " + str( self.url ) + " " + str( self.enabled )
 
 
 class FeedContainer( persist.Versionable ):

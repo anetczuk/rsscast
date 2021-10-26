@@ -128,6 +128,9 @@ class QThreadList( QtCore.QObject ):
 
     def start(self):
         _LOGGER.info( "starting threads" )
+        if len(self.threads) < 1:
+            self._computingFinished()
+            return
         for thr in self.threads:
             thr.start()
 

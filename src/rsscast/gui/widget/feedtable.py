@@ -29,7 +29,7 @@ from PyQt5.QtCore import Qt, QModelIndex
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtCore import QAbstractTableModel
 from PyQt5.QtWidgets import QTableView
-# from PyQt5.QtGui import QColor
+from PyQt5.QtGui import QColor
 
 from rsscast.gui.datatypes import FeedEntry
 from rsscast.gui.dataobject import DataObject, FeedContainer
@@ -111,6 +111,11 @@ class FeedTableModel( QAbstractTableModel ):
             rawData = self.attribute( entry, index.column() )
             return rawData
 
+        if role == Qt.BackgroundRole:
+            entry: FeedEntry = self._rawData.get( index.row() )
+            if entry.enabled is False:
+                return QColor( "gray" )
+
 #         if role == Qt.TextAlignmentRole:
 #             if index.column() == 4:
 #                 return Qt.AlignLeft | Qt.AlignVCenter
@@ -144,6 +149,8 @@ class FeedTableModel( QAbstractTableModel ):
             return entry.feedId
         elif index == 2:
             return entry.url
+        elif index == 3:
+            return entry.enabled
         return None
 
     @staticmethod
@@ -249,10 +256,16 @@ class FeedTable( QTableView ):
         addAction        = contextMenu.addAction("Add Entry")
         editAction       = contextMenu.addAction("Edit Entry")
         removeAction     = contextMenu.addAction("Remove Entry")
+        enableAction     = None
+        if entry.enabled is False:
+            enableAction     = contextMenu.addAction("Enable")
+        else:
+            enableAction     = contextMenu.addAction("Disable")
 
         if entry is None:
             editAction.setEnabled( False )
             removeAction.setEnabled( False )
+            enableAction.setEnabled( False )
 
         globalPos = QtGui.QCursor.pos()
         action = contextMenu.exec_( globalPos )
@@ -263,6 +276,8 @@ class FeedTable( QTableView ):
             self.dataObject.editEntry( entry )
         elif action == removeAction:
             self.dataObject.removeEntry( entry )
+        elif action == enableAction:
+            self.dataObject.switchEntryEnableState( entry )
 
     def currentChanged(self, current, previous):
         super().currentChanged( current, previous )
