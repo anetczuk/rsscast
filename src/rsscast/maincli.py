@@ -66,6 +66,8 @@ class CliApp:
         hostIp = RSSServerManager.getPrimaryIp()
         feedList: List[ FeedEntry ] = self.data.feed.getList()
         for feed in feedList:
+            if feed.enabled is False:
+                continue
             convert_rss( hostIp, feed.feedId, feed.url )
 
     def startServer(self):
