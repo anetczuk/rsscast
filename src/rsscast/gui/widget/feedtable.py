@@ -257,10 +257,10 @@ class FeedTable( QTableView ):
         editAction       = contextMenu.addAction("Edit Entry")
         removeAction     = contextMenu.addAction("Remove Entry")
         enableAction     = None
-        if entry.enabled is False:
-            enableAction     = contextMenu.addAction("Enable")
+        if entry is None or entry.enabled is False:
+            enableAction = contextMenu.addAction("Enable")
         else:
-            enableAction     = contextMenu.addAction("Disable")
+            enableAction = contextMenu.addAction("Disable")
 
         if entry is None:
             editAction.setEnabled( False )
