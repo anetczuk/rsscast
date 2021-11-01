@@ -30,7 +30,7 @@ from rsscast import DATA_DIR
 from rsscast.gui.dataobject import DataObject
 from rsscast.rss.rssserver import RSSServerManager
 
-from .. import uiloader
+from rsscast.gui import uiloader
 
 
 UiTargetClass, QtBaseClass = uiloader.load_ui_from_class_name( __file__ )

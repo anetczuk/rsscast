@@ -32,18 +32,17 @@ from PyQt5.QtWidgets import qApp
 
 from rsscast.datatypes import parse_feed
 from rsscast.rss.rssserver import RSSServerManager
+
 from rsscast.gui import threadlist
+from rsscast.gui import uiloader
+from rsscast.gui import trayicon
+from rsscast.gui import guistate
+from rsscast.gui.dataobject import DataObject
 from rsscast.gui.appwindow import AppWindow
 from rsscast.gui.widget import logwidget
 from rsscast.gui.trayicon import load_main_icon, load_disconnect_icon
 from rsscast.gui.resources import get_settings, get_user_data_path
-
-from . import uiloader
-from . import trayicon
-from . import guistate
-from .dataobject import DataObject
-
-from .widget.settingsdialog import SettingsDialog, AppSettings
+from rsscast.gui.widget.settingsdialog import SettingsDialog, AppSettings
 
 
 _LOGGER = logging.getLogger(__name__)

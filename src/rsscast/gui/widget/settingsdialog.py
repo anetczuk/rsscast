@@ -26,8 +26,8 @@ import copy
 
 from PyQt5.QtCore import pyqtSignal
 
-from .. import uiloader
-from .. import trayicon
+from rsscast.gui import uiloader
+from rsscast.gui import trayicon
 
 
 class AppSettings():

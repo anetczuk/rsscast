@@ -32,8 +32,7 @@ from PyQt5.QtWidgets import QTableView
 from PyQt5.QtGui import QColor
 
 from rsscast.rss.rssparser import RSSChannel, RSSItem
-
-from .. import guistate
+from rsscast.gui import guistate
 
 
 _LOGGER = logging.getLogger(__name__)

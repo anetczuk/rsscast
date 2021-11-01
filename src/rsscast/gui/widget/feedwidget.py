@@ -23,11 +23,10 @@
 
 import logging
 
-from rsscast.gui.dataobject import DataObject
-
-from .. import uiloader
 from rsscast.datatypes import FeedEntry
-from rsscast.rss.rssparser import RSSChannel
+
+from rsscast.gui import uiloader
+from rsscast.gui.dataobject import DataObject
 
 
 UiTargetClass, QtBaseClass = uiloader.load_ui_from_class_name( __file__ )

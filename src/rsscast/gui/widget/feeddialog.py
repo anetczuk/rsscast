@@ -26,7 +26,7 @@ import copy
 
 from rsscast.datatypes import FeedEntry
 
-from .. import uiloader
+from rsscast.gui import uiloader
 
 
 UiTargetClass, QtBaseClass = uiloader.load_ui_from_class_name( __file__ )

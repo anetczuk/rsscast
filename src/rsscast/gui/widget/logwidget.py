@@ -32,9 +32,8 @@ from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
 
 from rsscast.logger import get_logging_output_file
+from rsscast.gui import uiloader
 from rsscast.gui.appwindow import AppWindow
-
-from .. import uiloader
 
 
 _LOGGER = logging.getLogger(__name__)

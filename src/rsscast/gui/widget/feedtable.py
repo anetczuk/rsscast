@@ -34,7 +34,7 @@ from PyQt5.QtGui import QColor
 from rsscast.datatypes import FeedEntry
 from rsscast.gui.dataobject import DataObject, FeedContainer
 
-from .. import guistate
+from rsscast.gui import guistate
 
 
 _LOGGER = logging.getLogger(__name__)
