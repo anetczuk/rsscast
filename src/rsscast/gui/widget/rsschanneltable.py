@@ -31,8 +31,7 @@ from PyQt5.QtCore import QAbstractTableModel
 from PyQt5.QtWidgets import QTableView
 from PyQt5.QtGui import QColor
 
-from rsscast.datatypes import FeedEntry
-from rsscast.gui.dataobject import DataObject, FeedContainer
+from rsscast.rss.rssparser import RSSChannel, RSSItem
 
 from .. import guistate
 
@@ -40,11 +39,11 @@ from .. import guistate
 _LOGGER = logging.getLogger(__name__)
 
 
-class FeedTableModel( QAbstractTableModel ):
+class RSSChannelTableModel( QAbstractTableModel ):
 
-    def __init__(self, data: FeedContainer):
+    def __init__(self, data: RSSChannel):
         super().__init__()
-        self._rawData: FeedContainer = data
+        self._rawData: RSSChannel = data
 
     # pylint: disable=R0201
     def getItem(self, itemIndex: QModelIndex):
@@ -52,7 +51,7 @@ class FeedTableModel( QAbstractTableModel ):
             return itemIndex.internalPointer()
         return None
 
-    def setContent(self, data: FeedContainer):
+    def setContent(self, data: RSSChannel):
         self.beginResetModel()
         self._rawData = data
         self.endResetModel()
@@ -111,10 +110,10 @@ class FeedTableModel( QAbstractTableModel ):
             rawData = self.attribute( entry, index.column() )
             return rawData
 
-        if role == Qt.BackgroundRole:
-            entry: FeedEntry = self._rawData.get( index.row() )
-            if entry.enabled is False:
-                return QColor( "gray" )
+#         if role == Qt.BackgroundRole:
+#             entry: RSSItem = self._rawData.get( index.row() )
+#             if entry.enabled is False:
+#                 return QColor( "gray" )
 
 #         if role == Qt.TextAlignmentRole:
 #             if index.column() == 4:
@@ -142,35 +141,37 @@ class FeedTableModel( QAbstractTableModel ):
                 return index
         return None
 
-    def attribute(self, entry: FeedEntry, index):
+    def attribute(self, entry: RSSItem, index):
         if index == 0:
-            return entry.feedName
+            modelIndex = self.getIndex( entry )
+            row = modelIndex.row()
+            return row + 1
         elif index == 1:
-            return entry.feedId
+            return entry.title
         elif index == 2:
-            return entry.url
+            return entry.id
         elif index == 3:
-            return entry.enabled
+            return entry.link
         return None
 
     @staticmethod
     def attributeLabels():
-        return ( "Name", "Id", "URL" )
+        return ( "#", "Title", "Id", "URL" )
 
 
 ## ===========================================================
 
 
-class FeedTable( QTableView ):
+class RSSChannelTable( QTableView ):
 
-    selectedItem    = pyqtSignal( FeedEntry )
+    selectedItem    = pyqtSignal( RSSItem )
     itemUnselected  = pyqtSignal()
 
     def __init__(self, parentWidget=None):
         super().__init__(parentWidget)
-        self.setObjectName("feedtable")
+        self.setObjectName("rsschanneltable")
 
-        self.dataObject = None
+        self.dataObject: RSSChannel = None
 
         self.setSortingEnabled( True )
         self.setShowGrid( False )
@@ -184,7 +185,7 @@ class FeedTable( QTableView ):
 
         self.verticalHeader().hide()
 
-        self.dataModel = FeedTableModel( None )
+        self.dataModel = RSSChannelTableModel( None )
         self.proxyModel = QtCore.QSortFilterProxyModel(self)
         self.proxyModel.setSourceModel( self.dataModel )
         self.setModel( self.proxyModel )
@@ -204,18 +205,16 @@ class FeedTable( QTableView ):
 
     ## ===============================================
 
-    def connectData(self, dataObject: DataObject ):
-        self.dataObject = dataObject
-        self.dataObject.feedChanged.connect( self.refreshData )
+    def connectData(self, channel: RSSChannel ):
+        self.dataObject = channel
         self.refreshData()
 
     def refreshData(self):
-        feed: FeedContainer = self.dataObject.feed
-        self.dataModel.setContent( feed )
+        self.dataModel.setContent( self.dataObject )
         self.clearSelection()
 #         _LOGGER.debug( "entries: %s\n%s", type(history), history.printData() )
 
-    def refreshEntry(self, entry: FeedEntry=None):
+    def refreshEntry(self, entry: RSSItem=None):
         if entry is None:
             ## unable to refresh entry row -- refresh whole model
             self.refreshData()
@@ -232,52 +231,53 @@ class FeedTable( QTableView ):
             return
         self.proxyModel.dataChanged.emit( taskIndex, lastColIndex )
 
-    def getIndex(self, entry: FeedEntry, column: int = 0):
+    def getIndex(self, entry: RSSItem, column: int = 0):
         modelIndex = self.dataModel.getIndex( entry, column=column )
         if modelIndex is None:
             return None
         proxyIndex = self.proxyModel.mapFromSource( modelIndex )
         return proxyIndex
 
-    def getItem(self, itemIndex: QModelIndex ) -> FeedEntry:
+    def getItem(self, itemIndex: QModelIndex ) -> RSSItem:
         sourceIndex = self.proxyModel.mapToSource( itemIndex )
         return self.dataModel.getItem( sourceIndex )
 
-    def contextMenuEvent( self, event ):
-        evPos            = event.pos()
-        entry: FeedEntry = None
-        mIndex = self.indexAt( evPos )
-        if mIndex is not None:
-            entry = self.getItem( mIndex )
-
-#         create_entry_contextmenu( self, self.dataObject, entry )
-
-        contextMenu      = QtWidgets.QMenu( self )
-        addAction        = contextMenu.addAction("Add Entry")
-        editAction       = contextMenu.addAction("Edit Entry")
-        removeAction     = contextMenu.addAction("Remove Entry")
-        enableAction     = None
-        if entry is None or entry.enabled is False:
-            enableAction = contextMenu.addAction("Enable")
-        else:
-            enableAction = contextMenu.addAction("Disable")
-
-        if entry is None:
-            editAction.setEnabled( False )
-            removeAction.setEnabled( False )
-            enableAction.setEnabled( False )
-
-        globalPos = QtGui.QCursor.pos()
-        action = contextMenu.exec_( globalPos )
-
-        if action == addAction:
-            self.dataObject.addEntryNew()
-        elif action == editAction:
-            self.dataObject.editEntry( entry )
-        elif action == removeAction:
-            self.dataObject.removeEntry( entry )
-        elif action == enableAction:
-            self.dataObject.switchEntryEnableState( entry )
+#     def contextMenuEvent( self, event ):
+#         print("xxxxxxxxxxxxx")
+#         evPos            = event.pos()
+#         entry: RSSItem = None
+#         mIndex = self.indexAt( evPos )
+#         if mIndex is not None:
+#             entry = self.getItem( mIndex )
+# 
+# #         create_entry_contextmenu( self, self.dataObject, entry )
+# 
+#         contextMenu      = QtWidgets.QMenu( self )
+#         addAction        = contextMenu.addAction("Add Entry")
+#         editAction       = contextMenu.addAction("Edit Entry")
+#         removeAction     = contextMenu.addAction("Remove Entry")
+#         enableAction     = None
+#         if entry is None or entry.enabled is False:
+#             enableAction = contextMenu.addAction("Enable")
+#         else:
+#             enableAction = contextMenu.addAction("Disable")
+# 
+#         if entry is None:
+#             editAction.setEnabled( False )
+#             removeAction.setEnabled( False )
+#             enableAction.setEnabled( False )
+# 
+#         globalPos = QtGui.QCursor.pos()
+#         action = contextMenu.exec_( globalPos )
+# 
+#         if action == addAction:
+#             self.dataObject.addEntryNew()
+#         elif action == editAction:
+#             self.dataObject.editEntry( entry )
+#         elif action == removeAction:
+#             self.dataObject.removeEntry( entry )
+#         elif action == enableAction:
+#             self.dataObject.switchEntryEnableState( entry )
 
     def currentChanged(self, current, previous):
         super().currentChanged( current, previous )
@@ -287,33 +287,19 @@ class FeedTable( QTableView ):
         else:
             self.itemUnselected.emit()
 
-    def mouseDoubleClickEvent( self, event ):
-        evPos            = event.pos()
-        entry: FeedEntry = None
-        mIndex = self.indexAt( evPos )
-        if mIndex is not None:
-            entry = self.getItem( mIndex )
-
-        if entry is None:
-            self._addEntry()
-        else:
-            self._editEntry(entry)
-
-        return super().mouseDoubleClickEvent(event)
-
-    def _addEntry(self):
-        self.dataObject.addEntry( "", "", "" )
-
-    def _editEntryByIndex(self, item: QModelIndex):
-        history = self.dataObject.history
-        entry = history.getEntry( item.row() )
-        self._editEntry( entry )
-
-    def _editEntry(self, entry):
-        self.dataObject.editEntry(entry)
-
-    def _removeEntry(self, entry):
-        self.dataObject.removeEntry(entry)
+#     def mouseDoubleClickEvent( self, event ):
+#         evPos          = event.pos()
+#         entry: RSSItem = None
+#         mIndex = self.indexAt( evPos )
+#         if mIndex is not None:
+#             entry = self.getItem( mIndex )
+# 
+#         if entry is None:
+#             self._addEntry()
+#         else:
+#             self._editEntry(entry)
+# 
+#         return super().mouseDoubleClickEvent(event)
 
 
 def print_timedelta( value: timedelta ):

@@ -26,6 +26,8 @@ import logging
 from rsscast.gui.dataobject import DataObject
 
 from .. import uiloader
+from rsscast.datatypes import FeedEntry
+from rsscast.rss.rssparser import RSSChannel
 
 
 UiTargetClass, QtBaseClass = uiloader.load_ui_from_class_name( __file__ )
@@ -40,9 +42,21 @@ class FeedWidget( QtBaseClass ):           # type: ignore
         super().__init__(parentWidget)
         self.ui = UiTargetClass()
         self.ui.setupUi(self)
+        
+        self.ui.feedTableView.selectedItem.connect( self._feedSelected )
+        self.ui.feedTableView.itemUnselected.connect( self._feedUnselected )
 
     def connectData(self, dataObject: DataObject):
         self.ui.feedTableView.connectData( dataObject )
 
     def refreshView(self):
         self.ui.feedTableView.refreshData()
+        
+    def _feedSelected(self, feed: FeedEntry):
+#         print( "selected:", feed.feedName )
+        channel: RSSChannel = feed.channel
+        self.ui.feedItemsView.connectData( channel )
+        
+    def _feedUnselected(self):
+#         print( "unselected" )
+        self.ui.feedItemsView.clear()

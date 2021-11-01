@@ -30,6 +30,7 @@ import requests_file
 import feedparser
 
 from rsscast import DATA_DIR, persist
+from typing import List
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -86,10 +87,10 @@ class RSSChannel( persist.Versionable ):
     _class_version = 0
     
     def __init__(self):
-        self.title       = None
-        self.link        = None
-        self.publishDate = None
-        self.items       = list()
+        self.title                   = None
+        self.link                    = None
+        self.publishDate             = None
+        self.items: List[ RSSItem ]  = list()
     
     def _convertstate_( self, dict_, dictVersion_ ):
         _LOGGER.info( "converting object from version %s to %s", dictVersion_, self._class_version )
@@ -105,13 +106,22 @@ class RSSChannel( persist.Versionable ):
         # pylint: disable=W0201
         self.__dict__ = dict_
     
+    def size(self):
+        return len( self.items )
+
+    def get(self, index) -> RSSItem:
+        return self.items[ index ]
+
+    def getList(self) -> List[  RSSItem ]:
+        return self.items
+    
     def addItem(self, rssItem: RSSItem):
         found = self.findItem( rssItem.id )
         if found != None:
             return
         self.items.append( rssItem )
 
-    def findItem(self, itemId):
+    def findItem(self, itemId) -> RSSItem:
         for item in self.items:
             if item.id == itemId:
                 return item
