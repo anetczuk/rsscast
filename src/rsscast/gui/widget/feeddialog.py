@@ -24,7 +24,7 @@
 import logging
 import copy
 
-from rsscast.gui.datatypes import FeedEntry
+from rsscast.datatypes import FeedEntry
 
 from .. import uiloader
 

@@ -25,7 +25,7 @@ import logging
 
 from PyQt5.QtWidgets import QUndoCommand
 
-from rsscast.gui.datatypes import FeedContainer
+from rsscast.datatypes import FeedContainer
 
 
 _LOGGER = logging.getLogger(__name__)

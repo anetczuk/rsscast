@@ -28,9 +28,9 @@ from PyQt5 import QtWidgets
 from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtWidgets import QWidget, QUndoStack
 
+from rsscast.datatypes import UserContainer, FeedContainer
 from rsscast.gui.widget.feeddialog import FeedDialog
 from rsscast.gui.command.addentrycommand import AddEntryCommand
-from rsscast.gui.datatypes import UserContainer, FeedContainer
 from rsscast.gui.command.editentrycommand import EditEntryCommand
 from rsscast.gui.command.removeentrycommand import RemoveEntryCommand
 from rsscast.gui.command.setenablestateentrycommand import SetEnableStateEntryCommand

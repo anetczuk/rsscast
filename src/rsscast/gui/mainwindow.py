@@ -30,13 +30,12 @@ from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtWidgets import QDialog
 from PyQt5.QtWidgets import qApp
 
-from rsscast.gui.datatypes import FeedEntry
+from rsscast.datatypes import parse_feed
+from rsscast.rss.rssserver import RSSServerManager
+from rsscast.gui import threadlist
 from rsscast.gui.appwindow import AppWindow
 from rsscast.gui.widget import logwidget
 from rsscast.gui.trayicon import load_main_icon, load_disconnect_icon
-from rsscast.gui import threadlist
-from rsscast.rss.rssconverter import convert_rss
-from rsscast.rss.rssserver import RSSServerManager
 from rsscast.gui.resources import get_settings, get_user_data_path
 
 from . import uiloader
@@ -189,7 +188,7 @@ class MainWindow( QtBaseClass ):           # type: ignore
         for feed in feedList:
             if feed.enabled is False:
                 continue
-            threads.appendFunction( convert_rss, (hostIp, feed.feedId, feed.url) )
+            threads.appendFunction( parse_feed, (hostIp, feed) )
         threads.start()
 
     def _refreshingFinished(self):

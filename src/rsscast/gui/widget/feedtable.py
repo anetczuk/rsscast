@@ -31,7 +31,7 @@ from PyQt5.QtCore import QAbstractTableModel
 from PyQt5.QtWidgets import QTableView
 from PyQt5.QtGui import QColor
 
-from rsscast.gui.datatypes import FeedEntry
+from rsscast.datatypes import FeedEntry
 from rsscast.gui.dataobject import DataObject, FeedContainer
 
 from .. import guistate

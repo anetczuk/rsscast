@@ -35,12 +35,10 @@ import rsscast.logger as logger
 
 from rsscast import DATA_DIR
 from rsscast.rss.rssserver import RSSServerManager
-from rsscast.rss.rssconverter import convert_rss
 
+from rsscast.datatypes import parse_feed
 from rsscast.gui.resources import get_user_data_path
-from rsscast.gui.datatypes import FeedEntry
-
-from .gui.dataobject import DataObject
+from rsscast.gui.dataobject import DataObject
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -68,7 +66,7 @@ class CliApp:
         for feed in feedList:
             if feed.enabled is False:
                 continue
-            convert_rss( hostIp, feed.feedId, feed.url )
+            parse_feed( hostIp, feed )
 
     def startServer(self):
         pass

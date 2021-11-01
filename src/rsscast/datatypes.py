@@ -26,6 +26,8 @@ import glob
 from typing import List
 
 from rsscast import persist
+from rsscast.rss.rssparser import parse_rss, RSSChannel
+from rsscast.rss.rssconverter import generate_content
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -35,13 +37,15 @@ class FeedEntry( persist.Versionable ):
 
     ## 0 - first version
     ## 1 - add 'enabled' field
-    _class_version = 1
+    ## 2 - add 'channel' field
+    _class_version = 2
 
     def __init__(self):
-        self.feedName = None
-        self.feedId   = None
-        self.url      = None
-        self.enabled  = True
+        self.feedName            = None            ## defined by user
+        self.feedId              = None            ## defined by user
+        self.url                 = None
+        self.channel: RSSChannel = RSSChannel()
+        self.enabled             = True
 
     def _convertstate_( self, dict_, dictVersion_ ):
         _LOGGER.info( "converting object from version %s to %s", dictVersion_, self._class_version )
@@ -57,11 +61,31 @@ class FeedEntry( persist.Versionable ):
             dict_["enabled"] = True
             dictVersion_ = 1
 
+        if dictVersion_ == 1:
+            dict_["channel"] = RSSChannel()
+            dictVersion_ = 2
+
         # pylint: disable=W0201
         self.__dict__ = dict_
 
+    def update(self, channel: RSSChannel):
+        if self.channel is None:
+            self.channel = channel
+            return
+        self.channel.update( channel )
+
     def printData(self) -> str:
         return str( self.feedName ) + " " + str( self.feedId ) + " " + str( self.url ) + " " + str( self.enabled )
+
+
+def parse_feed( hostIp, feed: FeedEntry ):
+    feedId = feed.feedId
+    rssChannel: RSSChannel = parse_rss( feedId, feed.url )
+    feed.update( rssChannel )
+    generate_content( hostIp, feedId, rssChannel )
+    
+#     ## old
+#     convert_rss( hostIp, feed.feedId, feed.url )
 
 
 class FeedContainer( persist.Versionable ):

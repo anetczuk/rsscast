@@ -91,14 +91,15 @@ class ThreadWorker( BaseWorker ):
         super().__init__( parent )
         if args is None:
             args = []
-        self.func = func
-        self.args = args
+        self.func   = func
+        self.args   = args
+        self.result = None
 
     def processWorker(self):
 #         _LOGGER.info("executing function: %s %s", self.func, self.args)
         try:
             if self.func is not None:
-                self.func( *self.args )
+                self.result = self.func( *self.args )
     #         _LOGGER.info("executing finished")
             _LOGGER.info( "work finished" )
         # pylint: disable=W0703
