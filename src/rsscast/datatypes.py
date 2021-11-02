@@ -78,14 +78,26 @@ class FeedEntry( persist.Versionable ):
         return str( self.feedName ) + " " + str( self.feedId ) + " " + str( self.url ) + " " + str( self.enabled )
 
 
-def parse_feed( hostIp, feed: FeedEntry ):
+def fetch_feed( feed: FeedEntry ):
     feedId = feed.feedId
     rssChannel: RSSChannel = parse_rss( feedId, feed.url )
-    feed.update( rssChannel )
-    generate_content( hostIp, feedId, rssChannel )
+    feed.update( rssChannel )    
+
+
+def pull_feed( hostIp, feed: FeedEntry ):
+    feedId = feed.feedId
+    generate_content( hostIp, feedId, feed.channel )
+    
+
+def parse_feed( hostIp, feed: FeedEntry ):
+    fetch_feed( feed )
+    pull_feed( hostIp, feed )
     
 #     ## old
 #     convert_rss( hostIp, feed.feedId, feed.url )
+
+
+## ========================================================
 
 
 class FeedContainer( persist.Versionable ):

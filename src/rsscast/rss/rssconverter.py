@@ -24,7 +24,7 @@
 import os
 import logging
 import re
-import html
+# import html
 import feedparser
 
 from rsscast.rss.rssparser import RSSChannel
@@ -58,6 +58,7 @@ def convert_rss( host, feedId, feedUrl ):
     generate_content( host, feedId, rssChannel )
 
 
+## download required media and generate RSS file
 def generate_content( host, feedId, rssChannel: RSSChannel ):
     feedId = feedId.replace(":", "_")
     feedId = re.sub( r"\s+", "", feedId )

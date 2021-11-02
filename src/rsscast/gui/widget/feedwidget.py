@@ -50,6 +50,7 @@ class FeedWidget( QtBaseClass ):           # type: ignore
 
     def refreshView(self):
         self.ui.feedTableView.refreshData()
+        self.ui.feedItemsView.refreshData()
         
     def _feedSelected(self, feed: FeedEntry):
 #         print( "selected:", feed.feedName )

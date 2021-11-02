@@ -30,7 +30,7 @@ from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtWidgets import QDialog
 from PyQt5.QtWidgets import qApp
 
-from rsscast.datatypes import parse_feed
+from rsscast.datatypes import parse_feed, fetch_feed
 from rsscast.rss.rssserver import RSSServerManager
 
 from rsscast.gui import threadlist
@@ -66,7 +66,7 @@ class MainWindow( QtBaseClass ):           # type: ignore
 
         self.refreshAction = QtWidgets.QAction(self)
         self.refreshAction.setShortcuts( QtGui.QKeySequence.Refresh )
-        self.refreshAction.triggered.connect( self.refreshDataForce )
+        self.refreshAction.triggered.connect( self.pullDataForce )
         self.addAction( self.refreshAction )
 
         ## =============================================================
@@ -97,7 +97,8 @@ class MainWindow( QtBaseClass ):           # type: ignore
 
         ## ================== connecting signals ==================
 
-        self.ui.refreshPB.clicked.connect( self.refreshDataForce )
+        self.ui.fetchRSSPB.clicked.connect( self.fetchRSS )
+        self.ui.pullPB.clicked.connect( self.pullDataForce )
 
         self.ui.serverWidget.statusChanged.connect( self.updateTrayIndicator )
         self.ui.serverWidget.statusChanged.connect( self.updateTrayToolTip )
@@ -170,9 +171,19 @@ class MainWindow( QtBaseClass ):           # type: ignore
         self.ui.feedWidget.refreshView()
         self.ui.notesWidget.setNotes( self.data.notes )
 
-    def refreshDataForce(self):
-        self.refreshAction.setEnabled( False )
-        self.ui.refreshPB.setEnabled( False )
+    def fetchRSS(self):
+        function  = fetch_feed
+        arguments = ()
+        self._callOnFeeds(function, arguments)
+        
+    def pullDataForce(self):
+        function  = parse_feed
+        hostIp    = RSSServerManager.getPrimaryIp()
+        arguments = ( hostIp, )                     ## hack for one element tuple
+        self._callOnFeeds(function, arguments)
+        
+    def _callOnFeeds(self, function, arguments):
+        self._enableActions( False )
 
 #         threads = threadlist.QThreadList( self )
 #         threads = threadlist.SerialList( self )
@@ -182,17 +193,24 @@ class MainWindow( QtBaseClass ):           # type: ignore
         threads.finished.connect( threads.deleteLater )
         threads.finished.connect( self._refreshingFinished, Qt.QueuedConnection )
 
-        hostIp = RSSServerManager.getPrimaryIp()
         feedList: List[ FeedEntry ] = self.data.feed.getList()
         for feed in feedList:
             if feed.enabled is False:
                 continue
-            threads.appendFunction( parse_feed, (hostIp, feed) )
+            argsList = list( arguments )
+            argsList.append( feed )
+            args = tuple(argsList)
+            threads.appendFunction( function, args )
         threads.start()
 
     def _refreshingFinished(self):
-        self.refreshAction.setEnabled( True )
-        self.ui.refreshPB.setEnabled( True )
+        self.ui.feedWidget.refreshView()
+        self._enableActions( True )
+
+    def _enableActions(self, state=True):
+        self.refreshAction.setEnabled( state )
+        self.ui.pullPB.setEnabled( state )
+        self.ui.fetchRSSPB.setEnabled( state )
 
     ## ====================================================================
 

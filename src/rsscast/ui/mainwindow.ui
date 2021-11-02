@@ -107,9 +107,16 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="refreshPB">
+       <widget class="QPushButton" name="fetchRSSPB">
         <property name="text">
-         <string>Refresh</string>
+         <string>Fetch RSS</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pullPB">
+        <property name="text">
+         <string>Pull Content</string>
         </property>
        </widget>
       </item>
