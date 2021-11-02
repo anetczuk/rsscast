@@ -36,7 +36,7 @@ import rsscast.logger as logger
 from rsscast import DATA_DIR
 from rsscast.rss.rssserver import RSSServerManager
 
-from rsscast.datatypes import parse_feed
+from rsscast.datatypes import parse_feed, fetch_feed
 from rsscast.gui.resources import get_user_data_path
 from rsscast.gui.dataobject import DataObject
 
@@ -60,6 +60,13 @@ class CliApp:
             dataPath = get_user_data_path()
             self.data.load( dataPath )
 
+    def fetchRSS(self):
+        feedList: List[ FeedEntry ] = self.data.feed.getList()
+        for feed in feedList:
+            if feed.enabled is False:
+                continue
+            fetch_feed( feed )
+
     def refreshRSS(self):
         hostIp = RSSServerManager.getPrimaryIp()
         feedList: List[ FeedEntry ] = self.data.feed.getList()
@@ -81,6 +88,13 @@ def set_app_data( app ):
 def run_cli( args ):
     appData = CliApp()
     cli_mode = False
+
+    if args.fetchRSS:
+        cli_mode = True
+        appData.init()
+        _LOGGER.info( "fetching feed" )
+        appData.fetchRSS()
+        _LOGGER.info( "fetching done" )
 
     if args.refreshRSS:
         cli_mode = True
@@ -108,7 +122,8 @@ def run_cli( args ):
 def create_parser( parser: argparse.ArgumentParser = None ):
     if parser is None:
         parser = argparse.ArgumentParser(description='RSS Cast')
-    parser.add_argument('--refreshRSS', action='store_const', const=True, default=False, help='Refresh RSS channels' )
+    parser.add_argument('--fetchRSS', action='store_const', const=True, default=False, help='Update RSS channels' )
+    parser.add_argument('--refreshRSS', action='store_const', const=True, default=False, help='Update RSS channels and download content' )
     parser.add_argument('--startServer', action='store_const', const=True, default=False, help='Start RSS server' )
     return parser
 

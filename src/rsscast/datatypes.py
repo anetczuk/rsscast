@@ -86,12 +86,12 @@ def fetch_feed( feed: FeedEntry ):
 
 def pull_feed( hostIp, feed: FeedEntry ):
     feedId = feed.feedId
-    generate_content( hostIp, feedId, feed.channel )
+    return generate_content( hostIp, feedId, feed.channel )
     
 
 def parse_feed( hostIp, feed: FeedEntry ):
     fetch_feed( feed )
-    pull_feed( hostIp, feed )
+    return pull_feed( hostIp, feed )
     
 #     ## old
 #     convert_rss( hostIp, feed.feedId, feed.url )

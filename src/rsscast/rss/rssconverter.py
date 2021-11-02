@@ -55,7 +55,7 @@ def convert_rss( host, feedId, feedUrl ):
 
     rssChannel = RSSChannel()
     rssChannel.parse( feedContent )
-    generate_content( host, feedId, rssChannel )
+    return generate_content( host, feedId, rssChannel )
 
 
 ## download required media and generate RSS file
@@ -65,6 +65,7 @@ def generate_content( host, feedId, rssChannel: RSSChannel ):
 
     channelPath = get_channel_output_dir( feedId )
 
+    succeed = True
     items_result = ""
 #     rssItem: RSSItem = None
     for rssItem in rssChannel.items:
@@ -80,10 +81,12 @@ def generate_content( host, feedId, rssChannel: RSSChannel ):
 
         if not os.path.exists(postLocalPath):
             ## item file not exists -- convert and download
+            _LOGGER.info( "feed %s: converting video: %s to %s", feedId, postLink, postLocalPath )
             converted = convert_yt( postLink, postLocalPath )
             if converted is False:
                 ## skip elements that failed to convert
                 _LOGGER.info( "feed %s: unable to convert video '%s' -- skipped", feedId, postTitle )
+                succeed = False
                 continue
         else:
             _LOGGER.info( "feed %s: local conversion of %s found in %s", feedId, postLink, postLocalPath )
@@ -142,3 +145,5 @@ def generate_content( host, feedId, rssChannel: RSSChannel ):
     rssOutput = "%s/rss" % channelPath
     _LOGGER.info( "feed %s: writing converted rss output to %s", feedId, rssOutput )
     write_text( result, rssOutput )
+    
+    return succeed

@@ -101,8 +101,6 @@ def get_mp3_format_data( mp3FormatDict ):
 
 ## converting YT videos using webpage https://yt1s.com
 def convert_yt_yt1s( link, output, mimicHuman=True ):
-    _LOGGER.info( "converting video: %s to %s", link, output )
-
     dataBuffer = BytesIO()
     try:
         session = pycurl.Curl()
