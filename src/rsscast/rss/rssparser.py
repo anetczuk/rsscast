@@ -43,7 +43,8 @@ class RSSItem( persist.Versionable ):
     
     ## 0 - first version
     ## 1 - added 'enabled' field
-    _class_version = 1
+    ## 2 - added 'mediaSize' field
+    _class_version = 2
     
     def __init__(self, itemId=None, link=None):
         self.id = itemId
@@ -51,6 +52,7 @@ class RSSItem( persist.Versionable ):
         self.title = None
         self.summary = None
         self.publishDate = None
+        self.mediaSize = -1                 ## in bytes
         
         ## thumbnail
         self.thumb_url    = None
@@ -74,6 +76,10 @@ class RSSItem( persist.Versionable ):
             dict_["enabled"] = True
             dictVersion_ = 1
 
+        if dictVersion_ == 1:
+            dict_["mediaSize"] = -1
+            dictVersion_ = 2
+
         # pylint: disable=W0201
         self.__dict__ = dict_
 
@@ -86,6 +92,11 @@ class RSSItem( persist.Versionable ):
     
     def itemTitle(self):
         return html.escape( self.title )
+    
+    def localFileSize(self):
+        if self.mediaSize < 0:
+            return None
+        return self.mediaSize
     
     def switchEnabled(self):
         self.enabled = not self.enabled

@@ -81,6 +81,25 @@ class FeedTableModel( QAbstractTableModel ):
         entry = self._rawData.get( row )
         return self.createIndex(row, column, entry)
 
+    def getIndex(self, item, parentIndex: QModelIndex=None, column: int = 0):
+        if parentIndex is None:
+            parentIndex = QModelIndex()
+        if parentIndex.isValid():
+            # dataTask = parentIndex.data( Qt.UserRole )
+            dataTask = parentIndex.internalPointer()
+            if dataTask == item:
+                return parentIndex
+        elems = self.rowCount( parentIndex )
+        for i in range(elems):
+            index = self.index( i, column, parentIndex )
+            if index.isValid() is False:
+                continue
+            # dataTask = parentIndex.data( Qt.UserRole )
+            dataTask = index.internalPointer()
+            if dataTask == item:
+                return index
+        return None
+
     def data(self, index: QModelIndex, role=Qt.DisplayRole):
         if not index.isValid():
             return None
@@ -121,25 +140,6 @@ class FeedTableModel( QAbstractTableModel ):
 #                 return Qt.AlignLeft | Qt.AlignVCenter
 #             return Qt.AlignHCenter | Qt.AlignVCenter
 
-        return None
-
-    def getIndex(self, item, parentIndex: QModelIndex=None, column: int = 0):
-        if parentIndex is None:
-            parentIndex = QModelIndex()
-        if parentIndex.isValid():
-            # dataTask = parentIndex.data( Qt.UserRole )
-            dataTask = parentIndex.internalPointer()
-            if dataTask == item:
-                return parentIndex
-        elems = self.rowCount( parentIndex )
-        for i in range(elems):
-            index = self.index( i, column, parentIndex )
-            if index.isValid() is False:
-                continue
-            # dataTask = parentIndex.data( Qt.UserRole )
-            dataTask = index.internalPointer()
-            if dataTask == item:
-                return index
         return None
 
     def attribute(self, entry: FeedEntry, index):

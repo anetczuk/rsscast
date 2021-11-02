@@ -88,6 +88,8 @@ def generate_content( host, feedId, rssChannel: RSSChannel ):
         else:
             _LOGGER.info( "feed %s: local conversion of %s found in %s", feedId, postLink, postLocalPath )
 
+        rssItem.mediaSize = os.path.getsize( postLocalPath )
+
         enclosureURL  = "http://%s/feed/%s/%s.mp3" % ( host, feedId, videoId )      ## must have absolute path
 
         mediaThumbnailNode = ""

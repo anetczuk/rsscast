@@ -79,6 +79,25 @@ class RSSChannelTableModel( QAbstractTableModel ):
         entry = self._rawData.get( row )
         return self.createIndex(row, column, entry)
 
+    def getIndex(self, item, parentIndex: QModelIndex=None, column: int = 0):
+        if parentIndex is None:
+            parentIndex = QModelIndex()
+        if parentIndex.isValid():
+            # dataTask = parentIndex.data( Qt.UserRole )
+            dataTask = parentIndex.internalPointer()
+            if dataTask == item:
+                return parentIndex
+        elems = self.rowCount( parentIndex )
+        for i in range(elems):
+            index = self.index( i, column, parentIndex )
+            if index.isValid() is False:
+                continue
+            # dataTask = parentIndex.data( Qt.UserRole )
+            dataTask = index.internalPointer()
+            if dataTask == item:
+                return index
+        return None
+
     def data(self, index: QModelIndex, role=Qt.DisplayRole):
         if not index.isValid():
             return None
@@ -114,30 +133,16 @@ class RSSChannelTableModel( QAbstractTableModel ):
             if entry.enabled is False:
                 return QColor( "gray" )
 
-#         if role == Qt.TextAlignmentRole:
-#             if index.column() == 4:
-#                 return Qt.AlignLeft | Qt.AlignVCenter
-#             return Qt.AlignHCenter | Qt.AlignVCenter
+        if role == Qt.TextAlignmentRole:
+            if index.column() == 0:
+                ## order number
+                return Qt.AlignRight | Qt.AlignVCenter
+            if index.column() == 3:
+                ## media size
+                return Qt.AlignRight | Qt.AlignVCenter
+#                 return Qt.AlignHCenter | Qt.AlignVCenter
+            return Qt.AlignLeft | Qt.AlignVCenter
 
-        return None
-
-    def getIndex(self, item, parentIndex: QModelIndex=None, column: int = 0):
-        if parentIndex is None:
-            parentIndex = QModelIndex()
-        if parentIndex.isValid():
-            # dataTask = parentIndex.data( Qt.UserRole )
-            dataTask = parentIndex.internalPointer()
-            if dataTask == item:
-                return parentIndex
-        elems = self.rowCount( parentIndex )
-        for i in range(elems):
-            index = self.index( i, column, parentIndex )
-            if index.isValid() is False:
-                continue
-            # dataTask = parentIndex.data( Qt.UserRole )
-            dataTask = index.internalPointer()
-            if dataTask == item:
-                return index
         return None
 
     def attribute(self, entry: RSSItem, index):
@@ -150,12 +155,17 @@ class RSSChannelTableModel( QAbstractTableModel ):
         elif index == 2:
             return entry.id
         elif index == 3:
+            mediaSize = entry.localFileSize()
+            if mediaSize == None:
+                return None
+            return round( mediaSize / 1024 / 1024, 2 )
+        elif index == 4:
             return entry.link
         return None
 
     @staticmethod
     def attributeLabels():
-        return ( "#", "Title", "Id", "URL" )
+        return ( "#", "Title", "Id", "Size [MB]", "URL" )
 
 
 ## ===========================================================

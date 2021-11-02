@@ -120,6 +120,10 @@ def convert_yt_yt1s( link, output, mimicHuman=True ):
 #         _LOGGER.info( "response:\n%s", bodyOutput )
 
         data = json.loads( bodyOutput )
+
+#         print( "request response:" )
+#         pprint( data )
+        
         jsonStatus = data['status']
         if jsonStatus != "ok":
             _LOGGER.warning( "invalid status:\n%s", bodyOutput )
@@ -134,9 +138,6 @@ def convert_yt_yt1s( link, output, mimicHuman=True ):
             randTime = random.uniform( 1.0, 3.0 )
             time.sleep( randTime )
 
-#         print( "response data:" )
-#         pprint( data )
-
         ## video ID, eg: "EE4U9qpErW8"
         vidId     = data["vid"]
         
@@ -144,6 +145,9 @@ def convert_yt_yt1s( link, output, mimicHuman=True ):
         mp3Data   = data['links']['mp3']
         mp3Format = get_mp3_format_data( mp3Data )
         convertId = mp3Format['k']
+#         dataSize  = mp3Format['size']
+
+#         pprint( mp3Format )
 
         params = { 'vid': vidId,
                    'k': convertId }
@@ -157,7 +161,7 @@ def convert_yt_yt1s( link, output, mimicHuman=True ):
 
         data = json.loads( bodyOutput )
         
-#         print( "response data:" )
+#         print( "convert response:" )
 #         pprint( data )
         
         jsonStatus = data['status']
@@ -195,7 +199,7 @@ def convert_yt_yt1s( link, output, mimicHuman=True ):
 
 
 def curl_post( session, targetUrl, dataDict ):
-    _LOGGER.info( "accessing url: %s params: %s", targetUrl, dataDict )
+#     _LOGGER.info( "accessing url: %s params: %s", targetUrl, dataDict )
 
     dataBuffer = BytesIO()
 #     try:
