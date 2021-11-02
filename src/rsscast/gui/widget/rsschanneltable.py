@@ -109,10 +109,10 @@ class RSSChannelTableModel( QAbstractTableModel ):
             rawData = self.attribute( entry, index.column() )
             return rawData
 
-#         if role == Qt.BackgroundRole:
-#             entry: RSSItem = self._rawData.get( index.row() )
-#             if entry.enabled is False:
-#                 return QColor( "gray" )
+        if role == Qt.BackgroundRole:
+            entry: RSSItem = self._rawData.get( index.row() )
+            if entry.enabled is False:
+                return QColor( "gray" )
 
 #         if role == Qt.TextAlignmentRole:
 #             if index.column() == 4:
@@ -241,42 +241,30 @@ class RSSChannelTable( QTableView ):
         sourceIndex = self.proxyModel.mapToSource( itemIndex )
         return self.dataModel.getItem( sourceIndex )
 
-#     def contextMenuEvent( self, event ):
-#         print("xxxxxxxxxxxxx")
-#         evPos            = event.pos()
-#         entry: RSSItem = None
-#         mIndex = self.indexAt( evPos )
-#         if mIndex is not None:
-#             entry = self.getItem( mIndex )
-# 
-# #         create_entry_contextmenu( self, self.dataObject, entry )
-# 
-#         contextMenu      = QtWidgets.QMenu( self )
-#         addAction        = contextMenu.addAction("Add Entry")
-#         editAction       = contextMenu.addAction("Edit Entry")
-#         removeAction     = contextMenu.addAction("Remove Entry")
-#         enableAction     = None
-#         if entry is None or entry.enabled is False:
-#             enableAction = contextMenu.addAction("Enable")
-#         else:
-#             enableAction = contextMenu.addAction("Disable")
-# 
-#         if entry is None:
-#             editAction.setEnabled( False )
-#             removeAction.setEnabled( False )
-#             enableAction.setEnabled( False )
-# 
-#         globalPos = QtGui.QCursor.pos()
-#         action = contextMenu.exec_( globalPos )
-# 
-#         if action == addAction:
-#             self.dataObject.addEntryNew()
-#         elif action == editAction:
-#             self.dataObject.editEntry( entry )
-#         elif action == removeAction:
-#             self.dataObject.removeEntry( entry )
-#         elif action == enableAction:
-#             self.dataObject.switchEntryEnableState( entry )
+    def contextMenuEvent( self, event ):
+        evPos          = event.pos()
+        entry: RSSItem = None
+        mIndex = self.indexAt( evPos )
+        if mIndex is not None:
+            entry = self.getItem( mIndex )
+ 
+#         create_entry_contextmenu( self, self.dataObject, entry )
+ 
+        contextMenu      = QtWidgets.QMenu( self )
+        enableAction     = None
+        if entry is None or entry.enabled is False:
+            enableAction = contextMenu.addAction("Enable")
+        else:
+            enableAction = contextMenu.addAction("Disable")
+ 
+        if entry is None:
+            enableAction.setEnabled( False )
+ 
+        globalPos = QtGui.QCursor.pos()
+        action = contextMenu.exec_( globalPos )
+ 
+        if action == enableAction:
+            entry.switchEnabled()
 
     def currentChanged(self, current, previous):
         super().currentChanged( current, previous )

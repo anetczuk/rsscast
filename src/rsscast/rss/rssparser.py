@@ -23,7 +23,7 @@
 
 import os
 import logging
-import re
+# import re
 import html
 import requests
 import requests_file
@@ -42,7 +42,8 @@ _LOGGER = logging.getLogger(__name__)
 class RSSItem( persist.Versionable ):
     
     ## 0 - first version
-    _class_version = 0
+    ## 1 - added 'enabled' field
+    _class_version = 1
     
     def __init__(self, itemId=None, link=None):
         self.id = itemId
@@ -55,6 +56,8 @@ class RSSItem( persist.Versionable ):
         self.thumb_url    = None
         self.thumb_width  = None
         self.thumb_height = None
+        
+        self.enabled = True
 
     def _convertstate_( self, dict_, dictVersion_ ):
         _LOGGER.info( "converting object from version %s to %s", dictVersion_, self._class_version )
@@ -66,6 +69,10 @@ class RSSItem( persist.Versionable ):
         if dictVersion_ < 0:
             ## nothing to do
             dictVersion_ = 0
+
+        if dictVersion_ == 0:
+            dict_["enabled"] = True
+            dictVersion_ = 1
 
         # pylint: disable=W0201
         self.__dict__ = dict_
@@ -79,6 +86,9 @@ class RSSItem( persist.Versionable ):
     
     def itemTitle(self):
         return html.escape( self.title )
+    
+    def switchEnabled(self):
+        self.enabled = not self.enabled
 
 
 class RSSChannel( persist.Versionable ):

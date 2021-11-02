@@ -69,6 +69,9 @@ def generate_content( host, feedId, rssChannel: RSSChannel ):
     for rssItem in rssChannel.items:
 #         pprint( rssItem )
 
+        if rssItem.enabled is False:
+            continue
+
         videoId = rssItem.videoId()
         postLink = rssItem.link
         postLocalPath = "%s/%s.mp3" % ( channelPath, videoId )
