@@ -31,6 +31,7 @@ import feedparser
 
 from rsscast import DATA_DIR, persist
 from typing import List
+# from rsscast.rss.ytconverter import get_media_size
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -186,6 +187,10 @@ class RSSChannel( persist.Versionable ):
     
             rssItem.summary = post.get('summary', '')
             rssItem.publishDate = post['published']
+    
+#             linkSize = get_media_size( rssItem.link, False )
+#             if linkSize != None:
+#                 rssItem.mediaSize = linkSize
     
             self.addItem( rssItem )
 

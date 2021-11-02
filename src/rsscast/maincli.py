@@ -63,8 +63,8 @@ class CliApp:
     def fetchRSS(self):
         feedList: List[ FeedEntry ] = self.data.feed.getList()
         for feed in feedList:
-            if feed.enabled is False:
-                continue
+#             if feed.enabled is False:
+#                 continue
             fetch_feed( feed )
 
     def refreshRSS(self):

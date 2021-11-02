@@ -174,7 +174,7 @@ class MainWindow( QtBaseClass ):           # type: ignore
     def fetchRSS(self):
         function  = fetch_feed
         arguments = ()
-        self._callOnFeeds(function, arguments)
+        self._callOnFeeds(function, arguments, True)
         
     def pullDataForce(self):
         function  = parse_feed
@@ -182,7 +182,7 @@ class MainWindow( QtBaseClass ):           # type: ignore
         arguments = ( hostIp, )                     ## hack for one element tuple
         self._callOnFeeds(function, arguments)
         
-    def _callOnFeeds(self, function, arguments):
+    def _callOnFeeds(self, function, arguments, processDisabled=False):
         self._enableActions( False )
 
 #         threads = threadlist.QThreadList( self )
@@ -195,7 +195,7 @@ class MainWindow( QtBaseClass ):           # type: ignore
 
         feedList: List[ FeedEntry ] = self.data.feed.getList()
         for feed in feedList:
-            if feed.enabled is False:
+            if processDisabled is False and feed.enabled is False:
                 continue
             argsList = list( arguments )
             argsList.append( feed )

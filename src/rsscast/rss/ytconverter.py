@@ -99,49 +99,88 @@ def get_mp3_format_data( mp3FormatDict ):
     return mp3FormatDict[ formatKey ]
 
 
-## converting YT videos using webpage https://yt1s.com
-def convert_yt_yt1s( link, output, mimicHuman=True ):
-    dataBuffer = BytesIO()
-    try:
-        session = pycurl.Curl()
-        session.setopt( pycurl.USERAGENT, "curl/7.58.0" )
-        session.setopt( pycurl.FOLLOWLOCATION, True )        ## follow redirects
-        session.setopt( pycurl.CONNECTTIMEOUT, 60 )          ## connection phase timeout
+def get_curl_session():
+    session = pycurl.Curl()
+    session.setopt( pycurl.USERAGENT, "curl/7.58.0" )
+    session.setopt( pycurl.FOLLOWLOCATION, True )        ## follow redirects
+    session.setopt( pycurl.CONNECTTIMEOUT, 60 )          ## connection phase timeout
 #         session.setopt( pycurl.TIMEOUT, 60 )                 ## whole request timeout (transfer?)
 #         c.setopt( c.VERBOSE, 1 )
+    return session
 
-        params = {'q': link,
-                  'vt': 'mp3'}
 
-        dataBuffer = curl_post( session, "https://yt1s.com/api/ajaxSearch/index", params )
-        bodyOutput = dataBuffer.getvalue().decode('utf-8')
+def get_mp3_data( session, link, mimicHuman=True ):
+    params = {'q': link,
+              'vt': 'mp3'}
+
+    dataBuffer = curl_post( session, "https://yt1s.com/api/ajaxSearch/index", params )
+    bodyOutput = dataBuffer.getvalue().decode('utf-8')
 #         _LOGGER.info( "response:\n%s", bodyOutput )
 
-        data = json.loads( bodyOutput )
+    data = json.loads( bodyOutput )
 
 #         print( "request response:" )
 #         pprint( data )
+    
+    jsonStatus = data['status']
+    if jsonStatus != "ok":
+        _LOGGER.warning( "invalid status:\n%s", bodyOutput )
+        return None
+    jsonMess = data['mess']
+    if jsonMess != "":
+        ## happens always for delayed premieres
+        _LOGGER.warning( "invalid status while converting %s:\n%s\npremiere?", link, bodyOutput )
+        return None
+
+    if mimicHuman:
+        randTime = random.uniform( 1.0, 3.0 )
+        time.sleep( randTime )
+
+    ## video ID, eg: "EE4U9qpErW8"
+    vidId     = data["vid"]
+    
+    ## convert key, like: "0+azXhfVIrnzRYKBCptsmBJiPRF1HVqa5l7v3sVU68OOkmCBRvmw/2jfMz2F1b42/wu2h1L4EoRSl7BxuLz3jxPrCyVYC2cF9udBFCDoF7T5kZpCBy5X"
+    mp3Data   = data['links']['mp3']
+    mp3Format = get_mp3_format_data( mp3Data )
+    return ( vidId, mp3Format )
+
+
+def get_media_size( link, mimicHuman=True ):
+    try:
+        session = get_curl_session()
         
-        jsonStatus = data['status']
-        if jsonStatus != "ok":
-            _LOGGER.warning( "invalid status:\n%s", bodyOutput )
-            return False
-        jsonMess = data['mess']
-        if jsonMess != "":
-            ## happens always for delayed premieres
-            _LOGGER.warning( "invalid status while converting %s:\n%s\npremiere?", link, bodyOutput )
+        mp3Data = get_mp3_data( session, link, mimicHuman )
+        if mp3Data == None:
+            return None
+        
+        mp3Format = mp3Data[1]
+        dataSize  = mp3Format['size']
+        if dataSize == None:
+            return None
+        
+        print( "xxxxxxxxxxx:", dataSize )
+#         return dataSize
+
+        return None
+        
+    finally:
+        session.close()
+
+    return None
+
+
+## converting YT videos using webpage https://yt1s.com
+def convert_yt_yt1s( link, output, mimicHuman=True ):
+    try:
+        session = get_curl_session()
+        
+        mp3Data = get_mp3_data( session, link, mimicHuman )
+        if mp3Data == None:
             return False
 
-        if mimicHuman:
-            randTime = random.uniform( 1.0, 3.0 )
-            time.sleep( randTime )
-
-        ## video ID, eg: "EE4U9qpErW8"
-        vidId     = data["vid"]
+        vidId     = mp3Data[0]
+        mp3Format = mp3Data[1]
         
-        ## convert key, like: "0+azXhfVIrnzRYKBCptsmBJiPRF1HVqa5l7v3sVU68OOkmCBRvmw/2jfMz2F1b42/wu2h1L4EoRSl7BxuLz3jxPrCyVYC2cF9udBFCDoF7T5kZpCBy5X"
-        mp3Data   = data['links']['mp3']
-        mp3Format = get_mp3_format_data( mp3Data )
         convertId = mp3Format['k']
 #         dataSize  = mp3Format['size']
 
