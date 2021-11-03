@@ -33,6 +33,10 @@ from PyQt5.QtGui import QColor
 
 from rsscast.rss.rssparser import RSSChannel, RSSItem
 from rsscast.gui import guistate
+from rsscast.datatypes import FeedEntry
+from rsscast.rss.rssconverter import generate_channel_content
+from rsscast.gui.dataobject import DataObject
+from rsscast.gui.command.rsschannelcommand import RemoveRSSItemCommand
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -180,7 +184,8 @@ class RSSChannelTable( QTableView ):
         super().__init__(parentWidget)
         self.setObjectName("rsschanneltable")
 
-        self.dataObject: RSSChannel = None
+        self.dataObject: DataObject = None
+        self.feedObject: FeedEntry  = None
 
         self.setSortingEnabled( True )
         self.setShowGrid( False )
@@ -214,12 +219,17 @@ class RSSChannelTable( QTableView ):
 
     ## ===============================================
 
-    def connectData(self, channel: RSSChannel ):
-        self.dataObject = channel
+    def connectData(self, dataObject: DataObject, feed: FeedEntry ):
+        self.dataObject = dataObject
+        self.feedObject = feed
         self.refreshData()
+        self.dataObject.feedChanged.connect( self.refreshData )
 
     def refreshData(self):
-        self.dataModel.setContent( self.dataObject )
+        channel = None
+        if self.feedObject is not None:
+            channel = self.feedObject.channel
+        self.dataModel.setContent( channel )
         self.clearSelection()
 #         _LOGGER.debug( "entries: %s\n%s", type(history), history.printData() )
 
@@ -258,9 +268,11 @@ class RSSChannelTable( QTableView ):
         if mIndex is not None:
             entry = self.getItem( mIndex )
  
-#         create_entry_contextmenu( self, self.dataObject, entry )
+#         create_entry_contextmenu( self, self.feedObject, entry )
  
         contextMenu      = QtWidgets.QMenu( self )
+        pullAction       = contextMenu.addAction("Pull")
+        removeAction     = contextMenu.addAction("Remove")
         enableAction     = None
         if entry is None or entry.enabled is False:
             enableAction = contextMenu.addAction("Enable")
@@ -268,12 +280,22 @@ class RSSChannelTable( QTableView ):
             enableAction = contextMenu.addAction("Disable")
  
         if entry is None:
+            pullAction.setEnabled( False )
+            removeAction.setEnabled( False )
             enableAction.setEnabled( False )
  
         globalPos = QtGui.QCursor.pos()
         action = contextMenu.exec_( globalPos )
  
-        if action == enableAction:
+        if action == pullAction:
+            feedId  = self.feedObject.feedId
+            channel = self.feedObject.channel
+            #TODO: finish -- call "convert_yt()"
+            ## generate_channel_content( feedId, channel )
+        elif action == removeAction:
+            command = RemoveRSSItemCommand( self.dataObject, self.feedObject, entry )
+            self.dataObject.pushUndo( command )
+        elif action == enableAction:
             entry.switchEnabled()
 
     def currentChanged(self, current, previous):

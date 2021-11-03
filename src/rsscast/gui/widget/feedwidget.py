@@ -54,8 +54,8 @@ class FeedWidget( QtBaseClass ):           # type: ignore
         
     def _feedSelected(self, feed: FeedEntry):
 #         print( "selected:", feed.feedName )
-        channel: RSSChannel = feed.channel
-        self.ui.feedItemsView.connectData( channel )
+        dataObject = self.ui.feedTableView.dataObject
+        self.ui.feedItemsView.connectData( dataObject, feed )
         
     def _feedUnselected(self):
 #         print( "unselected" )

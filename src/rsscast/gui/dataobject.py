@@ -28,7 +28,7 @@ from PyQt5 import QtWidgets
 from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtWidgets import QWidget, QUndoStack
 
-from rsscast.datatypes import UserContainer, FeedContainer
+from rsscast.datatypes import UserContainer, FeedContainer, FeedEntry
 from rsscast.gui.widget.feeddialog import FeedDialog
 from rsscast.gui.command.addentrycommand import AddEntryCommand
 from rsscast.gui.command.editentrycommand import EditEntryCommand
@@ -104,7 +104,7 @@ class DataObject( QObject ):
         command = EditEntryCommand( self, entry, entryDialog.entry )
         self.pushUndo( command )
 
-    def removeEntry(self, entry):
+    def removeEntry(self, entry: FeedEntry):
         if entry is None:
             return
         command = RemoveEntryCommand( self, entry )

@@ -26,8 +26,8 @@ import glob
 from typing import List
 
 from rsscast import persist
-from rsscast.rss.rssparser import parse_rss, RSSChannel
-from rsscast.rss.rssconverter import generate_content
+from rsscast.rss.rssparser import parse_rss, RSSChannel, RSSItem
+from rsscast.rss.rssconverter import generate_channel_content
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -74,6 +74,16 @@ class FeedEntry( persist.Versionable ):
             return
         self.channel.update( channel )
 
+    def addItem(self, rssItem: RSSItem, index):
+        if self.channel is None:
+            return
+        self.channel.addItem(rssItem, index)
+        
+    def removeItem(self, rssItem: RSSItem):
+        if self.channel is None:
+            return
+        self.channel.removeItem( rssItem )
+
     def printData(self) -> str:
         return str( self.feedName ) + " " + str( self.feedId ) + " " + str( self.url ) + " " + str( self.enabled )
 
@@ -84,17 +94,10 @@ def fetch_feed( feed: FeedEntry ):
     feed.update( rssChannel )    
 
 
-def pull_feed( hostIp, feed: FeedEntry ):
-    feedId = feed.feedId
-    return generate_content( hostIp, feedId, feed.channel )
-    
-
-def parse_feed( hostIp, feed: FeedEntry ):
+def parse_feed( feed: FeedEntry ):
     fetch_feed( feed )
-    return pull_feed( hostIp, feed )
-    
-#     ## old
-#     convert_rss( hostIp, feed.feedId, feed.url )
+    feedId = feed.feedId
+    return generate_channel_content( feedId, feed.channel )
 
 
 ## ========================================================

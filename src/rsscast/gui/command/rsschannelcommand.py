@@ -25,27 +25,31 @@ import logging
 
 from PyQt5.QtWidgets import QUndoCommand
 
-from rsscast.datatypes import FeedContainer, FeedEntry
+from rsscast.rss.rssparser import RSSItem
+from rsscast.gui.dataobject import DataObject
+from rsscast.datatypes import FeedEntry
 
 
 _LOGGER = logging.getLogger(__name__)
 
 
-class RemoveEntryCommand( QUndoCommand ):
+class RemoveRSSItemCommand( QUndoCommand ):
 
-    def __init__(self, dataObject: "DataObject", entry: FeedEntry, parentCommand=None):
+    def __init__(self, dataObject: DataObject, feed: FeedEntry, entry: RSSItem, parentCommand=None):
         super().__init__(parentCommand)
 
         self.data: DataObject = dataObject
-        self.feedContainer: FeedContainer = self.data.feed
-        self.entry: FeedEntry = entry
+        self.feed: FeedEntry = feed
+        self.entry: RSSItem = entry
 
-        self.setText( "Remove Entry: " + str(entry.feedName) )
+        self.itemIndex = self.feed.channel.itemIndex( self.entry )
+
+        self.setText( "Remove Item: " + str(entry.id) )
 
     def redo(self):
-        self.feedContainer.removeFeed( self.entry )
+        self.feed.removeItem( self.entry )
         self.data.feedChanged.emit()
 
     def undo(self):
-        self.feedContainer.addFeed( self.entry )
+        self.feed.addItem( self.entry, self.itemIndex )
         self.data.feedChanged.emit()

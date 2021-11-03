@@ -137,11 +137,20 @@ class RSSChannel( persist.Versionable ):
     def getList(self) -> List[  RSSItem ]:
         return self.items
     
-    def addItem(self, rssItem: RSSItem):
+    def addItem(self, rssItem: RSSItem, index = None):
         found = self.findItem( rssItem.id )
         if found != None:
             return
-        self.items.append( rssItem )
+        if index == None:
+            self.items.append( rssItem )
+        else:
+            self.items.insert( index, rssItem )
+
+    def removeItem(self, rssItem: RSSItem):
+        self.items.remove( rssItem )
+
+    def itemIndex(self, rssItem: RSSItem) -> int:
+        self.items.index( rssItem )
 
     def findItem(self, itemId) -> RSSItem:
         for item in self.items:

@@ -31,33 +31,20 @@ from rsscast.rss.rssparser import RSSChannel
 from rsscast.rss.rssparser import read_url, get_channel_output_dir
 from rsscast.rss.rssparser import write_text
 from rsscast.rss.ytconverter import convert_yt
+from rsscast.rss.rssserver import RSSServerManager
 
 
 _LOGGER = logging.getLogger(__name__)
 
 
-##
-## podcast generation: https://feedgen.kiesow.be/
-##
-def convert_rss( host, feedId, feedUrl ):
-    _LOGGER.info( "feed %s: reading url %s", feedId, feedUrl )
-    feedContent = read_url( feedUrl )
-    channelPath = get_channel_output_dir( feedId )
-    sourceRSS = os.path.abspath( os.path.join(channelPath, "source.rss") )
-    write_text( feedContent, sourceRSS )
-    
-    _LOGGER.info( "feed %s: parsing rss", feedId )
-    parsedDict = feedparser.parse( feedContent )
-
-    _LOGGER.info( "feed %s: detected entries %s", feedId, len(parsedDict.entries) )
-#     pprint( parsedDict.feed )
-#     pprint( parsedDict.entries )
-
-    rssChannel = RSSChannel()
-    rssChannel.parse( feedContent )
+def generate_channel_content( feedId, rssChannel: RSSChannel ):
+    host = RSSServerManager.getPrimaryIp()
     return generate_content( host, feedId, rssChannel )
 
 
+##
+## podcast generation: https://feedgen.kiesow.be/
+##
 ## download required media and generate RSS file
 def generate_content( host, feedId, rssChannel: RSSChannel ):
     feedId = feedId.replace(":", "_")

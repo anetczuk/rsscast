@@ -178,8 +178,7 @@ class MainWindow( QtBaseClass ):           # type: ignore
         
     def pullDataForce(self):
         function  = parse_feed
-        hostIp    = RSSServerManager.getPrimaryIp()
-        arguments = ( hostIp, )                     ## hack for one element tuple
+        arguments = ()
         self._callOnFeeds(function, arguments)
         
     def _callOnFeeds(self, function, arguments, processDisabled=False):

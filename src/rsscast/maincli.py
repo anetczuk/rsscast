@@ -68,12 +68,11 @@ class CliApp:
             fetch_feed( feed )
 
     def refreshRSS(self):
-        hostIp = RSSServerManager.getPrimaryIp()
         feedList: List[ FeedEntry ] = self.data.feed.getList()
         for feed in feedList:
             if feed.enabled is False:
                 continue
-            parse_feed( hostIp, feed )
+            parse_feed( feed )
 
     def startServer(self):
         pass
