@@ -48,7 +48,7 @@ class CliApp:
 
     def __init__(self):
         self.app  = None
-        self.data = None
+        self.data: DataObject = None
 
     def init( self ):
         if self.app is None:
@@ -56,9 +56,18 @@ class CliApp:
             set_app_data( self.app )
 
         if self.data is None:
-            self.data = DataObject()
-            dataPath = get_user_data_path()
-            self.data.load( dataPath )
+            self.loadData()
+
+    def loadData(self):
+        self.data = DataObject()
+        dataPath = get_user_data_path()
+        self.data.load( dataPath )
+
+    def saveData(self):
+        if self.data is None:
+            return
+        dataPath = get_user_data_path()
+        self.data.store( dataPath )
 
     def fetchRSS(self):
         feedList: List[ FeedEntry ] = self.data.feed.getList()
@@ -101,6 +110,9 @@ def run_cli( args ):
         _LOGGER.info( "refreshing feed" )
         appData.refreshRSS()
         _LOGGER.info( "refreshing done" )
+
+    if cli_mode:
+        appData.saveData()
 
     if args.startServer:
         _LOGGER.info( "starting server" )
