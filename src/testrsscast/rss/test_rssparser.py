@@ -51,17 +51,17 @@ class RSSChannelTest(unittest.TestCase):
         self.assertTrue( items != None )
         self.assertEqual( len(items), 3 )
         
-        self.assertEqual( items[0].id, "yt:video:DXU6PBpv-eI" )
-        self.assertEqual( items[0].link, "https://www.youtube.com/watch?v=DXU6PBpv-eI" )
-        self.assertEqual( items[0].title, "Reflexiona sobre el 2020 #conmigo" )
-        self.assertEqual( items[0].summary[0:26], "El 2020 nos llenó de dudas" )
-        self.assertEqual( items[0].publishDate, "2020-12-15T20:00:30+00:00" )
-        self.assertEqual( items[0].thumb_url, "https://i1.ytimg.com/vi/DXU6PBpv-eI/hqdefault.jpg" )
+        self.assertEqual( items[0].id, "yt:video:omY5FahfTrI" )
+        self.assertEqual( items[0].link, "https://www.youtube.com/watch?v=omY5FahfTrI" )
+        self.assertEqual( items[0].title, "#RegresoAClases con Julioprofe" )
+        self.assertEqual( items[0].summary[0:26], "Ya estamos más que listos " )
+        self.assertEqual( items[0].publishDate, "2020-08-24T20:58:16+00:00" )
+        self.assertEqual( items[0].thumb_url, "https://i4.ytimg.com/vi/omY5FahfTrI/hqdefault.jpg" )
         self.assertEqual( items[0].thumb_width, "480" )
         self.assertEqual( items[0].thumb_height, "360" )
 
         self.assertEqual( items[1].id, "yt:video:kztwPl8QQTA" )
-        self.assertEqual( items[2].id, "yt:video:omY5FahfTrI" )
+        self.assertEqual( items[2].id, "yt:video:DXU6PBpv-eI" )
 
     def test_update(self):
         channelFrom = RSSChannel()

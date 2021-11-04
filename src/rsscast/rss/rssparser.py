@@ -29,6 +29,8 @@ import requests
 import requests_file
 import feedparser
 
+from functools import cmp_to_key
+
 from rsscast import DATA_DIR, persist
 from typing import List
 # from rsscast.rss.ytconverter import get_media_size
@@ -204,10 +206,38 @@ class RSSChannel( persist.Versionable ):
             self.addItem( rssItem )
 
     def _sortItems( self ):
-        def sort_key( rssItem: RSSItem ):
-            return rssItem.publishDate
+#         def sort_key( rssItem: RSSItem ):
+#             return rssItem.publishDate
         
-        self.items.sort( key=sort_key )
+        def cmp_none( obj1, obj2 ):
+            if obj2 is None:
+                if obj1 is None:
+                    ## both None
+                    return 0
+                return -1
+            if obj1 is None:
+                return 1
+            ## none objects None
+            return -2
+        
+        def compare( rssItem1: RSSItem, rssItem2: RSSItem ):
+            rss_none = cmp_none( rssItem1, rssItem2 )
+            if rss_none > -2:
+                ## one or two None
+                return rss_none
+            
+            pub_none = cmp_none( rssItem1.publishDate, rssItem2.publishDate )
+            if pub_none > -2:
+                ## one or two None
+                return pub_none
+            
+            if rssItem1.publishDate < rssItem2.publishDate:
+                return -1
+            if rssItem1.publishDate > rssItem2.publishDate:
+                return 1
+            return 0
+        
+        self.items.sort( key=cmp_to_key(compare) )
 
 
 ## ============================================================
