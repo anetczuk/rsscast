@@ -184,12 +184,15 @@ class MainWindow( QtBaseClass ):           # type: ignore
     def _callOnFeeds(self, function, arguments, processDisabled=False):
         self._enableActions( False )
 
+#         objects = self.findChildren( QtCore.QObject )
+#         _LOGGER.info( 'Objects = %d' % len(objects) )
+
 #         threads = threadlist.QThreadList( self )
 #         threads = threadlist.SerialList( self )
         threads = threadlist.QThreadMeasuredList( self )
+        threads.deleteOnFinish()
 #         threads = threadlist.ProcessList( self )
 
-        threads.finished.connect( threads.deleteLater )
         threads.finished.connect( self._refreshingFinished, Qt.QueuedConnection )
 
         feedList: List[ FeedEntry ] = self.data.feed.getList()

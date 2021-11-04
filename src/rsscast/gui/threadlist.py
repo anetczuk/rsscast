@@ -71,11 +71,25 @@ class ParallelWorker( QtCore.QObject ):
 
         self.thread = QtCore.QThread( parent )
         self.moveToThread( self.thread )
+ 
         self.thread.started.connect( self._processWorker, Qt.QueuedConnection )
-        self.finished.connect( self.thread.quit )
-        self.finished.connect( self.deleteLater )
-        self.thread.finished.connect( self.thread.deleteLater )
+        self.thread.finished.connect( self.finished )
+        #### deleted by parent
+#         self.thread.finished.connect( self.thread.deleteLater )
 
+#         self.destroyed.connect( ParallelWorker._destroyed )
+#         self.thread.destroyed.connect( ParallelWorker._threadDestroyed )
+# 
+#     ## static method is required, because "destroyed" is triggered after destruction of Python object (Qt object still exists)
+#     @staticmethod
+#     def _destroyed(self):
+#         _LOGGER.info("worker destroyed")
+# 
+#     ## static method is required, because "destroyed" is triggered after destruction of Python object (Qt object still exists)
+#     @staticmethod
+#     def _threadDestroyed():
+#         _LOGGER.info("worker thread destroyed")
+        
     def start(self):
         self.thread.start()
 
@@ -89,7 +103,7 @@ class ParallelWorker( QtCore.QObject ):
         except Exception:
             _LOGGER.exception("work terminated" )
         finally:
-            self.finished.emit()
+            self.thread.quit()
 
 
 ## mostly for debugging
@@ -101,7 +115,8 @@ class SerialWorker( QtCore.QObject ):
         super().__init__( None )
  
         self.calculationFunctor = calculationFunctor
-        self.finished.connect( self.deleteLater )
+        ## deleted by parent
+#         self.finished.connect( self.deleteLater )
  
     def start(self):
         self._processWorker()
@@ -148,6 +163,16 @@ class QThreadList( QtCore.QObject ):
         self.workers = list()
         self.finishCounter = 0
         self.singleThreaded = singleThreaded
+        
+#         self.destroyed.connect( QThreadList._destroyed )
+#     
+#     ## static method is required, because "destroyed" is triggered after destruction of Python object (Qt object still exists)
+#     @staticmethod
+#     def _destroyed():
+#         _LOGGER.info("worker list destroyed")
+
+    def deleteOnFinish(self):
+        self.finished.connect( self.deleteLater )
 
     def appendFunction(self, function, args=None):
         task = WorkerTask( function, args )
@@ -156,7 +181,9 @@ class QThreadList( QtCore.QObject ):
             worker = SerialWorker( task, self )
         else:
             worker = ParallelWorker( task, self )
-        worker.finished.connect( self._threadFinished )
+        worker.finished.connect( self._workerFinished )
+        #### workers will be deleted with parent
+#         worker.finished.connect( worker.deleteLater )
         self.workers.append( worker )
 
 #     def map(self, func, argsList):
@@ -166,6 +193,7 @@ class QThreadList( QtCore.QObject ):
     def start(self):
         _LOGGER.info( "starting workers" )
         if len(self.workers) < 1:
+            ## nothing to do
             self._computingFinished()
             return
         for thr in self.workers:
@@ -175,9 +203,9 @@ class QThreadList( QtCore.QObject ):
         for thr in self.workers:
             thr.wait()
 
-    def _threadFinished(self):
-        #_LOGGER.info( "thread finished" )
+    def _workerFinished(self):
         self.finishCounter += 1
+        ## _LOGGER.info( "thread finished: %d %d", self.finishCounter, len( self.workers ) )
         if self.finishCounter == len( self.workers ):
             self._computingFinished()
 
@@ -192,18 +220,15 @@ class QThreadMeasuredList( QThreadList ):
         super().__init__( parent, singleThreaded )
         self.startTime = None
 
-    def deleteOnFinish(self):
-        self.finished.connect( self.deleteLater )
-
     def start(self):
         self.startTime = datetime.datetime.now()
         super().start()
 
     def _computingFinished(self):
-        super()._computingFinished()
         endTime = datetime.datetime.now()
         diffTime = endTime - self.startTime
         _LOGGER.info( "computation time: %s", diffTime )
+        super()._computingFinished()
 
     @staticmethod
     def calculate( parent, function, args=None ):
