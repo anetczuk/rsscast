@@ -34,7 +34,7 @@ from PyQt5.QtGui import QColor
 from rsscast.rss.rssparser import RSSChannel, RSSItem
 from rsscast.gui import guistate
 from rsscast.datatypes import FeedEntry
-from rsscast.rss.rssconverter import generate_channel_content
+from rsscast.rss.rssconverter import generate_channel_rss, download_items
 from rsscast.gui.dataobject import DataObject
 from rsscast.gui.command.rsschannelcommand import RemoveRSSItemCommand
 
@@ -290,8 +290,9 @@ class RSSChannelTable( QTableView ):
         if action == pullAction:
             feedId  = self.feedObject.feedId
             channel = self.feedObject.channel
-            #TODO: finish -- call "convert_yt()"
-            ## generate_channel_content( feedId, channel )
+            itemsList = [entry]
+            download_items( feedId, itemsList )
+            generate_channel_rss( feedId, channel, False )
         elif action == removeAction:
             command = RemoveRSSItemCommand( self.dataObject, self.feedObject, entry )
             self.dataObject.pushUndo( command )

@@ -113,7 +113,7 @@ class RSSChannel( persist.Versionable ):
         self.link                    = None
         self.publishDate             = None
         self.items: List[ RSSItem ]  = list()
-    
+
     def _convertstate_( self, dict_, dictVersion_ ):
         _LOGGER.info( "converting object from version %s to %s", dictVersion_, self._class_version )
 
@@ -134,17 +134,16 @@ class RSSChannel( persist.Versionable ):
     def get(self, index) -> RSSItem:
         return self.items[ index ]
 
-    def getList(self) -> List[  RSSItem ]:
-        return self.items
+#     def getList(self) -> List[  RSSItem ]:
+#         return self.items
     
-    def addItem(self, rssItem: RSSItem, index = None):
+    def addItem(self, rssItem: RSSItem):
         found = self.findItem( rssItem.id )
         if found != None:
-            return
-        if index == None:
-            self.items.append( rssItem )
-        else:
-            self.items.insert( index, rssItem )
+            return False
+        self.items.append( rssItem )
+        self._sortItems()
+        return True
 
     def removeItem(self, rssItem: RSSItem):
         self.items.remove( rssItem )
@@ -164,6 +163,7 @@ class RSSChannel( persist.Versionable ):
         self.publishDate = channel.publishDate
         for item in channel.items:
             self.addItem( item )
+        self._sortItems()
     
     def parse(self, feedContent):
         parsedDict = feedparser.parse( feedContent )
@@ -202,6 +202,12 @@ class RSSChannel( persist.Versionable ):
 #                 rssItem.mediaSize = linkSize
     
             self.addItem( rssItem )
+
+    def _sortItems( self ):
+        def sort_key( rssItem: RSSItem ):
+            return rssItem.publishDate
+        
+        self.items.sort( key=sort_key )
 
 
 ## ============================================================

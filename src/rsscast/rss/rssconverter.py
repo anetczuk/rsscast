@@ -27,26 +27,66 @@ import re
 # import html
 import feedparser
 
-from rsscast.rss.rssparser import RSSChannel
+from rsscast.rss.rssparser import RSSChannel, RSSItem
 from rsscast.rss.rssparser import read_url, get_channel_output_dir
 from rsscast.rss.rssparser import write_text
 from rsscast.rss.ytconverter import convert_yt
 from rsscast.rss.rssserver import RSSServerManager
+from typing import List
 
 
 _LOGGER = logging.getLogger(__name__)
 
 
-def generate_channel_content( feedId, rssChannel: RSSChannel ):
+def generate_channel_rss( feedId, rssChannel: RSSChannel, downloadContent = True ):
     host = RSSServerManager.getPrimaryIp()
-    return generate_content( host, feedId, rssChannel )
+    return generate_rss( host, feedId, rssChannel, downloadContent )
+
+
+def generate_rss( host, feedId, rssChannel: RSSChannel, downloadContent = True ):
+    items = list()
+    for rssItem in rssChannel.items:
+        if rssItem.enabled is False:
+            continue
+        items.append( rssItem )
+        
+    if downloadContent:
+        download_items( feedId, items )
+
+    return generate_items_rss( host, feedId, rssChannel, items )
+
+
+def download_items( feedId, itemsList: List[RSSItem] ):
+    feedId = feedId.replace(":", "_")
+    feedId = re.sub( r"\s+", "", feedId )
+
+    channelPath = get_channel_output_dir( feedId )
+
+#     rssItem: RSSItem = None
+    for rssItem in itemsList:
+#         pprint( rssItem )
+
+        videoId = rssItem.videoId()
+        postLink = rssItem.link
+        postLocalPath = "%s/%s.mp3" % ( channelPath, videoId )
+
+        if not os.path.exists(postLocalPath):
+            ## item file not exists -- convert and download
+            _LOGGER.info( "feed %s: converting video: %s to %s", feedId, postLink, postLocalPath )
+            converted = convert_yt( postLink, postLocalPath )
+            if converted is False:
+                ## skip elements that failed to convert
+                _LOGGER.info( "feed %s: unable to convert video '%s' -- skipped", feedId, rssItem.title )
+                continue
+
+        rssItem.mediaSize = os.path.getsize( postLocalPath )
 
 
 ##
 ## podcast generation: https://feedgen.kiesow.be/
 ##
 ## download required media and generate RSS file
-def generate_content( host, feedId, rssChannel: RSSChannel ):
+def generate_items_rss( host, feedId, rssChannel: RSSChannel, itemsList: List[RSSItem] ):
     feedId = feedId.replace(":", "_")
     feedId = re.sub( r"\s+", "", feedId )
 
@@ -55,30 +95,20 @@ def generate_content( host, feedId, rssChannel: RSSChannel ):
     succeed = True
     items_result = ""
 #     rssItem: RSSItem = None
-    for rssItem in rssChannel.items:
+    for rssItem in itemsList:
 #         pprint( rssItem )
 
-        if rssItem.enabled is False:
-            continue
-
         videoId = rssItem.videoId()
-        postLink = rssItem.link
         postLocalPath = "%s/%s.mp3" % ( channelPath, videoId )
-        postTitle = rssItem.title
 
         if not os.path.exists(postLocalPath):
             ## item file not exists -- convert and download
-            _LOGGER.info( "feed %s: converting video: %s to %s", feedId, postLink, postLocalPath )
-            converted = convert_yt( postLink, postLocalPath )
-            if converted is False:
-                ## skip elements that failed to convert
-                _LOGGER.info( "feed %s: unable to convert video '%s' -- skipped", feedId, postTitle )
-                succeed = False
-                continue
-        else:
-            _LOGGER.info( "feed %s: local conversion of %s found in %s", feedId, postLink, postLocalPath )
+            _LOGGER.info( "feed %s: unable to find video: %s", feedId, postLocalPath )
+            succeed = False
+            continue
 
-        rssItem.mediaSize = os.path.getsize( postLocalPath )
+        postLink = rssItem.link
+        postTitle = rssItem.title
 
         enclosureURL  = "http://%s/feed/%s/%s.mp3" % ( host, feedId, videoId )      ## must have absolute path
 

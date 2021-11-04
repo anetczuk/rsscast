@@ -42,8 +42,6 @@ class RemoveRSSItemCommand( QUndoCommand ):
         self.feed: FeedEntry = feed
         self.entry: RSSItem = entry
 
-        self.itemIndex = self.feed.channel.itemIndex( self.entry )
-
         self.setText( "Remove Item: " + str(entry.id) )
 
     def redo(self):
@@ -51,5 +49,5 @@ class RemoveRSSItemCommand( QUndoCommand ):
         self.data.feedChanged.emit()
 
     def undo(self):
-        self.feed.addItem( self.entry, self.itemIndex )
+        self.feed.addItem( self.entry )
         self.data.feedChanged.emit()

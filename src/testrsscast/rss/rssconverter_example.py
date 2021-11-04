@@ -40,7 +40,7 @@ import argparse
 # from PyQt5.QtWidgets import QApplication
 
 import rsscast.logger as logger
-from rsscast.rss.rssconverter import generate_content
+from rsscast.rss.rssconverter import generate_rss
 from rsscast.rss.rssparser import RSSChannel
 from rsscast.rss.rssserver import RSSServerManager
 
@@ -76,7 +76,7 @@ feedContent = read_data( "yt_latino_short.rss" )
 
 rssChannel = RSSChannel()
 rssChannel.parse( feedContent )
-generate_content( hostAddress, "test/abc", rssChannel )
+generate_rss( hostAddress, "test/abc", rssChannel )
 
 
 #         read_rss( "https://www.youtube.com/feeds/videos.xml?channel_id=UCbbz3_jH582xS93hxszPvjQ" )

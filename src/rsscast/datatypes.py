@@ -27,7 +27,7 @@ from typing import List
 
 from rsscast import persist
 from rsscast.rss.rssparser import parse_rss, RSSChannel, RSSItem
-from rsscast.rss.rssconverter import generate_channel_content
+from rsscast.rss.rssconverter import generate_channel_rss
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -74,10 +74,10 @@ class FeedEntry( persist.Versionable ):
             return
         self.channel.update( channel )
 
-    def addItem(self, rssItem: RSSItem, index):
+    def addItem(self, rssItem: RSSItem):
         if self.channel is None:
             return
-        self.channel.addItem(rssItem, index)
+        self.channel.addItem(rssItem)
         
     def removeItem(self, rssItem: RSSItem):
         if self.channel is None:
@@ -97,7 +97,7 @@ def fetch_feed( feed: FeedEntry ):
 def parse_feed( feed: FeedEntry ):
     fetch_feed( feed )
     feedId = feed.feedId
-    return generate_channel_content( feedId, feed.channel )
+    return generate_channel_rss( feedId, feed.channel )
 
 
 ## ========================================================
