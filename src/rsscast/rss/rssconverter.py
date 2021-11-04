@@ -66,8 +66,8 @@ def download_items( feedId, itemsList: List[RSSItem] ):
     for rssItem in itemsList:
 #         pprint( rssItem )
 
-        videoId = rssItem.videoId()
         postLink = rssItem.link
+        videoId = rssItem.videoId()
         postLocalPath = "%s/%s.mp3" % ( channelPath, videoId )
 
         if not os.path.exists(postLocalPath):
@@ -80,6 +80,21 @@ def download_items( feedId, itemsList: List[RSSItem] ):
                 continue
 
         rssItem.mediaSize = os.path.getsize( postLocalPath )
+
+
+def remove_item_data( feedId, rssItem: RSSItem ):
+    feedId = feedId.replace(":", "_")
+    feedId = re.sub( r"\s+", "", feedId )
+    
+    channelPath = get_channel_output_dir( feedId )
+    
+    videoId = rssItem.videoId()
+    postLocalPath = "%s/%s.mp3" % ( channelPath, videoId )
+    
+    if not os.path.exists(postLocalPath):
+        return
+
+    os.remove( postLocalPath ) 
 
 
 ##

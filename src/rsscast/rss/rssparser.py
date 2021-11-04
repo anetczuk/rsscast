@@ -168,7 +168,7 @@ class RSSChannel( persist.Versionable ):
     def parse(self, feedContent):
         parsedDict = feedparser.parse( feedContent )
     
-        _LOGGER.info( "detected entries %s", len(parsedDict.entries) )
+#         _LOGGER.info( "detected entries %s", len(parsedDict.entries) )
     #     pprint( parsedDict.feed )
     #     pprint( parsedDict.entries )
     
@@ -222,6 +222,7 @@ def parse_rss( feedId, feedUrl ) -> RSSChannel:
     _LOGGER.info( "feed %s: parsing rss", feedId )
     rssChannel = RSSChannel()
     rssChannel.parse( feedContent )
+    _LOGGER.info( "feed %s: parsing done", feedId )
     return rssChannel
 
 

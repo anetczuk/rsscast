@@ -27,7 +27,7 @@ from typing import List
 
 from rsscast import persist
 from rsscast.rss.rssparser import parse_rss, RSSChannel, RSSItem
-from rsscast.rss.rssconverter import generate_channel_rss
+from rsscast.rss.rssconverter import generate_channel_rss, remove_item_data
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -83,6 +83,7 @@ class FeedEntry( persist.Versionable ):
         if self.channel is None:
             return
         self.channel.removeItem( rssItem )
+        remove_item_data( self.feedId, rssItem )
 
     def printData(self) -> str:
         return str( self.feedName ) + " " + str( self.feedId ) + " " + str( self.url ) + " " + str( self.enabled )
