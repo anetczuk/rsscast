@@ -207,7 +207,7 @@ class QThreadList( QtCore.QObject ):
 
     def _workerFinished(self):
         self.finishCounter += 1
-        ## _LOGGER.info( "thread finished: %d %d", self.finishCounter, len( self.workers ) )
+        _LOGGER.info( "thread finished" )
         if self.finishCounter == len( self.workers ):
             self._computingFinished()
 
