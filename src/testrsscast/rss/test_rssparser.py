@@ -42,13 +42,13 @@ class RSSChannelTest(unittest.TestCase):
         channel = RSSChannel()
         channel.parse( feedContent )
 
-        self.assertTrue( channel != None )
+        self.assertTrue( channel is not None )
         self.assertEqual( channel.title, "YouTube Latinoamérica" )
         self.assertEqual( channel.link, "https://www.youtube.com/channel/UCBrGE6cmFbcwzlwAyIDMGpw" )
         self.assertEqual( channel.publishDate, "2013-10-07T19:27:52+00:00" )
 
         items = channel.items
-        self.assertTrue( items != None )
+        self.assertTrue( items is not None )
         self.assertEqual( len(items), 3 )
 
         self.assertEqual( items[0].id, "yt:video:omY5FahfTrI" )

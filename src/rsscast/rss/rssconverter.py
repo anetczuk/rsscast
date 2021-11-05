@@ -38,12 +38,12 @@ from typing import List
 _LOGGER = logging.getLogger(__name__)
 
 
-def generate_channel_rss( feedId, rssChannel: RSSChannel, downloadContent = True ):
+def generate_channel_rss( feedId, rssChannel: RSSChannel, downloadContent=True ):
     host = RSSServerManager.getPrimaryIp()
     return generate_rss( host, feedId, rssChannel, downloadContent )
 
 
-def generate_rss( host, feedId, rssChannel: RSSChannel, downloadContent = True ):
+def generate_rss( host, feedId, rssChannel: RSSChannel, downloadContent=True ):
     items = list()
     for rssItem in rssChannel.items:
         if rssItem.enabled is False:

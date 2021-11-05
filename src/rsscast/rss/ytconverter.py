@@ -204,18 +204,15 @@ def get_media_size( link, mimicHuman=True ):
         session = get_curl_session()
 
         mp3Data = get_mp3_data( session, link, mimicHuman )
-        if mp3Data == None:
+        if mp3Data is None:
             return None
 
         mp3Format = mp3Data[1]
         dataSize  = mp3Format['size']
-        if dataSize == None:
+        if dataSize is None:
             return None
 
-        print( "xxxxxxxxxxx:", dataSize )
-#         return dataSize
-
-        return None
+        return dataSize
 
     finally:
         session.close()

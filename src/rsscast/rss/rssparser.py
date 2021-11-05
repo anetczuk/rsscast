@@ -141,7 +141,7 @@ class RSSChannel( persist.Versionable ):
 
     def addItem(self, rssItem: RSSItem):
         found = self.findItem( rssItem.id )
-        if found != None:
+        if found is not None:
             return False
         self.items.append( rssItem )
         self._sortItems()
