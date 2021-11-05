@@ -30,6 +30,7 @@ import logging
 from io import BytesIO
 from urllib.parse import urlencode
 import json
+import re
 
 import pycurl
 # import urllib.request
@@ -40,6 +41,59 @@ import requests
 
 
 _LOGGER = logging.getLogger(__name__)
+
+
+def convert_yt_rss( yt_channel_url ):
+    pass
+
+
+def read_yt_rss( yt_url ):
+    try:
+        buffer = BytesIO()
+        session = pycurl.Curl()
+        session.setopt( pycurl.URL, yt_url )
+        session.setopt( pycurl.WRITEDATA, buffer)
+        session.setopt( pycurl.USERAGENT, "curl/7.58.0" )
+        session.setopt( pycurl.FOLLOWLOCATION, True )        ## follow redirects
+        session.setopt( pycurl.CONNECTTIMEOUT, 60 )          ## connection phase timeout
+#             session.setopt( pycurl.TIMEOUT, 60 )                 ## whole request timeout (transfer?)
+    #         c.setopt( c.VERBOSE, 1 )
+        session.perform()
+ 
+        site_content = buffer.getvalue().decode('utf-8')
+
+        return read_yt_rss_from_source( site_content )
+
+    finally:
+        session.close()
+
+    return None
+
+
+def read_yt_rss_from_source( site_content ):
+    ## <span class="start-tag">link</span> <span class="attribute-name">rel</span>="<a class="attribute-value">alternate</a>" <span class="attribute-name">type</span>="<a class="attribute-value">application/rss+xml</a>" <span class="attribute-name">title</span>="<a class="attribute-value">RSS</a>" <span class="attribute-name">href</span>="<a class="attribute-value" href="view-source:https://www.youtube.com/feeds/videos.xml?channel_id=UCViVL2aOkLWKcFVi0_p6u6g">https://www.youtube.com/feeds/videos.xml?channel_id=UCViVL2aOkLWKcFVi0_p6u6g</a>"&gt;</span>
+    ## <link rel="alternate" type="application/rss+xml" title="RSS" href="https://www.youtube.com/feeds/videos.xml?channel_id=UC7jDnr-ZAjQ94lf46eTcTAQ">
+    match = re.search( '<link.+?type.+?application/rss\+xml.+?href="(.+?)">', site_content )
+#     match = re.search( 'link.+?type.+?application/rss\+xml.+?href.+?attribute-value.+?>(.+?)</a>', site_content )
+    if not match:
+        _LOGGER.warning( "unable to find link" )
+#         with open("xxx.html", "w") as file1:
+#             file1.write( site_content )
+        return None
+    foundUrl = match.group(1)
+
+    ## <meta itemprop="name" content="namzalezy.pl">
+    match = re.search( '<meta.+?itemprop.+?name.+?content="(.+?)">', site_content )
+#     match = re.search( 'meta.+?itemprop.+?name.+?content.+?attribute-value.+?>(.+?)</a>', site_content )
+    foundName = None
+    if match:
+        foundName = match.group(1)
+    
+    _LOGGER.info( "found data: %s %s", foundName, foundUrl )
+    return (foundName, foundUrl)
+
+
+## ===================================================================
 
 
 def convert_yt( link, output, mimicHuman=True ):

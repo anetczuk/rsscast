@@ -23,10 +23,12 @@
 
 import logging
 import copy
+import re
 
 from rsscast.datatypes import FeedEntry
 
 from rsscast.gui import uiloader
+from rsscast.rss.ytconverter import read_yt_rss
 
 
 UiTargetClass, QtBaseClass = uiloader.load_ui_from_class_name( __file__ )
@@ -41,6 +43,8 @@ class FeedDialog( QtBaseClass ):           # type: ignore
         super().__init__(parentWidget)
         self.ui = UiTargetClass()
         self.ui.setupUi(self)
+
+        self.ui.readRSSPB.clicked.connect( self._readURL )
 
         self.entry: FeedEntry = None
 
@@ -59,6 +63,22 @@ class FeedDialog( QtBaseClass ):           # type: ignore
         self.ui.urlLE.setText( self.entry.url )
 
 #         self.adjustSize()
+
+    def _readURL(self):
+        currentURL = self.ui.urlLE.text()
+        rss_data = read_yt_rss( currentURL )
+        if rss_data is None:
+            return
+        
+        foundName = rss_data[0]
+        foundId = rss_data[0]
+        if foundId is not None:
+            foundId = foundId.replace(":", "_")
+            foundId = re.sub( r"\s+", "", foundId )
+        
+        self.ui.nameLE.setText( foundName )
+        self.ui.idLE.setText( foundId )
+        self.ui.urlLE.setText( rss_data[1] )
 
     def _done(self, _):
         self.entry.feedName = self.ui.nameLE.text()
