@@ -59,7 +59,7 @@ def read_yt_rss( yt_url ):
 #             session.setopt( pycurl.TIMEOUT, 60 )                 ## whole request timeout (transfer?)
     #         c.setopt( c.VERBOSE, 1 )
         session.perform()
- 
+
         site_content = buffer.getvalue().decode('utf-8')
 
         return read_yt_rss_from_source( site_content )
@@ -88,7 +88,7 @@ def read_yt_rss_from_source( site_content ):
     foundName = None
     if match:
         foundName = match.group(1)
-    
+
     _LOGGER.info( "found data: %s %s", foundName, foundUrl )
     return (foundName, foundUrl)
 
@@ -175,7 +175,7 @@ def get_mp3_data( session, link, mimicHuman=True ):
 
 #         print( "request response:" )
 #         pprint( data )
-    
+
     jsonStatus = data['status']
     if jsonStatus != "ok":
         _LOGGER.warning( "invalid status:\n%s", bodyOutput )
@@ -192,7 +192,7 @@ def get_mp3_data( session, link, mimicHuman=True ):
 
     ## video ID, eg: "EE4U9qpErW8"
     vidId     = data["vid"]
-    
+
     ## convert key, like: "0+azXhfVIrnzRYKBCptsmBJiPRF1HVqa5l7v3sVU68OOkmCBRvmw/2jfMz2F1b42/wu2h1L4EoRSl7BxuLz3jxPrCyVYC2cF9udBFCDoF7T5kZpCBy5X"
     mp3Data   = data['links']['mp3']
     mp3Format = get_mp3_format_data( mp3Data )
@@ -202,21 +202,21 @@ def get_mp3_data( session, link, mimicHuman=True ):
 def get_media_size( link, mimicHuman=True ):
     try:
         session = get_curl_session()
-        
+
         mp3Data = get_mp3_data( session, link, mimicHuman )
         if mp3Data == None:
             return None
-        
+
         mp3Format = mp3Data[1]
         dataSize  = mp3Format['size']
         if dataSize == None:
             return None
-        
+
         print( "xxxxxxxxxxx:", dataSize )
 #         return dataSize
 
         return None
-        
+
     finally:
         session.close()
 
@@ -227,14 +227,14 @@ def get_media_size( link, mimicHuman=True ):
 def convert_yt_yt1s( link, output, mimicHuman=True ):
     try:
         session = get_curl_session()
-        
+
         mp3Data = get_mp3_data( session, link, mimicHuman )
         if mp3Data == None:
             return False
 
         vidId     = mp3Data[0]
         mp3Format = mp3Data[1]
-        
+
         convertId = mp3Format['k']
 #         dataSize  = mp3Format['size']
 
@@ -251,10 +251,10 @@ def convert_yt_yt1s( link, output, mimicHuman=True ):
             time.sleep( randTime )
 
         data = json.loads( bodyOutput )
-        
+
 #         print( "convert response:" )
 #         pprint( data )
-        
+
         jsonStatus = data['status']
         if jsonStatus != "ok":
             _LOGGER.warning( "invalid status:\n%s", bodyOutput )

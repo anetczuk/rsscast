@@ -71,7 +71,7 @@ class ParallelWorker( QtCore.QObject ):
 
         self.thread = QtCore.QThread( parent )
         self.moveToThread( self.thread )
- 
+
         self.thread.started.connect( self._processWorker, Qt.QueuedConnection )
         self.thread.finished.connect( self.finished )
         #### deleted by parent
@@ -79,17 +79,17 @@ class ParallelWorker( QtCore.QObject ):
 
 #         self.destroyed.connect( ParallelWorker._destroyed )
 #         self.thread.destroyed.connect( ParallelWorker._threadDestroyed )
-# 
+#
 #     ## static method is required, because "destroyed" is triggered after destruction of Python object (Qt object still exists)
 #     @staticmethod
 #     def _destroyed(self):
 #         _LOGGER.info("worker destroyed")
-# 
+#
 #     ## static method is required, because "destroyed" is triggered after destruction of Python object (Qt object still exists)
 #     @staticmethod
 #     def _threadDestroyed():
 #         _LOGGER.info("worker thread destroyed")
-        
+
     def start(self):
         self.thread.start()
 
@@ -108,23 +108,23 @@ class ParallelWorker( QtCore.QObject ):
 
 ## mostly for debugging
 class SerialWorker( QtCore.QObject ):
- 
+
     finished = QtCore.pyqtSignal()
- 
+
     def __init__(self, calculationFunctor, parent=None):
         super().__init__( None )
- 
+
         self.calculationFunctor = calculationFunctor
         ## deleted by parent
 #         self.finished.connect( self.deleteLater )
- 
+
     def start(self):
         self._processWorker()
- 
+
     def wait(self):
         ## do nothing
         pass
- 
+
     def _processWorker(self):
         try:
             self.calculationFunctor()
@@ -163,9 +163,9 @@ class QThreadList( QtCore.QObject ):
         self.workers = list()
         self.finishCounter = 0
         self.singleThreaded = singleThreaded
-        
+
 #         self.destroyed.connect( QThreadList._destroyed )
-#     
+#
 #     ## static method is required, because "destroyed" is triggered after destruction of Python object (Qt object still exists)
 #     @staticmethod
 #     def _destroyed():

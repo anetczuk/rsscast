@@ -268,9 +268,9 @@ class RSSChannelTable( QTableView ):
         mIndex = self.indexAt( evPos )
         if mIndex is not None:
             entry = self.getItem( mIndex )
- 
+
 #         create_entry_contextmenu( self, self.feedObject, entry )
- 
+
         contextMenu      = QtWidgets.QMenu( self )
         pullAction       = contextMenu.addAction("Pull")
         removeFileAction = contextMenu.addAction("Remove data")
@@ -280,16 +280,16 @@ class RSSChannelTable( QTableView ):
             enableAction = contextMenu.addAction("Enable")
         else:
             enableAction = contextMenu.addAction("Disable")
- 
+
         if entry is None:
             pullAction.setEnabled( False )
             removeFileAction.setEnabled( False )
             removeAction.setEnabled( False )
             enableAction.setEnabled( False )
- 
+
         globalPos = QtGui.QCursor.pos()
         action = contextMenu.exec_( globalPos )
- 
+
         if action == pullAction:
             feedId  = self.feedObject.feedId
             channel = self.feedObject.channel
@@ -319,12 +319,12 @@ class RSSChannelTable( QTableView ):
 #         mIndex = self.indexAt( evPos )
 #         if mIndex is not None:
 #             entry = self.getItem( mIndex )
-# 
+#
 #         if entry is None:
 #             self._addEntry()
 #         else:
 #             self._editEntry(entry)
-# 
+#
 #         return super().mouseDoubleClickEvent(event)
 
 

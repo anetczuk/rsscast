@@ -76,13 +76,13 @@ class FeedEntry( persist.Versionable ):
             return
         feedId = self.feedId.replace(":", "_")
         feedId = re.sub( r"\s+", "", feedId )
-            
+
         channelPath = get_channel_output_dir( feedId )
-    
+
         for rssItem in self.channel.items:
             videoId = rssItem.videoId()
             postLocalPath = "%s/%s.mp3" % ( channelPath, videoId )
-    
+
             if os.path.exists(postLocalPath):
                 rssItem.mediaSize = os.path.getsize( postLocalPath )
             else:
@@ -98,7 +98,7 @@ class FeedEntry( persist.Versionable ):
         if self.channel is None:
             return
         self.channel.addItem(rssItem)
-        
+
     def removeItem(self, rssItem: RSSItem):
         if self.channel is None:
             return
@@ -112,7 +112,7 @@ class FeedEntry( persist.Versionable ):
 def fetch_feed( feed: FeedEntry ):
     feedId = feed.feedId
     rssChannel: RSSChannel = parse_rss( feedId, feed.url )
-    feed.update( rssChannel )    
+    feed.update( rssChannel )
     feed.updateLocalData()
 
 

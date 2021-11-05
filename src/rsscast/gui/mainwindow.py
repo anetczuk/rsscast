@@ -175,12 +175,12 @@ class MainWindow( QtBaseClass ):           # type: ignore
         function  = fetch_feed
         arguments = ()
         self._callOnFeeds(function, arguments, True)
-        
+
     def pullDataForce(self):
         function  = parse_feed
         arguments = ()
         self._callOnFeeds(function, arguments)
-        
+
     def _callOnFeeds(self, function, arguments, processDisabled=False):
         self._enableActions( False )
 

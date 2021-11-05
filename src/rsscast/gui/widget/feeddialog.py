@@ -69,13 +69,13 @@ class FeedDialog( QtBaseClass ):           # type: ignore
         rss_data = read_yt_rss( currentURL )
         if rss_data is None:
             return
-        
+
         foundName = rss_data[0]
         foundId = rss_data[0]
         if foundId is not None:
             foundId = foundId.replace(":", "_")
             foundId = re.sub( r"\s+", "", foundId )
-        
+
         self.ui.nameLE.setText( foundName )
         self.ui.idLE.setText( foundId )
         self.ui.urlLE.setText( rss_data[1] )

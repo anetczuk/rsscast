@@ -36,10 +36,10 @@ class ytconverterTest(unittest.TestCase):
     def tearDown(self):
         ## Called after testfunction was executed
         pass
-    
+
     def test_read_yt_rss_from_source(self):
         siteContent = read_data( "wideoprezentacje.html" )
-        
+
         rss_url_data = read_yt_rss_from_source( siteContent )
         self.assertTrue( rss_url_data is not None )
         self.assertEqual( rss_url_data[0], "wideoprezentacje" )

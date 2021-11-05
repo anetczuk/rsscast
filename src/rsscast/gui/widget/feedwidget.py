@@ -41,7 +41,7 @@ class FeedWidget( QtBaseClass ):           # type: ignore
         super().__init__(parentWidget)
         self.ui = UiTargetClass()
         self.ui.setupUi(self)
-        
+
         self.ui.feedTableView.selectedItem.connect( self._feedSelected )
         self.ui.feedTableView.itemUnselected.connect( self._feedUnselected )
 
@@ -51,12 +51,12 @@ class FeedWidget( QtBaseClass ):           # type: ignore
     def refreshView(self):
         self.ui.feedTableView.refreshData()
         self.ui.feedItemsView.refreshData()
-        
+
     def _feedSelected(self, feed: FeedEntry):
 #         print( "selected:", feed.feedName )
         dataObject = self.ui.feedTableView.dataObject
         self.ui.feedItemsView.connectData( dataObject, feed )
-        
+
     def _feedUnselected(self):
 #         print( "unselected" )
         self.ui.feedItemsView.clear()

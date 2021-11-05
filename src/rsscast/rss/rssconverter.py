@@ -49,7 +49,7 @@ def generate_rss( host, feedId, rssChannel: RSSChannel, downloadContent = True )
         if rssItem.enabled is False:
             continue
         items.append( rssItem )
-        
+
     if downloadContent:
         download_items( feedId, items )
 
@@ -85,18 +85,18 @@ def download_items( feedId, itemsList: List[RSSItem] ):
 def remove_item_data( feedId, rssItem: RSSItem ):
     feedId = feedId.replace(":", "_")
     feedId = re.sub( r"\s+", "", feedId )
-    
+
     channelPath = get_channel_output_dir( feedId )
-    
+
     videoId = rssItem.videoId()
     postLocalPath = "%s/%s.mp3" % ( channelPath, videoId )
-    
+
     rssItem.mediaSize = -1
-    
+
     if not os.path.exists(postLocalPath):
         return
 
-    os.remove( postLocalPath ) 
+    os.remove( postLocalPath )
 
 
 ##
@@ -179,5 +179,5 @@ def generate_items_rss( host, feedId, rssChannel: RSSChannel, itemsList: List[RS
     rssOutput = "%s/rss" % channelPath
     _LOGGER.info( "feed %s: writing converted rss output to %s", feedId, rssOutput )
     write_text( result, rssOutput )
-    
+
     return succeed

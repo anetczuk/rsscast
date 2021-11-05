@@ -43,12 +43,12 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class RSSItem( persist.Versionable ):
-    
+
     ## 0 - first version
     ## 1 - added 'enabled' field
     ## 2 - added 'mediaSize' field
     _class_version = 2
-    
+
     def __init__(self, itemId=None, link=None):
         self.id = itemId
         self.link = link
@@ -56,12 +56,12 @@ class RSSItem( persist.Versionable ):
         self.summary = None
         self.publishDate = None
         self.mediaSize = -1                 ## in bytes
-        
+
         ## thumbnail
         self.thumb_url    = None
         self.thumb_width  = None
         self.thumb_height = None
-        
+
         self.enabled = True
 
     def _convertstate_( self, dict_, dictVersion_ ):
@@ -88,28 +88,28 @@ class RSSItem( persist.Versionable ):
 
     def videoId(self):
         return self.id.replace(":", "_")
-    
+
     def enclosureURL(self, host, feedId):
         videoId = self.videoId()
         return "http://%s/feed/%s/%s.mp3" % ( host, feedId, videoId )      ## must have absolute path
-    
+
     def itemTitle(self):
         return html.escape( self.title )
-    
+
     def localFileSize(self):
         if self.mediaSize < 0:
             return None
         return self.mediaSize
-    
+
     def switchEnabled(self):
         self.enabled = not self.enabled
 
 
 class RSSChannel( persist.Versionable ):
-    
+
     ## 0 - first version
     _class_version = 0
-    
+
     def __init__(self):
         self.title                   = None
         self.link                    = None
@@ -129,7 +129,7 @@ class RSSChannel( persist.Versionable ):
 
         # pylint: disable=W0201
         self.__dict__ = dict_
-    
+
     def size(self):
         return len( self.items )
 
@@ -138,7 +138,7 @@ class RSSChannel( persist.Versionable ):
 
 #     def getList(self) -> List[  RSSItem ]:
 #         return self.items
-    
+
     def addItem(self, rssItem: RSSItem):
         found = self.findItem( rssItem.id )
         if found != None:
@@ -166,49 +166,49 @@ class RSSChannel( persist.Versionable ):
         for item in channel.items:
             self.addItem( item )
         self._sortItems()
-    
+
     def parse(self, feedContent):
         parsedDict = feedparser.parse( feedContent )
-    
+
 #         _LOGGER.info( "detected entries %s", len(parsedDict.entries) )
     #     pprint( parsedDict.feed )
     #     pprint( parsedDict.entries )
-    
+
         parsedFeed = parsedDict['feed']
         self.title = parsedFeed['title']
         self.link = parsedFeed.get('href', "")
         self.publishDate = parsedFeed.get('published', "")
-    
+
         for post in parsedDict.entries:
     #         pprint( post )
-    
+
             rssItem = RSSItem()
-            
+
             rssItem.id = post['id']
     #         rssItem.id = post['yt_videoid']
-    
+
             rssItem.link = post['link']
             rssItem.title = post['title']
-    
+
             if 'media_thumbnail' in post:
                 thumbnail = post['media_thumbnail'][0]
                 rssItem.thumb_url    = thumbnail['url']
                 rssItem.thumb_width  = thumbnail['width']
                 rssItem.thumb_height = thumbnail['height']
-    
+
             rssItem.summary = post.get('summary', '')
             rssItem.publishDate = post['published']
-    
+
 #             linkSize = get_media_size( rssItem.link, False )
 #             if linkSize != None:
 #                 rssItem.mediaSize = linkSize
-    
+
             self.addItem( rssItem )
 
     def _sortItems( self ):
 #         def sort_key( rssItem: RSSItem ):
 #             return rssItem.publishDate
-        
+
         def cmp_none( obj1, obj2 ):
             if obj2 is None:
                 if obj1 is None:
@@ -219,24 +219,24 @@ class RSSChannel( persist.Versionable ):
                 return 1
             ## none objects None
             return -2
-        
+
         def compare( rssItem1: RSSItem, rssItem2: RSSItem ):
             rss_none = cmp_none( rssItem1, rssItem2 )
             if rss_none > -2:
                 ## one or two None
                 return rss_none
-            
+
             pub_none = cmp_none( rssItem1.publishDate, rssItem2.publishDate )
             if pub_none > -2:
                 ## one or two None
                 return pub_none
-            
+
             if rssItem1.publishDate < rssItem2.publishDate:
                 return -1
             if rssItem1.publishDate > rssItem2.publishDate:
                 return 1
             return 0
-        
+
         self.items.sort( key=cmp_to_key(compare) )
 
 
