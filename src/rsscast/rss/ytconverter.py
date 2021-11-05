@@ -28,23 +28,19 @@ import time
 import random
 import logging
 from io import BytesIO
-from urllib.parse import urlencode
 import json
 import re
+from urllib.parse import urlencode
 
+import requests
 import pycurl
 # import urllib.request
-import requests
 
 # from rsscast.pprint import pprint
 # import youtube_dl
 
 
 _LOGGER = logging.getLogger(__name__)
-
-
-def convert_yt_rss( yt_channel_url ):
-    pass
 
 
 def read_yt_rss( yt_url ):
@@ -71,9 +67,9 @@ def read_yt_rss( yt_url ):
 
 
 def read_yt_rss_from_source( site_content ):
-    ## <span class="start-tag">link</span> <span class="attribute-name">rel</span>="<a class="attribute-value">alternate</a>" <span class="attribute-name">type</span>="<a class="attribute-value">application/rss+xml</a>" <span class="attribute-name">title</span>="<a class="attribute-value">RSS</a>" <span class="attribute-name">href</span>="<a class="attribute-value" href="view-source:https://www.youtube.com/feeds/videos.xml?channel_id=UCViVL2aOkLWKcFVi0_p6u6g">https://www.youtube.com/feeds/videos.xml?channel_id=UCViVL2aOkLWKcFVi0_p6u6g</a>"&gt;</span>
+    # pylint: disable=C0301
     ## <link rel="alternate" type="application/rss+xml" title="RSS" href="https://www.youtube.com/feeds/videos.xml?channel_id=UC7jDnr-ZAjQ94lf46eTcTAQ">
-    match = re.search( '<link.+?type.+?application/rss\+xml.+?href="(.+?)">', site_content )
+    match = re.search( r'<link.+?type.+?application/rss\+xml.+?href="(.+?)">', site_content )
 #     match = re.search( 'link.+?type.+?application/rss\+xml.+?href.+?attribute-value.+?>(.+?)</a>', site_content )
     if not match:
         _LOGGER.warning( "unable to find link" )
@@ -193,6 +189,7 @@ def get_mp3_data( session, link, mimicHuman=True ):
     ## video ID, eg: "EE4U9qpErW8"
     vidId     = data["vid"]
 
+    # pylint: disable=C0301
     ## convert key, like: "0+azXhfVIrnzRYKBCptsmBJiPRF1HVqa5l7v3sVU68OOkmCBRvmw/2jfMz2F1b42/wu2h1L4EoRSl7BxuLz3jxPrCyVYC2cF9udBFCDoF7T5kZpCBy5X"
     mp3Data   = data['links']['mp3']
     mp3Format = get_mp3_format_data( mp3Data )

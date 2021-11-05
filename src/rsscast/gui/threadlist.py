@@ -24,7 +24,6 @@
 import logging
 import threading
 import datetime
-import abc
 
 from multiprocessing import Process
 
@@ -80,12 +79,14 @@ class ParallelWorker( QtCore.QObject ):
 #         self.destroyed.connect( ParallelWorker._destroyed )
 #         self.thread.destroyed.connect( ParallelWorker._threadDestroyed )
 #
-#     ## static method is required, because "destroyed" is triggered after destruction of Python object (Qt object still exists)
+#     ## static method is required, because "destroyed" is triggered after
+#     ## destruction of Python object (Qt object still exists)
 #     @staticmethod
 #     def _destroyed(self):
 #         _LOGGER.info("worker destroyed")
 #
-#     ## static method is required, because "destroyed" is triggered after destruction of Python object (Qt object still exists)
+#     ## static method is required, because "destroyed" is triggered after
+#     ## destruction of Python object (Qt object still exists)
 #     @staticmethod
 #     def _threadDestroyed():
 #         _LOGGER.info("worker thread destroyed")
@@ -112,7 +113,7 @@ class SerialWorker( QtCore.QObject ):
     finished = QtCore.pyqtSignal()
 
     def __init__(self, calculationFunctor, parent=None):
-        super().__init__( None )
+        super().__init__( parent )
 
         self.calculationFunctor = calculationFunctor
         ## deleted by parent
@@ -166,7 +167,8 @@ class QThreadList( QtCore.QObject ):
 
 #         self.destroyed.connect( QThreadList._destroyed )
 #
-#     ## static method is required, because "destroyed" is triggered after destruction of Python object (Qt object still exists)
+#     ## static method is required, because "destroyed" is triggered after
+#     ## destruction of Python object (Qt object still exists)
 #     @staticmethod
 #     def _destroyed():
 #         _LOGGER.info("worker list destroyed")

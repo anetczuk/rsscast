@@ -24,15 +24,13 @@
 import os
 import logging
 import re
-# import html
-import feedparser
+from typing import List
 
 from rsscast.rss.rssparser import RSSChannel, RSSItem
-from rsscast.rss.rssparser import read_url, get_channel_output_dir
+from rsscast.rss.rssparser import get_channel_output_dir
 from rsscast.rss.rssparser import write_text
 from rsscast.rss.ytconverter import convert_yt
 from rsscast.rss.rssserver import RSSServerManager
-from typing import List
 
 
 _LOGGER = logging.getLogger(__name__)

@@ -37,6 +37,8 @@ class RemoveEntryCommand( QUndoCommand ):
     def __init__(self, dataObject: DataObject, entry: FeedEntry, parentCommand=None):
         super().__init__(parentCommand)
 
+        dataObject.pushUndo( self )
+
         self.data: DataObject = dataObject
         self.feedContainer: FeedContainer = self.data.feed
         self.entry: FeedEntry = entry

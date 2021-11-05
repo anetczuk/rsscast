@@ -36,9 +36,9 @@ import rsscast.logger as logger
 from rsscast import DATA_DIR
 from rsscast.rss.rssserver import RSSServerManager
 
-from rsscast.datatypes import parse_feed, fetch_feed
+from rsscast.datatypes import FeedEntry, parse_feed, fetch_feed
 from rsscast.gui.resources import get_user_data_path
-from rsscast.gui.dataobject import FeedEntry, DataObject
+from rsscast.gui.dataobject import DataObject
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -134,7 +134,8 @@ def create_parser( parser: argparse.ArgumentParser = None ):
     if parser is None:
         parser = argparse.ArgumentParser(description='RSS Cast')
     parser.add_argument('--fetchRSS', action='store_const', const=True, default=False, help='Update RSS channels' )
-    parser.add_argument('--refreshRSS', action='store_const', const=True, default=False, help='Update RSS channels and download content' )
+    parser.add_argument('--refreshRSS', action='store_const', const=True, default=False,
+                        help='Update RSS channels and download content' )
     parser.add_argument('--startServer', action='store_const', const=True, default=False, help='Start RSS server' )
     return parser
 

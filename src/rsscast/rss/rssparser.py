@@ -23,16 +23,15 @@
 
 import os
 import logging
-# import re
+from typing import List
+from functools import cmp_to_key
+
 import html
 import requests
 import requests_file
 import feedparser
 
-from functools import cmp_to_key
-
 from rsscast import DATA_DIR, persist
-from typing import List
 # from rsscast.rss.ytconverter import get_media_size
 
 

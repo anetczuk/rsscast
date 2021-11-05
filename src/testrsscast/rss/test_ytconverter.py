@@ -28,7 +28,7 @@ from rsscast.rss.ytconverter import read_yt_rss_from_source
 from testrsscast.data import read_data
 
 
-class ytconverterTest(unittest.TestCase):
+class YtconverterTest(unittest.TestCase):
     def setUp(self):
         ## Called before testfunction is executed
         pass
@@ -43,4 +43,5 @@ class ytconverterTest(unittest.TestCase):
         rss_url_data = read_yt_rss_from_source( siteContent )
         self.assertTrue( rss_url_data is not None )
         self.assertEqual( rss_url_data[0], "wideoprezentacje" )
-        self.assertEqual( rss_url_data[1], "https://www.youtube.com/feeds/videos.xml?channel_id=UCViVL2aOkLWKcFVi0_p6u6g" )
+        self.assertEqual( rss_url_data[1],
+                          "https://www.youtube.com/feeds/videos.xml?channel_id=UCViVL2aOkLWKcFVi0_p6u6g" )

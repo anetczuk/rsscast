@@ -28,11 +28,10 @@ from PyQt5 import QtWidgets
 from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtWidgets import QWidget, QUndoStack
 
-from rsscast.datatypes import UserContainer, FeedContainer, FeedEntry
+from rsscast.datatypes import UserContainer, FeedContainer
 from rsscast.gui.widget.feeddialog import FeedDialog
 from rsscast.gui.command.addentrycommand import AddEntryCommand
 from rsscast.gui.command.editentrycommand import EditEntryCommand
-from rsscast.gui.command.removeentrycommand import RemoveEntryCommand
 from rsscast.gui.command.setenablestateentrycommand import SetEnableStateEntryCommand
 
 
@@ -102,12 +101,6 @@ class DataObject( QObject ):
         if dialogCode == QtWidgets.QDialog.Rejected:
             return
         command = EditEntryCommand( self, entry, entryDialog.entry )
-        self.pushUndo( command )
-
-    def removeEntry(self, entry: FeedEntry):
-        if entry is None:
-            return
-        command = RemoveEntryCommand( self, entry )
         self.pushUndo( command )
 
     def switchEntryEnableState(self, entry):
