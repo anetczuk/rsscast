@@ -268,7 +268,7 @@ def convert_yt_yt1s( link, output, mimicHuman=True ):
 
         dlink = data["dlink"]
 
-        _LOGGER.info( "grabbing file: %s to %s", dlink, output )
+#         _LOGGER.info( "grabbing file: %s to %s", dlink, output )
         simple_download( dlink, output )
 #         curl_download( session, dlink, output )
 
