@@ -105,7 +105,7 @@ class FeedTableModel( QAbstractTableModel ):
             return None
 
         entry: FeedEntry = self._rawData.get( index.row() )
-        
+
         if role == Qt.DisplayRole:
             rawData = self.attribute( entry, index.column() )
             if rawData is None:

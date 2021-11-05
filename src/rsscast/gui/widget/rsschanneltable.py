@@ -159,7 +159,7 @@ class RSSChannelTableModel( QAbstractTableModel ):
             return entry.id
         elif index == 3:
             mediaSize = entry.localFileSize()
-            if mediaSize == None:
+            if mediaSize is None:
                 return None
             return round( mediaSize / 1024 / 1024, 2 )
         elif index == 4:

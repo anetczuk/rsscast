@@ -226,7 +226,7 @@ def convert_yt_yt1s( link, output, mimicHuman=True ):
         session = get_curl_session()
 
         mp3Data = get_mp3_data( session, link, mimicHuman )
-        if mp3Data == None:
+        if mp3Data is None:
             return False
 
         vidId     = mp3Data[0]
