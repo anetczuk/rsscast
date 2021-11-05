@@ -107,8 +107,9 @@ class RSSChannelTableModel( QAbstractTableModel ):
         if not index.isValid():
             return None
 
+        entry: RSSItem = self._rawData.get( index.row() )
+
         if role == Qt.DisplayRole:
-            entry = self._rawData.get( index.row() )
             rawData = self.attribute( entry, index.column() )
             if rawData is None:
                 return "-"
@@ -124,17 +125,14 @@ class RSSChannelTableModel( QAbstractTableModel ):
 #             return strData
 
         if role == Qt.UserRole:
-            entry = self._rawData.get( index.row() )
             rawData = self.attribute( entry, index.column() )
             return rawData
 
         if role == Qt.EditRole:
-            entry = self._rawData.get( index.row() )
             rawData = self.attribute( entry, index.column() )
             return rawData
 
         if role == Qt.BackgroundRole:
-            entry: RSSItem = self._rawData.get( index.row() )
             if entry.enabled is False:
                 return QColor( "gray" )
 

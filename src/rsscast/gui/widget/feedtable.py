@@ -104,8 +104,9 @@ class FeedTableModel( QAbstractTableModel ):
         if not index.isValid():
             return None
 
+        entry: FeedEntry = self._rawData.get( index.row() )
+        
         if role == Qt.DisplayRole:
-            entry = self._rawData.get( index.row() )
             rawData = self.attribute( entry, index.column() )
             if rawData is None:
                 return "-"
@@ -126,12 +127,10 @@ class FeedTableModel( QAbstractTableModel ):
             return rawData
 
         if role == Qt.EditRole:
-            entry = self._rawData.get( index.row() )
             rawData = self.attribute( entry, index.column() )
             return rawData
 
         if role == Qt.BackgroundRole:
-            entry: FeedEntry = self._rawData.get( index.row() )
             if entry.enabled is False:
                 return QColor( "gray" )
 

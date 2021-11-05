@@ -151,7 +151,7 @@ class RSSChannel( persist.Versionable ):
         self.items.remove( rssItem )
 
     def itemIndex(self, rssItem: RSSItem) -> int:
-        self.items.index( rssItem )
+        return self.items.index( rssItem )
 
     def findItem(self, itemId) -> RSSItem:
         for item in self.items:
