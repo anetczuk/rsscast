@@ -23,10 +23,13 @@
 
 import logging
 import glob
+import os
+import re
 from typing import List
 
 from rsscast import persist
-from rsscast.rss.rssparser import parse_rss, RSSChannel, RSSItem
+from rsscast.rss.rssparser import parse_rss, RSSChannel, RSSItem,\
+    get_channel_output_dir
 from rsscast.rss.rssconverter import generate_channel_rss, remove_item_data
 
 
@@ -68,6 +71,23 @@ class FeedEntry( persist.Versionable ):
         # pylint: disable=W0201
         self.__dict__ = dict_
 
+    def updateLocalData(self):
+        if self.channel is None:
+            return
+        feedId = self.feedId.replace(":", "_")
+        feedId = re.sub( r"\s+", "", feedId )
+            
+        channelPath = get_channel_output_dir( feedId )
+    
+        for rssItem in self.channel.items:
+            videoId = rssItem.videoId()
+            postLocalPath = "%s/%s.mp3" % ( channelPath, videoId )
+    
+            if os.path.exists(postLocalPath):
+                rssItem.mediaSize = os.path.getsize( postLocalPath )
+            else:
+                rssItem.mediaSize = -1
+
     def update(self, channel: RSSChannel):
         if self.channel is None:
             self.channel = channel
@@ -93,6 +113,7 @@ def fetch_feed( feed: FeedEntry ):
     feedId = feed.feedId
     rssChannel: RSSChannel = parse_rss( feedId, feed.url )
     feed.update( rssChannel )    
+    feed.updateLocalData()
 
 
 def parse_feed( feed: FeedEntry ):

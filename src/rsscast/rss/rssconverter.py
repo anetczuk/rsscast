@@ -91,6 +91,8 @@ def remove_item_data( feedId, rssItem: RSSItem ):
     videoId = rssItem.videoId()
     postLocalPath = "%s/%s.mp3" % ( channelPath, videoId )
     
+    rssItem.mediaSize = -1
+    
     if not os.path.exists(postLocalPath):
         return
 

@@ -34,7 +34,8 @@ from PyQt5.QtGui import QColor
 from rsscast.rss.rssparser import RSSChannel, RSSItem
 from rsscast.gui import guistate
 from rsscast.datatypes import FeedEntry
-from rsscast.rss.rssconverter import generate_channel_rss, download_items
+from rsscast.rss.rssconverter import generate_channel_rss, download_items,\
+    remove_item_data
 from rsscast.gui.dataobject import DataObject
 from rsscast.gui.command.rsschannelcommand import RemoveRSSItemCommand
 
@@ -272,6 +273,7 @@ class RSSChannelTable( QTableView ):
  
         contextMenu      = QtWidgets.QMenu( self )
         pullAction       = contextMenu.addAction("Pull")
+        removeFileAction = contextMenu.addAction("Remove data")
         removeAction     = contextMenu.addAction("Remove")
         enableAction     = None
         if entry is None or entry.enabled is False:
@@ -281,6 +283,7 @@ class RSSChannelTable( QTableView ):
  
         if entry is None:
             pullAction.setEnabled( False )
+            removeFileAction.setEnabled( False )
             removeAction.setEnabled( False )
             enableAction.setEnabled( False )
  
@@ -293,6 +296,9 @@ class RSSChannelTable( QTableView ):
             itemsList = [entry]
             download_items( feedId, itemsList )
             generate_channel_rss( feedId, channel, False )
+        elif action == removeFileAction:
+            feedId  = self.feedObject.feedId
+            remove_item_data( feedId, entry )
         elif action == removeAction:
             command = RemoveRSSItemCommand( self.dataObject, self.feedObject, entry )
             self.dataObject.pushUndo( command )
