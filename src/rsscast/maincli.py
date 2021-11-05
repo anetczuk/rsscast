@@ -38,7 +38,7 @@ from rsscast.rss.rssserver import RSSServerManager
 
 from rsscast.datatypes import parse_feed, fetch_feed
 from rsscast.gui.resources import get_user_data_path
-from rsscast.gui.dataobject import DataObject
+from rsscast.gui.dataobject import FeedEntry, DataObject
 
 
 _LOGGER = logging.getLogger(__name__)

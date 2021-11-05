@@ -37,7 +37,7 @@ from rsscast.gui import threadlist
 from rsscast.gui import uiloader
 from rsscast.gui import trayicon
 from rsscast.gui import guistate
-from rsscast.gui.dataobject import DataObject
+from rsscast.gui.dataobject import FeedEntry, DataObject
 from rsscast.gui.appwindow import AppWindow
 from rsscast.gui.widget import logwidget
 from rsscast.gui.trayicon import load_main_icon, load_disconnect_icon
