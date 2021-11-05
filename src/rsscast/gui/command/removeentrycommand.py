@@ -26,7 +26,7 @@ import logging
 from PyQt5.QtWidgets import QUndoCommand
 
 from rsscast.datatypes import FeedContainer, FeedEntry
-from rsscast.gui.dataobject import DataObject
+# from rsscast.gui.dataobject import DataObject
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -34,12 +34,10 @@ _LOGGER = logging.getLogger(__name__)
 
 class RemoveEntryCommand( QUndoCommand ):
 
-    def __init__(self, dataObject: DataObject, entry: FeedEntry, parentCommand=None):
+    def __init__(self, dataObject, entry: FeedEntry, parentCommand=None):
         super().__init__(parentCommand)
 
-        dataObject.pushUndo( self )
-
-        self.data: DataObject = dataObject
+        self.data = dataObject
         self.feedContainer: FeedContainer = self.data.feed
         self.entry: FeedEntry = entry
 
