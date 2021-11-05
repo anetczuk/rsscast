@@ -8,6 +8,8 @@ SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
 src_dir=$SCRIPT_DIR/../src
 
 
+echo "doc checking using pydocstyle"
+
 ## D100: Missing docstring in public module
 ## D101: Missing docstring in public class
 ## D102: Missing docstring in public method

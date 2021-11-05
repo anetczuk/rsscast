@@ -11,6 +11,8 @@ SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
 src_dir=$SCRIPT_DIR/../src
 
 
+echo "code checking using pycodestyle"
+
 ## E115 intend of comment
 ## E126 continuation line over-indented for hanging indent
 ## E201 whitespace after '('
@@ -37,9 +39,10 @@ fi
 echo "pycodestyle -- no warnings found"
 
 
+echo "code checking using flake8"
+
 ## F401 'PyQt5.QtCore' imported but unused
 ignore_errors=$ignore_errors,F401
-
 
 flake8 --show-source --statistics --count --ignore=$ignore_errors $src_dir
 exit_code=$?
@@ -51,6 +54,8 @@ fi
 
 echo "flake8 -- no warnings found"
 
+
+echo "code checking using pylint3"
 
 pylint3 --rcfile=$SCRIPT_DIR/pylint3.config $src_dir/rsscast $src_dir/testrsscast $src_dir/*.py
 exit_code=$?
