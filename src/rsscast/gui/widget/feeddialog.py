@@ -25,6 +25,8 @@ import logging
 import copy
 import re
 
+import unidecode
+
 from rsscast.datatypes import FeedEntry
 
 from rsscast.gui import uiloader
@@ -35,6 +37,16 @@ UiTargetClass, QtBaseClass = uiloader.load_ui_from_class_name( __file__ )
 
 
 _LOGGER = logging.getLogger(__name__)
+
+
+def convert_to_ascii( inputData: str ):
+    """Convert input string removing scpecial characters, whites paces etc."""
+    data = inputData
+    data = data.lower()
+    data = unidecode.unidecode( data )
+    data = data.replace(":", "_")
+    data = re.sub( r"\s+", "", data )
+    return data
 
 
 class FeedDialog( QtBaseClass ):           # type: ignore
@@ -73,8 +85,7 @@ class FeedDialog( QtBaseClass ):           # type: ignore
         foundName = rss_data[0]
         foundId = rss_data[0]
         if foundId is not None:
-            foundId = foundId.replace(":", "_")
-            foundId = re.sub( r"\s+", "", foundId )
+            foundId = convert_to_ascii( foundId )
 
         self.ui.nameLE.setText( foundName )
         self.ui.idLE.setText( foundId )
