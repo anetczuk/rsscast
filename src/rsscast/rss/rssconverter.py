@@ -24,6 +24,7 @@
 import os
 import logging
 import re
+import html
 from typing import List
 
 from rsscast.rss.rssparser import RSSChannel, RSSItem
@@ -125,7 +126,7 @@ def generate_items_rss( host, feedId, rssChannel: RSSChannel, itemsList: List[RS
         postLink = rssItem.link
         postTitle = rssItem.title
 
-        enclosureURL  = "http://%s/feed/%s/%s.mp3" % ( host, feedId, videoId )      ## must have absolute path
+        enclosureURL = rssItem.enclosureURL( host, feedId )                           ## must have absolute path
 
         mediaThumbnailNode = ""
         if rssItem.thumb_url is not None:
@@ -133,6 +134,7 @@ def generate_items_rss( host, feedId, rssChannel: RSSChannel, itemsList: List[RS
             mediaThumbnailNode = f"""<media:thumbnail url="{rssItem.thumb_url}" width="{rssItem.thumb_width}" height="{rssItem.thumb_height}"/>"""
 
         description = rssItem.summary
+        description = fix_url_text( description )       ## fix URLs
         # description = html.escape( description )
 
         postTitle = rssItem.itemTitle()
@@ -179,3 +181,36 @@ def generate_items_rss( host, feedId, rssChannel: RSSChannel, itemsList: List[RS
     write_text( result, rssOutput )
 
     return succeed
+
+
+def fix_url_text( inputText ):
+    outputText = inputText
+    link_regex = re.compile( '((https?):((//)|(\\\\))+([\w\d:#@%/;$()~_?\+-=\\\.&](#!)?)*)', re.DOTALL )
+    links = re.findall( link_regex, inputText )
+    for lnk in links:
+        sourceURL = lnk[0]
+        # print( sourceURL )
+        fixedURL = fix_url( sourceURL )
+        if fixedURL is None:
+            continue
+        outputText = outputText.replace( sourceURL, fixedURL )
+
+    return outputText
+
+
+def fix_url( inputURL ):
+    """There were found invalid URL parts. It needs to be fixed to accept by AntennaPod."""
+    outputURL = re.sub( r"&sub;+", "&sub", inputURL )
+    outputURL = html.escape( outputURL )
+    if outputURL is inputURL:
+        return None
+    return outputURL
+
+
+# def fix_url( inputURL ):
+#     """AntennaPod does not accept semicolons(;) in URLs. It can be fixed by replacing it with '&' characters."""
+#     outputURL = re.sub( r";+", "&", inputURL )
+#     outputURL = html.escape( outputURL )
+#     if outputURL is inputURL:
+#         return None
+#     return outputURL
