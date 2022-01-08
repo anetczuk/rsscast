@@ -1,3 +1,4 @@
+unidecode
 feedparser
 requests_file
 pycurl
