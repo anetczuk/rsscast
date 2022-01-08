@@ -136,6 +136,8 @@ def generate_items_rss( host, feedId, rssChannel: RSSChannel, itemsList: List[RS
         description = rssItem.summary
         description = fix_url_text( description )       ## fix URLs
         # description = html.escape( description )
+        
+        defaultIconURL = "http://%s/rss-icon.png" % ( host )      ## must have absolute path
 
         postTitle = rssItem.itemTitle()
 
@@ -162,12 +164,12 @@ def generate_items_rss( host, feedId, rssChannel: RSSChannel, itemsList: List[RS
     <channel>
         <title>{rssChannel.title}</title>
         <link>{rssChannel.link}</link>
-        <description></description>
+        <description>YouTube channel converted to RSS by RSSCast service.</description>
         <lastBuildDate>{rssChannel.publishDate}</lastBuildDate>
         <language></language>
         <copyright></copyright>
         <image>
-            <url></url>
+            <url>{defaultIconURL}</url>
             <title>{rssChannel.title}</title>
             <link>{rssChannel.link}</link>
         </image>

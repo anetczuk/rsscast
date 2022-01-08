@@ -21,7 +21,9 @@
 # SOFTWARE.
 #
 
+import os
 import logging
+import shutil
 
 from PyQt5 import QtCore
 from PyQt5.QtCore import pyqtSignal
@@ -30,7 +32,7 @@ from rsscast import DATA_DIR
 from rsscast.gui.dataobject import DataObject
 from rsscast.rss.rssserver import RSSServerManager
 
-from rsscast.gui import uiloader
+from rsscast.gui import uiloader, resources
 
 
 UiTargetClass, QtBaseClass = uiloader.load_ui_from_class_name( __file__ )
@@ -73,6 +75,9 @@ class ServerWidget( QtBaseClass ):           # type: ignore
         return False
 
     def startServer(self):
+        sourcePath = resources.get_image_path( "rss-icon-black.png" )
+        targetPath = os.path.abspath( os.path.join(DATA_DIR, "rss-icon.png") )
+        shutil.copyfile( sourcePath, targetPath )
         self.server.port = self.ui.portSB.value()
         self.server.start( DATA_DIR )
         self.refreshWidget()
