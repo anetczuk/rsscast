@@ -42,6 +42,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class RSSItem( persist.Versionable ):
+    """RSS item in channel."""
 
     ## 0 - first version
     ## 1 - added 'enabled' field
@@ -105,6 +106,7 @@ class RSSItem( persist.Versionable ):
 
 
 class RSSChannel( persist.Versionable ):
+    """RSS data structure."""
 
     ## 0 - first version
     _class_version = 0
