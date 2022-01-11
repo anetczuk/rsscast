@@ -31,10 +31,11 @@ from PyQt5.QtCore import QAbstractTableModel
 from PyQt5.QtWidgets import QTableView
 from PyQt5.QtGui import QColor
 
-from rsscast.datatypes import FeedEntry
+from rsscast.datatypes import FeedEntry, fetch_feed, parse_feed
 from rsscast.gui.dataobject import DataObject, FeedContainer
 
 from rsscast.gui import guistate
+from rsscast.rss.rssconverter import generate_channel_rss
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -260,11 +261,18 @@ class FeedTable( QTableView ):
             enableAction = contextMenu.addAction("Enable")
         else:
             enableAction = contextMenu.addAction("Disable")
+        contextMenu.addSeparator()
+        fetchAction      = contextMenu.addAction("Fetch")
+        generateAction   = contextMenu.addAction("Generate RSS")
+        pullAction       = contextMenu.addAction("Pull")
 
         if entry is None:
             editAction.setEnabled( False )
             removeAction.setEnabled( False )
             enableAction.setEnabled( False )
+            fetchAction.setEnabled( False )
+            generateAction.setEnabled( False )
+            pullAction.setEnabled( False )
 
         globalPos = QtGui.QCursor.pos()
         action = contextMenu.exec_( globalPos )
@@ -277,6 +285,12 @@ class FeedTable( QTableView ):
             self.dataObject.removeEntry( entry )
         elif action == enableAction:
             self.dataObject.switchEntryEnableState( entry )
+        elif action == fetchAction:
+            fetch_feed( entry )
+        elif action == generateAction:
+            generate_channel_rss( entry.feedId, entry.channel, downloadContent=False )
+        elif action == pullAction:
+            parse_feed( entry )
 
     def currentChanged(self, current, previous):
         super().currentChanged( current, previous )
