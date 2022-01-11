@@ -32,6 +32,7 @@ import requests_file
 import feedparser
 
 from rsscast import DATA_DIR, persist
+import pprint
 # from rsscast.rss.ytconverter import get_media_size
 
 
@@ -170,6 +171,13 @@ class RSSChannel( persist.Versionable ):
 
     def parse(self, feedContent):
         parsedDict = feedparser.parse( feedContent )
+        
+        if parsedDict.get('bozo', False):
+            reason = parsedDict.get('bozo_exception', "<unknown>")
+            _LOGGER.warning( "malformed rss detected, reason %s", reason )
+            return
+
+#         pprint.pprint( parsedDict )
 
 #         _LOGGER.info( "detected entries %s", len(parsedDict.entries) )
     #     pprint( parsedDict.feed )

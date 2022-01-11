@@ -63,6 +63,20 @@ class RSSChannelTest(unittest.TestCase):
         self.assertEqual( items[1].id, "yt:video:kztwPl8QQTA" )
         self.assertEqual( items[2].id, "yt:video:DXU6PBpv-eI" )
 
+    def test_parse_404(self):
+        feedContent = read_data( "404.rss" )
+        channel = RSSChannel()
+        channel.parse( feedContent )
+
+        self.assertTrue( channel is not None )
+        self.assertEqual( channel.title, None )
+        self.assertEqual( channel.link, None )
+        self.assertEqual( channel.publishDate, None )
+
+        items = channel.items
+        self.assertTrue( items is not None )
+        self.assertEqual( len(items), 0 )
+
     def test_update(self):
         channelFrom = RSSChannel()
         channelFrom.addItem( RSSItem( itemId="xxx1", link="aaa1" ) )
