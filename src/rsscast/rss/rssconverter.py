@@ -39,7 +39,7 @@ _LOGGER = logging.getLogger(__name__)
 
 def generate_channel_rss( feedId, rssChannel: RSSChannel, downloadContent=True ):
     host = RSSServerManager.getPrimaryIp()
-    return generate_rss( host, feedId, rssChannel, downloadContent )
+    generate_rss( host, feedId, rssChannel, downloadContent )
 
 
 def generate_rss( host, feedId, rssChannel: RSSChannel, downloadContent=True ):
@@ -52,7 +52,7 @@ def generate_rss( host, feedId, rssChannel: RSSChannel, downloadContent=True ):
     if downloadContent:
         download_items( feedId, items )
 
-    return generate_items_rss( host, feedId, rssChannel, items )
+    generate_items_rss( host, feedId, rssChannel, items )
 
 
 def download_items( feedId, itemsList: List[RSSItem] ):

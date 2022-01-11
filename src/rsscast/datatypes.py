@@ -117,9 +117,13 @@ def fetch_feed( feed: FeedEntry ):
 
 
 def parse_feed( feed: FeedEntry ):
-    fetch_feed( feed )
-    feedId = feed.feedId
-    return generate_channel_rss( feedId, feed.channel )
+    try:
+        fetch_feed( feed )
+        feedId = feed.feedId
+        generate_channel_rss( feedId, feed.channel )
+    except Exception as ex:
+        _LOGGER.exception( "unable parse feed: %s reaseon: %s", feed.feedId, ex, exc_info=False )
+        raise
 
 
 ## ========================================================
