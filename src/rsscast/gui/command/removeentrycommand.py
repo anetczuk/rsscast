@@ -37,6 +37,8 @@ class RemoveEntryCommand( QUndoCommand ):
     def __init__(self, dataObject, entry: FeedEntry, parentCommand=None):
         super().__init__(parentCommand)
 
+        _LOGGER.info( "removing entry %s", entry.feedId )
+
         self.data = dataObject
         self.feedContainer: FeedContainer = self.data.feed
         self.entry: FeedEntry = entry

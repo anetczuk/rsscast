@@ -35,7 +35,6 @@ from rsscast.datatypes import FeedEntry
 from rsscast.gui.dataobject import DataObject, FeedContainer
 
 from rsscast.gui import guistate
-from rsscast.gui.command.removeentrycommand import RemoveEntryCommand
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -275,7 +274,7 @@ class FeedTable( QTableView ):
         elif action == editAction:
             self.dataObject.editEntry( entry )
         elif action == removeAction:
-            RemoveEntryCommand( self.dataObject, entry )
+            self.dataObject.removeEntry( entry )
         elif action == enableAction:
             self.dataObject.switchEntryEnableState( entry )
 
@@ -313,7 +312,7 @@ class FeedTable( QTableView ):
         self.dataObject.editEntry(entry)
 
     def _removeEntry(self, entry):
-        RemoveEntryCommand( self.dataObject, entry )
+        self.dataObject.removeEntry( entry )
 
 
 def print_timedelta( value: timedelta ):
