@@ -30,10 +30,13 @@ import logging
 from io import BytesIO
 import json
 import re
+
+import urllib.request as request
 from urllib.parse import urlencode
 
 import requests
 import pycurl
+import ssl
 # import urllib.request
 
 # from rsscast.pprint import pprint
@@ -160,6 +163,7 @@ def get_curl_session():
 
 
 def get_mp3_data( session, link, mimicHuman=True ):
+#     _LOGGER.info( "curl_post: accessing %s", link )
     params = {'q': link,
               'vt': 'mp3'}
 
@@ -263,7 +267,8 @@ def convert_yt_yt1s( link, output, mimicHuman=True ):
         dlink = data["dlink"]
 
 #         _LOGGER.info( "grabbing file: %s to %s", dlink, output )
-        simple_download( dlink, output )
+        urlretrieve( dlink, output )
+#         simple_download( dlink, output )
 #         curl_download( session, dlink, output )
 
 #         if mimicHuman:
@@ -329,9 +334,44 @@ def curl_download_raw( session, sourceUrl, outputFile ):
         os.remove( path )
 
 
-def simple_download( sourceUrl, outputFile ):
-#     urllib.request.urlretrieve( sourceUrl, outputFile )
+# def simple_download( sourceUrl, outputFile ):
+# #     urllib.request.urlretrieve( sourceUrl, outputFile )
+# 
+#     r = requests.get( sourceUrl )
+#     with open( outputFile, 'wb' ) as output:
+#         output.write( r.content )
 
-    r = requests.get( sourceUrl )
-    with open( outputFile, 'wb' ) as output:
-        output.write( r.content )
+
+def urlretrieve( url, outputPath ):
+    ##
+    ## Under Ubuntu 20 SSL configuration has changed causing problems with SSL keys.
+    ## For more details see: https://forums.raspberrypi.com/viewtopic.php?t=255167
+    ##
+    ctx_no_secure = ssl.create_default_context()
+    ctx_no_secure.set_ciphers('HIGH:!DH:!aNULL')
+    ctx_no_secure.check_hostname = False
+    ctx_no_secure.verify_mode = ssl.CERT_NONE
+
+    ## changed "user-agent" fixes blocking by server
+    req = request.Request( url, headers={'User-Agent': 'Mozilla/5.0'} )
+    result = request.urlopen( req, timeout=30, context=ctx_no_secure )
+
+#     result = request.urlopen( url, context=ctx_no_secure )
+    content_data = result.read()
+
+    try:
+        with open(outputPath, 'wb') as of:
+            of.write( content_data )
+
+#         content_text = content_data.decode("utf-8")
+#         with open(outputPath, 'wt') as of:
+#             of.write( content_text )
+
+    except UnicodeDecodeError as ex:
+        _LOGGER.exception( "unable to access: %s %s", url, ex, exc_info=False )
+        raise
+
+#     urllib.request.urlretrieve( url, outputPath, context=ctx_no_secure )
+#     urllib.request.urlretrieve( url, outputPath )
+
+    return content_data
