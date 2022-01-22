@@ -334,14 +334,6 @@ def curl_download_raw( session, sourceUrl, outputFile ):
         os.remove( path )
 
 
-# def simple_download( sourceUrl, outputFile ):
-# #     urllib.request.urlretrieve( sourceUrl, outputFile )
-# 
-#     r = requests.get( sourceUrl )
-#     with open( outputFile, 'wb' ) as output:
-#         output.write( r.content )
-
-
 def urlretrieve( url, outputPath ):
     ##
     ## Under Ubuntu 20 SSL configuration has changed causing problems with SSL keys.
@@ -375,3 +367,11 @@ def urlretrieve( url, outputPath ):
 #     urllib.request.urlretrieve( url, outputPath )
 
     return content_data
+
+
+# def simple_download( sourceUrl, outputFile ):
+# #     urllib.request.urlretrieve( sourceUrl, outputFile )
+# 
+#     r = requests.get( sourceUrl )
+#     with open( outputFile, 'wb' ) as output:
+#         output.write( r.content )
