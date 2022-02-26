@@ -30,7 +30,7 @@ from typing import List
 from rsscast.rss.rssparser import RSSChannel, RSSItem
 from rsscast.rss.rssparser import get_channel_output_dir
 from rsscast.rss.rssparser import write_text
-from rsscast.rss.ytconverter import convert_yt
+from rsscast.rss.ytconverter import convert_yt, get_yt_duration
 from rsscast.rss.rssserver import RSSServerManager
 
 
@@ -45,6 +45,7 @@ def generate_channel_rss( feedId, rssChannel: RSSChannel, downloadContent=True )
 
 def generate_rss( host, feedId, rssChannel: RSSChannel, downloadContent=True ):
     """Generate channel's converted RSS"""
+    duration_limit = 60 * 60 * 2        # 2 hours
     items = list()
     for rssItem in rssChannel.items:
         if rssItem.enabled is False:
@@ -52,12 +53,12 @@ def generate_rss( host, feedId, rssChannel: RSSChannel, downloadContent=True ):
         items.append( rssItem )
 
     if downloadContent:
-        download_items( feedId, items )
+        download_items( feedId, items, duration_limit )
 
     generate_items_rss( host, feedId, rssChannel, items )
 
 
-def download_items( feedId, itemsList: List[RSSItem] ):
+def download_items( feedId, itemsList: List[RSSItem], videoDurationLimit=None ):
     """Download media."""
     feedId = feedId.replace(":", "_")
     feedId = re.sub( r"\s+", "", feedId )
@@ -74,6 +75,13 @@ def download_items( feedId, itemsList: List[RSSItem] ):
 
         if not os.path.exists(postLocalPath):
             ## item file not exists -- convert and download
+            if videoDurationLimit is not None:
+                video_duration = get_yt_duration( postLink )
+                if video_duration > videoDurationLimit:
+                    _LOGGER.info( "feed %s: video '%s' exceeds duration limit: %sm > %sm -- skipped", 
+                                  feedId, postLink, video_duration / 60, videoDurationLimit / 60 )
+                    continue
+            
             _LOGGER.info( "feed %s: converting video: %s to %s", feedId, postLink, postLocalPath )
             converted = convert_yt( postLink, postLocalPath )
             if converted is False:

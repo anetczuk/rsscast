@@ -291,6 +291,7 @@ class FeedTable( QTableView ):
             generate_channel_rss( entry.feedId, entry.channel, downloadContent=False )
         elif action == pullAction:
             parse_feed( entry )
+            _LOGGER.info( "pulling finished" )
 
     def currentChanged(self, current, previous):
         super().currentChanged( current, previous )

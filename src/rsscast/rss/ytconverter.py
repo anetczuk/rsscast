@@ -40,7 +40,8 @@ import ssl
 # import urllib.request
 
 # from rsscast.pprint import pprint
-# import youtube_dl
+
+from pytube import YouTube
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -93,6 +94,16 @@ def read_yt_rss_from_source( site_content ):
 
 
 ## ===================================================================
+
+
+## returns value in seconds
+def get_yt_duration( link ):
+    try:
+        yt = YouTube( link )
+        return yt.length
+    except TypeError as e:
+        _LOGGER.warning( "unable to get video duration: %s", e )
+    return -1
 
 
 def convert_yt( link, output, mimicHuman=True ):

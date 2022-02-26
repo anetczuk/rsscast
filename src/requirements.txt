@@ -4,3 +4,5 @@ requests_file
 pycurl
 watchdog
 #youtube-dl
+## required to read video duration
+pytube
