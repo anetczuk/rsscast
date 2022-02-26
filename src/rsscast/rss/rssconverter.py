@@ -81,10 +81,10 @@ def download_items( feedId, itemsList: List[RSSItem], videoDurationLimit=None ):
             if videoDurationLimit is not None:
                 video_duration = get_yt_duration( postLink )
                 if video_duration > videoDurationLimit:
-                    _LOGGER.info( "feed %s: video '%s' exceeds duration limit: %sm > %sm -- skipped", 
+                    _LOGGER.info( "feed %s: video '%s' exceeds duration limit: %sm > %sm -- skipped",
                                   feedId, postLink, video_duration / 60, videoDurationLimit / 60 )
                     continue
-            
+
             _LOGGER.info( "feed %s: converting video: %s to %s", feedId, postLink, postLocalPath )
             converted = convert_yt( postLink, postLocalPath )
             if converted is False:
@@ -151,7 +151,7 @@ def generate_items_rss( host, feedId, rssChannel: RSSChannel, itemsList: List[RS
         description = rssItem.summary
         description = fix_url_text( description )       ## fix URLs
         # description = html.escape( description )
-        
+
         defaultIconURL = "http://%s/rss-icon.png" % ( host )      ## must have absolute path
 
         postTitle = rssItem.itemTitle()

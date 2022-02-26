@@ -384,7 +384,7 @@ def urlretrieve( url, outputPath ):
 
 # def simple_download( sourceUrl, outputFile ):
 # #     urllib.request.urlretrieve( sourceUrl, outputFile )
-# 
+#
 #     r = requests.get( sourceUrl )
 #     with open( outputFile, 'wb' ) as output:
 #         output.write( r.content )

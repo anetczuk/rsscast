@@ -171,7 +171,7 @@ class RSSChannel( persist.Versionable ):
 
     def parse(self, feedContent):
         parsedDict = feedparser.parse( feedContent )
-        
+
         if parsedDict.get('bozo', False):
             reason = parsedDict.get('bozo_exception', "<unknown>")
             _LOGGER.warning( "malformed rss detected, reason %s", reason )

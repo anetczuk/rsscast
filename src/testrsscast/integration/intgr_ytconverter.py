@@ -21,8 +21,8 @@ from rsscast.rss.ytconverter import get_yt_duration
 
 
 _LOGGER = logging.getLogger(__name__)
- 
- 
+
+
 logging.basicConfig( level=logging.DEBUG )
 
 
