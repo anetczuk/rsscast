@@ -141,6 +141,7 @@ def convert_yt( link, output, mimicHuman=True ):
 ## ===================================================================
 
 
+## get mp3 format from response dict
 def get_mp3_format_data( mp3FormatDict ):
     if '256' in mp3FormatDict:
         return mp3FormatDict['256']
@@ -163,7 +164,7 @@ def get_curl_session():
 
 
 def get_mp3_data( session, link, mimicHuman=True ):
-#     _LOGGER.info( "curl_post: accessing %s", link )
+#    _LOGGER.debug( "curl_post: accessing %s", link )
     params = {'q': link,
               'vt': 'mp3'}
 
@@ -288,6 +289,7 @@ def convert_yt_yt1s( link, output, mimicHuman=True ):
     return False
 
 
+## perform 'POST' request on curl session
 def curl_post( session, targetUrl, dataDict ):
 #     _LOGGER.info( "accessing url: %s params: %s", targetUrl, dataDict )
 

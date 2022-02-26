@@ -70,11 +70,14 @@ class CliApp:
         self.data.store( dataPath )
 
     def fetchRSS(self):
+        itemsNum = self.data.feed.countItems()
         feedList: List[ FeedEntry ] = self.data.feed.getList()
         for feed in feedList:
 #             if feed.enabled is False:
 #                 continue
             fetch_feed( feed )
+        addedItems = self.data.feed.countItems() - itemsNum
+        _LOGGER.info( "fetched new items: %s", addedItems )
 
     def refreshRSS(self):
         feedList: List[ FeedEntry ] = self.data.feed.getList()

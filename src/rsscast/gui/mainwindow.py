@@ -93,6 +93,8 @@ class MainWindow( QtBaseClass ):           # type: ignore
 
         self.ui.serverWidget.connectData( self.data )
         self.ui.feedWidget.connectData( self.data )
+        
+        self.data.feedChanged.connect( self._updateFeedsNum )
 
         ## ================== connecting signals ==================
 
@@ -166,6 +168,7 @@ class MainWindow( QtBaseClass ):           # type: ignore
         self.updateTrayToolTip()
 
     def refreshView(self):
+        self._updateFeedsNum()
         self.ui.serverWidget.refreshWidget()
         self.ui.feedWidget.refreshView()
         self.ui.notesWidget.setNotes( self.data.notes )
@@ -206,12 +209,17 @@ class MainWindow( QtBaseClass ):           # type: ignore
 
     def _refreshingFinished(self):
         self.ui.feedWidget.refreshView()
+        self._updateFeedsNum()
         self._enableActions( True )
 
     def _enableActions(self, state=True):
         self.refreshAction.setEnabled( state )
         self.ui.pullPB.setEnabled( state )
         self.ui.fetchRSSPB.setEnabled( state )
+        
+    def _updateFeedsNum(self):
+        itemsNum = self.data.feed.countItems()
+        self.ui.itemsNum.setText( str(itemsNum) )
 
     ## ====================================================================
 

@@ -71,6 +71,9 @@ class FeedEntry( persist.Versionable ):
         # pylint: disable=W0201
         self.__dict__ = dict_
 
+    def countItems(self):
+        return self.channel.size()
+
     def updateLocalData(self):
         if self.channel is None:
             return
@@ -163,6 +166,12 @@ class FeedContainer( persist.Versionable ):
 
     def getList(self) -> List[  FeedEntry ]:
         return self.feedList
+
+    def countItems(self):
+        count = 0
+        for item in self.feedList:
+            count += item.countItems()
+        return count
 
     def addFeedNew(self, feedName: str, feedId: str, feedUrl: str):
         feed = FeedEntry()
