@@ -68,6 +68,9 @@ def download_items( feedId, itemsList: List[RSSItem], videoDurationLimit=None ):
 #     rssItem: RSSItem = None
     for rssItem in itemsList:
 #         pprint( rssItem )
+        if rssItem.enabled is False:
+            _LOGGER.info( "feed %s: video '%s' disabled -- skipped", feedId, rssItem.title )
+            continue
 
         postLink = rssItem.link
         videoId = rssItem.videoId()

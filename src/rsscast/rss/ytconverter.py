@@ -290,9 +290,9 @@ def convert_yt_yt1s( link, output, mimicHuman=True ):
         ## done -- returning
         return True
 
-#    except Exception as err:
-#        logging.exception("Unexpected exception")
-#        return False
+    except Exception as err:
+        _LOGGER.exception("Unexpected exception", exc_info=False)
+        return False
 
     finally:
         session.close()
@@ -312,7 +312,7 @@ def curl_post( session, targetUrl, dataDict ):
     session.setopt( pycurl.WRITEDATA, dataBuffer )
     session.perform()
 #         except Exception as err:
-#             logging.exception("Unexpected exception")
+#             _LOGGER.exception("Unexpected exception")
 #             return ""
 #     finally:
 #         session.close()
