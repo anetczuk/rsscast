@@ -25,17 +25,27 @@ import logging
 from datetime import datetime, time, timedelta
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import Qt, QModelIndex
+from PyQt5.QtCore import QModelIndex
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtCore import QAbstractTableModel
 from PyQt5.QtWidgets import QTableView
 from PyQt5.QtGui import QColor
+
+## workaround for mypy type errors
+from PyQt5.QtCore import Qt
 
 from rsscast.datatypes import FeedEntry, fetch_feed, parse_feed
 from rsscast.gui.dataobject import DataObject, FeedContainer
 
 from rsscast.gui import guistate
 from rsscast.rss.rssconverter import generate_channel_rss
+from rsscast.pprint import print_timedelta
+
+
+QtDisplayRole    = Qt.DisplayRole                  # type: ignore
+QtUserRole       = Qt.UserRole                     # type: ignore
+QtEditRole       = Qt.EditRole                     # type: ignore
+QtBackgroundRole = Qt.BackgroundRole               # type: ignore
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -70,23 +80,24 @@ class FeedTableModel( QAbstractTableModel ):
         return len( attrsList )
 
     def headerData(self, section, orientation, role):
-        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
+        if orientation == Qt.Horizontal and role == QtDisplayRole:
             attrsList = self.attributeLabels()
             return attrsList[ section ]
         return super().headerData( section, orientation, role )
 
     ## for invalid parent return elements form root list
-    def index(self, row, column, parent: QModelIndex):
+    ## parent: QModelIndex
+    def index(self, row, column, parent):
         if not self.hasIndex(row, column, parent):
             return QModelIndex()
         entry = self._rawData.get( row )
         return self.createIndex(row, column, entry)
 
-    def getIndex(self, item, parentIndex: QModelIndex=None, column: int = 0):
+    def getIndex(self, item, parentIndex: QModelIndex = None, column: int = 0):
         if parentIndex is None:
             parentIndex = QModelIndex()
         if parentIndex.isValid():
-            # dataTask = parentIndex.data( Qt.UserRole )
+            # dataTask = parentIndex.data( QtUserRole )
             dataTask = parentIndex.internalPointer()
             if dataTask == item:
                 return parentIndex
@@ -95,19 +106,19 @@ class FeedTableModel( QAbstractTableModel ):
             index = self.index( i, column, parentIndex )
             if index.isValid() is False:
                 continue
-            # dataTask = parentIndex.data( Qt.UserRole )
+            # dataTask = parentIndex.data( QtUserRole )
             dataTask = index.internalPointer()
             if dataTask == item:
                 return index
         return None
 
-    def data(self, index: QModelIndex, role=Qt.DisplayRole):
+    def data(self, index: QModelIndex, role=QtDisplayRole):
         if not index.isValid():
             return None
 
         entry: FeedEntry = self._rawData.get( index.row() )
 
-        if role == Qt.DisplayRole:
+        if role == QtDisplayRole:
             rawData = self.attribute( entry, index.column() )
             if rawData is None:
                 return "-"
@@ -122,16 +133,16 @@ class FeedTableModel( QAbstractTableModel ):
 #             strData = str(rawData)
 #             return strData
 
-        if role == Qt.UserRole:
+        if role == QtUserRole:
             entry = self._rawData.get( index.row() )
             rawData = self.attribute( entry, index.column() )
             return rawData
 
-        if role == Qt.EditRole:
+        if role == QtEditRole:
             rawData = self.attribute( entry, index.column() )
             return rawData
 
-        if role == Qt.BackgroundRole:
+        if role == QtBackgroundRole:
             if entry.enabled is False:
                 return QColor( "gray" )
 
@@ -145,11 +156,11 @@ class FeedTableModel( QAbstractTableModel ):
     def attribute(self, entry: FeedEntry, index):
         if index == 0:
             return entry.feedName
-        elif index == 1:
+        if index == 1:
             return entry.feedId
-        elif index == 2:
+        if index == 2:
             return entry.url
-        elif index == 3:
+        if index == 3:
             return entry.enabled
         return None
 
@@ -194,7 +205,7 @@ class FeedTable( QTableView ):
         settings.beginGroup( wkey )
         visDict = settings.value("columnsVisible", None, type=dict)
         if visDict is None:
-            visDict = dict()
+            visDict = {}
 
     def saveSettings(self, settings):
         wkey = guistate.get_widget_key(self, "tablesettings")
@@ -215,7 +226,7 @@ class FeedTable( QTableView ):
         self.clearSelection()
 #         _LOGGER.debug( "entries: %s\n%s", type(history), history.printData() )
 
-    def refreshEntry(self, entry: FeedEntry=None):
+    def refreshEntry(self, entry: FeedEntry = None):
         if entry is None:
             ## unable to refresh entry row -- refresh whole model
             self.refreshData()
@@ -328,25 +339,3 @@ class FeedTable( QTableView ):
 
     def _removeEntry(self, entry):
         self.dataObject.removeEntry( entry )
-
-
-def print_timedelta( value: timedelta ):
-    s = ""
-    secs = value.seconds
-    days = value.days
-    if secs != 0 or days == 0:
-        mm, _ = divmod(secs, 60)
-        hh, mm = divmod(mm, 60)
-        s = "%d:%02d" % (hh, mm)
-#         s = "%d:%02d:%02d" % (hh, mm, ss)
-    if days:
-        def plural(n):
-            return n, abs(n) != 1 and "s" or ""
-        if s != "":
-            s = ("%d day%s, " % plural(days)) + s
-        else:
-            s = ("%d day%s" % plural(days)) + s
-#     micros = value.microseconds
-#     if micros:
-#         s = s + ".%06d" % micros
-    return s

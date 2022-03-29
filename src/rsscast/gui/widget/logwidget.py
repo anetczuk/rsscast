@@ -41,20 +41,23 @@ _LOGGER = logging.getLogger(__name__)
 
 class AutoScrollTextEdit( QtWidgets.QTextEdit ):
 
+    switchAutoScroll = pyqtSignal( bool )
+
     def __init__(self, parentWidget=None):
         super().__init__(parentWidget)
 
-        self.autoScroll = False
+        self.autoScroll = True
+        self.setAutoScroll( False )
 
         self.setLineWrapMode( QtWidgets.QTextEdit.NoWrap )
-
-#         self.textChanged.connect( self._textChanged )
 
         verticalBar = self.verticalScrollBar()
         verticalBar.rangeChanged.connect( self._scrollRangeChanged )
         verticalBar.valueChanged.connect( self._scrollValueChanged )
 
     def setAutoScroll( self, state: bool ):
+        if self.autoScroll == state:
+            return
         self.autoScroll = state
         if self.autoScroll:
             verticalBar = self.verticalScrollBar()
@@ -69,7 +72,14 @@ class AutoScrollTextEdit( QtWidgets.QTextEdit ):
         currPos = verticalBar.value()
 #         print( "setContent", "val:", currPos )
 
+        cursor = self.textCursor()
+        pos = cursor.position()
+
         self.setPlainText( content )
+
+        cursor = self.textCursor()
+        cursor.setPosition( pos )
+        self.setTextCursor( cursor )
 
         if self.autoScroll is False:
             verticalBar.setValue( currPos )
@@ -78,12 +88,64 @@ class AutoScrollTextEdit( QtWidgets.QTextEdit ):
         verticalBar = self.verticalScrollBar()
         verticalBar.triggerAction( QtWidgets.QAbstractSlider.SliderToMaximum )
 
-#     def _textChanged(self):
-#         verticalBar = self.verticalScrollBar()
-#         print( "_textChanged", "val:", verticalBar.value() )
+    def keyPressEvent(self, event):
+        if self.autoScroll:
+            moved = self._isMoveUp( event )
+            if moved:
+                self.switchAutoScroll.emit( False )
+            super().keyPressEvent( event )
+            return
 
-#     def _scrollRangeChanged(self, minVal, maxVal):
+        moved = self._isMoveDown( event )
+        if not moved:
+            ## not moved down -- regular behaviour
+            super().keyPressEvent( event )
+            return
+
+        ## moved down
+        super().keyPressEvent( event )
+        self._handlePositionChange()
+
+    def _isMoveUp(self, event):
+        if event.key() == QtCore.Qt.Key_Up:
+            return True
+        if event.key() == QtCore.Qt.Key_PageUp:
+            return True
+        if (event.modifiers() & QtCore.Qt.ControlModifier) and event.key() == QtCore.Qt.Key_Home:
+            return True
+        return False
+
+    def _isMoveDown(self, event):
+        if event.key() == QtCore.Qt.Key_Down:
+            return True
+        if event.key() == QtCore.Qt.Key_PageDown:
+            return True
+        if (event.modifiers() & QtCore.Qt.ControlModifier) and event.key() == QtCore.Qt.Key_End:
+            return True
+        return False
+
+    def wheelEvent(self, event):
+        scrollDirection = event.angleDelta().y()
+        if scrollDirection > 0:
+            ## scrolling up
+            if self.autoScroll:
+                self.switchAutoScroll.emit( False )
+            super().wheelEvent( event )
+            return
+
+        ## scrolling down
+        super().wheelEvent( event )
+        self._handlePositionChange()
+
+    def _handlePositionChange( self ):
+        verticalBar = self.verticalScrollBar()
+        currValue = verticalBar.value()
+        if verticalBar.maximum() - currValue < 10:
+            ## did reach the bottom
+            self.switchAutoScroll.emit( True )
+
     def _scrollRangeChanged(self, _, maxVal):
+#     def _scrollRangeChanged(self, _, maxVal):
         verticalBar = self.verticalScrollBar()
 #         print( "_scrollRangeChanged", "min:", minVal, "max:", maxVal, "val:", verticalBar.value() )
         if self.autoScroll:
@@ -150,7 +212,7 @@ class LogWidget( QtBaseClass ):           # type: ignore
 
     def _updateText(self):
         if self.ui.splitByThredCB.isChecked() is False:
-            with open(self.logFile, "r") as myfile:
+            with open(self.logFile, "r", encoding="utf-8") as myfile:
                 fileText = myfile.read()
                 content = str(fileText)
                 textEdit = self._getTextEdit( "full" )
@@ -159,14 +221,14 @@ class LogWidget( QtBaseClass ):           # type: ignore
 
         threadsDict = {}
 
-        with open(self.logFile, "r") as myfile:
+        with open(self.logFile, "r", encoding="utf-8") as myfile:
             linesContent = myfile.readlines()
             recentThread = None
             for line in linesContent:
                 fields = line.split()
 
                 threadName = "full"
-                threadLines = threadsDict.get( threadName, list() )
+                threadLines = threadsDict.get( threadName, [] )
                 threadLines.append( line )
                 threadsDict[ threadName ] = threadLines
 
@@ -176,7 +238,7 @@ class LogWidget( QtBaseClass ):           # type: ignore
                 if recentThread is None:
                     continue
 
-                threadLines = threadsDict.get( recentThread, list() )
+                threadLines = threadsDict.get( recentThread, [] )
                 threadLines.append( line )
                 threadsDict[ recentThread ] = threadLines
 
@@ -236,6 +298,7 @@ class LogWidget( QtBaseClass ):           # type: ignore
                 return itemWidget
 
         newTextEdit = AutoScrollTextEdit( self )
+        newTextEdit.switchAutoScroll.connect( self.ui.autoScrollCB.setChecked )
         newTextEdit.setObjectName( name )
         newState = self.ui.autoScrollCB.isChecked()
         newTextEdit.setAutoScroll( newState )

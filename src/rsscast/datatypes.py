@@ -54,11 +54,9 @@ class FeedEntry( persist.Versionable ):
         _LOGGER.info( "converting object from version %s to %s", dictVersion_, self._class_version )
 
         if dictVersion_ is None:
-            dictVersion_ = 0
+            dictVersion_ = -1
 
-        if dictVersion_ < 0:
-            ## nothing to do
-            dictVersion_ = 0
+        dictVersion_ = max(dictVersion_, 0)
 
         if dictVersion_ == 0:
             dict_["enabled"] = True
@@ -84,7 +82,7 @@ class FeedEntry( persist.Versionable ):
 
         for rssItem in self.channel.items:
             videoId = rssItem.videoId()
-            postLocalPath = "%s/%s.mp3" % ( channelPath, videoId )
+            postLocalPath = f"{channelPath}/{videoId}.mp3"
 
             if os.path.exists(postLocalPath):
                 rssItem.mediaSize = os.path.getsize( postLocalPath )
@@ -113,7 +111,7 @@ class FeedEntry( persist.Versionable ):
 
 
 def fetch_feed( feed: FeedEntry ):
-    """Download channel's source RSS"""
+    """Download channel's source RSS."""
     feedId = feed.feedId
     rssChannel: RSSChannel = parse_rss( feedId, feed.url )
     feed.update( rssChannel )
@@ -145,11 +143,9 @@ class FeedContainer( persist.Versionable ):
         _LOGGER.info( "converting object from version %s to %s", dictVersion_, self._class_version )
 
         if dictVersion_ is None:
-            dictVersion_ = 0
+            dictVersion_ = -1
 
-        if dictVersion_ < 0:
-            ## nothing to do
-            dictVersion_ = 0
+        dictVersion_ = max(dictVersion_, 0)
 
 #         if dictVersion_ == 0:
 #             dict_["stockList"] = dict()

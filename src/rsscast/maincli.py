@@ -31,7 +31,7 @@ from typing import List
 
 from PyQt5.QtCore import QCoreApplication
 
-import rsscast.logger as logger
+from rsscast import logger
 
 from rsscast import DATA_DIR
 from rsscast.rss.rssserver import RSSServerManager

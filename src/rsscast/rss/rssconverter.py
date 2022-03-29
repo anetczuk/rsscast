@@ -38,15 +38,15 @@ _LOGGER = logging.getLogger(__name__)
 
 
 def generate_channel_rss( feedId, rssChannel: RSSChannel, downloadContent=True ):
-    """Generate channel's converted RSS"""
+    """Generate channel's converted RSS."""
     host = RSSServerManager.getPrimaryIp()
     generate_rss( host, feedId, rssChannel, downloadContent )
 
 
 def generate_rss( host, feedId, rssChannel: RSSChannel, downloadContent=True ):
-    """Generate channel's converted RSS"""
+    """Generate channel's converted RSS."""
     duration_limit = 60 * 60 * 2        # 2 hours
-    items = list()
+    items = []
     for rssItem in rssChannel.items:
         if rssItem.enabled is False:
             continue
@@ -74,7 +74,7 @@ def download_items( feedId, itemsList: List[RSSItem], videoDurationLimit=None ):
 
         postLink = rssItem.link
         videoId = rssItem.videoId()
-        postLocalPath = "%s/%s.mp3" % ( channelPath, videoId )
+        postLocalPath = f"{channelPath}/{videoId}.mp3"
 
         if not os.path.exists(postLocalPath):
             ## item file not exists -- convert and download
@@ -102,7 +102,7 @@ def remove_item_data( feedId, rssItem: RSSItem ):
     channelPath = get_channel_output_dir( feedId )
 
     videoId = rssItem.videoId()
-    postLocalPath = "%s/%s.mp3" % ( channelPath, videoId )
+    postLocalPath = f"{channelPath}/{videoId}.mp3"
 
     rssItem.mediaSize = -1
 
@@ -130,7 +130,7 @@ def generate_items_rss( host, feedId, rssChannel: RSSChannel, itemsList: List[RS
 #         pprint( rssItem )
 
         videoId = rssItem.videoId()
-        postLocalPath = "%s/%s.mp3" % ( channelPath, videoId )
+        postLocalPath = f"{channelPath}/{videoId}.mp3"
 
         if not os.path.exists(postLocalPath):
             ## item file not exists -- convert and download
@@ -152,7 +152,7 @@ def generate_items_rss( host, feedId, rssChannel: RSSChannel, itemsList: List[RS
         description = fix_url_text( description )       ## fix URLs
         # description = html.escape( description )
 
-        defaultIconURL = "http://%s/rss-icon.png" % ( host )      ## must have absolute path
+        defaultIconURL = f"http://{host}/rss-icon.png"      ## must have absolute path
 
         postTitle = rssItem.itemTitle()
 
@@ -193,7 +193,7 @@ def generate_items_rss( host, feedId, rssChannel: RSSChannel, itemsList: List[RS
 </rss>
 """
 
-    rssOutput = "%s/rss" % channelPath
+    rssOutput = f"{channelPath}/rss"
     _LOGGER.info( "feed %s: writing converted rss output to %s", feedId, rssOutput )
     write_text( result, rssOutput )
 
@@ -202,7 +202,7 @@ def generate_items_rss( host, feedId, rssChannel: RSSChannel, itemsList: List[RS
 
 def fix_url_text( inputText ):
     outputText = inputText
-    link_regex = re.compile( '((https?):((//)|(\\\\))+([\w\d:#@%/;$()~_?\+-=\\\.&](#!)?)*)', re.DOTALL )
+    link_regex = re.compile( r'((https?):((//)|(\\\\))+([\w\d:#@%/;$()~_?\+-=\\\.&](#!)?)*)', re.DOTALL )
     links = re.findall( link_regex, inputText )
     for lnk in links:
         sourceURL = lnk[0]

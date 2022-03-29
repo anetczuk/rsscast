@@ -21,6 +21,8 @@
 # SOFTWARE.
 #
 
+from datetime import timedelta
+
 
 def pprint(variable, indent=0):
     if variable is None:
@@ -43,3 +45,25 @@ def pprint(variable, indent=0):
             pprint( value, indent + 1 )
     else:
         print('\t' * (indent + 1) + str(variable))
+
+
+def print_timedelta( value: timedelta ):
+    s = ""
+    secs = value.seconds
+    days = value.days
+    if secs != 0 or days == 0:
+        mm, _ = divmod(secs, 60)
+        hh, mm = divmod(mm, 60)
+        s = "%d:%02d" % (hh, mm)                                # pylint: disable=C0209
+#         s = "%d:%02d:%02d" % (hh, mm, ss)
+    if days:
+        def plural(n):
+            return n, abs(n) != 1 and "s" or ""
+        if s != "":
+            s = ("%d day%s, " % plural(days)) + s               # pylint: disable=C0209
+        else:
+            s = ("%d day%s" % plural(days)) + s                 # pylint: disable=C0209
+#     micros = value.microseconds
+#     if micros:
+#         s = s + ".%06d" % micros
+    return s

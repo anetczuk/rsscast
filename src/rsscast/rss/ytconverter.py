@@ -31,15 +31,11 @@ from io import BytesIO
 import json
 import re
 
-import urllib.request as request
+from urllib import request
 from urllib.parse import urlencode
 
-import requests
-import pycurl
 import ssl
-# import urllib.request
-
-# from rsscast.pprint import pprint
+import pycurl
 
 from pytube import YouTube
 
@@ -290,7 +286,7 @@ def convert_yt_yt1s( link, output, mimicHuman=True ):
         ## done -- returning
         return True
 
-    except Exception as err:
+    except Exception:                                               # pylint: disable=W0703
         _LOGGER.exception("Unexpected exception", exc_info=False)
         return False
 
@@ -320,8 +316,7 @@ def curl_post( session, targetUrl, dataDict ):
 
 
 def curl_download( session, sourceUrl, outputFile, repeatsOnFail=0 ):
-    if repeatsOnFail < 0:
-        repeatsOnFail = 0
+    repeatsOnFail = max( repeatsOnFail, 0 )
     for _ in range(0, repeatsOnFail):
         try:
             curl_download_raw( session, sourceUrl, outputFile )
@@ -359,27 +354,27 @@ def urlretrieve( url, outputPath ):
 
     ## changed "user-agent" fixes blocking by server
     req = request.Request( url, headers={'User-Agent': 'Mozilla/5.0'} )
-    result = request.urlopen( req, timeout=30, context=ctx_no_secure )
+    with request.urlopen( req, timeout=30, context=ctx_no_secure ) as result:
 
-#     result = request.urlopen( url, context=ctx_no_secure )
-    content_data = result.read()
+    #     result = request.urlopen( url, context=ctx_no_secure )
+        content_data = result.read()
 
-    try:
-        with open(outputPath, 'wb') as of:
-            of.write( content_data )
+        try:
+            with open(outputPath, 'wb') as of:
+                of.write( content_data )
 
-#         content_text = content_data.decode("utf-8")
-#         with open(outputPath, 'wt') as of:
-#             of.write( content_text )
+    #         content_text = content_data.decode("utf-8")
+    #         with open(outputPath, 'wt') as of:
+    #             of.write( content_text )
 
-    except UnicodeDecodeError as ex:
-        _LOGGER.exception( "unable to access: %s %s", url, ex, exc_info=False )
-        raise
+        except UnicodeDecodeError as ex:
+            _LOGGER.exception( "unable to access: %s %s", url, ex, exc_info=False )
+            raise
 
-#     urllib.request.urlretrieve( url, outputPath, context=ctx_no_secure )
-#     urllib.request.urlretrieve( url, outputPath )
+    #     urllib.request.urlretrieve( url, outputPath, context=ctx_no_secure )
+    #     urllib.request.urlretrieve( url, outputPath )
 
-    return content_data
+        return content_data
 
 
 # def simple_download( sourceUrl, outputFile ):

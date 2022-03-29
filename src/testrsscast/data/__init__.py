@@ -37,5 +37,5 @@ def get_data_path( fileName: str ) -> str:
 
 def read_data( fileName: str ) -> str:
     filePath = get_data_path( fileName )
-    with open(filePath, 'r') as file:
+    with open(filePath, 'r', encoding="utf-8") as file:
         return file.read()

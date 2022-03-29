@@ -32,8 +32,6 @@ import requests_file
 import feedparser
 
 from rsscast import DATA_DIR, persist
-import pprint
-# from rsscast.rss.ytconverter import get_media_size
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -69,12 +67,9 @@ class RSSItem( persist.Versionable ):
         _LOGGER.info( "converting object from version %s to %s", dictVersion_, self._class_version )
 
         if dictVersion_ is None:
-            ## nothing to do
-            dictVersion_ = 0
+            dictVersion_ = -1
 
-        if dictVersion_ < 0:
-            ## nothing to do
-            dictVersion_ = 0
+        dictVersion_ = max(dictVersion_, 0)
 
         if dictVersion_ == 0:
             dict_["enabled"] = True
@@ -92,7 +87,7 @@ class RSSItem( persist.Versionable ):
 
     def enclosureURL(self, host, feedId):
         videoId = self.videoId()
-        return "http://%s/feed/%s/%s.mp3" % ( host, feedId, videoId )      ## must have absolute path
+        return f"http://{host}/feed/{feedId}/{videoId}.mp3"             ## must have absolute path
 
     def itemTitle(self):
         return html.escape( self.title )
@@ -116,18 +111,15 @@ class RSSChannel( persist.Versionable ):
         self.title                   = None
         self.link                    = None
         self.publishDate             = None
-        self.items: List[ RSSItem ]  = list()
+        self.items: List[ RSSItem ]  = []
 
     def _convertstate_( self, dict_, dictVersion_ ):
         _LOGGER.info( "converting object from version %s to %s", dictVersion_, self._class_version )
 
         if dictVersion_ is None:
-            ## nothing to do
-            dictVersion_ = 0
+            dictVersion_ = -1
 
-        if dictVersion_ < 0:
-            ## nothing to do
-            dictVersion_ = 0
+        dictVersion_ = max(dictVersion_, 0)
 
         # pylint: disable=W0201
         self.__dict__ = dict_
@@ -282,5 +274,5 @@ def get_channel_output_dir( feedId ):
 
 
 def write_text( content, outputPath ):
-    with open( outputPath, 'wt' ) as fp:
+    with open( outputPath, 'wt', encoding="utf-8" ) as fp:
         fp.write( content )

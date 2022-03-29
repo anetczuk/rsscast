@@ -44,7 +44,7 @@ echo "code checking using flake8"
 ## F401 'PyQt5.QtCore' imported but unused
 ignore_errors=$ignore_errors,F401
 
-flake8 --show-source --statistics --count --ignore=$ignore_errors $src_dir
+python3 -m flake8 --show-source --statistics --count --ignore=$ignore_errors $src_dir
 exit_code=$?
 
 if [ $exit_code -ne 0 ]; then
@@ -57,7 +57,7 @@ echo "flake8 -- no warnings found"
 
 echo "code checking using pylint3"
 
-pylint3 --rcfile=$SCRIPT_DIR/pylint3.config $src_dir/rsscast $src_dir/testrsscast $src_dir/*.py
+pylint --rcfile=$SCRIPT_DIR/pylint3.config $src_dir/rsscast $src_dir/testrsscast $src_dir/*.py
 exit_code=$?
 if [ $exit_code -ne 0 ]; then
     exit $exit_code

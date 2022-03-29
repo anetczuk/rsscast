@@ -82,6 +82,8 @@ class RSSServerManager():
 
     @unique
     class Status(Enum):
+        """Server status."""
+
         STARTED        = 'Started'
         STOPPED        = 'Stopped'
 

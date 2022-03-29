@@ -28,7 +28,7 @@ try:
     ## otherwise will throw exception when executing as parameter for "python -m"
     # pylint: disable=W0611
     import __init__
-except ImportError as error:
+except ImportError:
     ## when import fails then it means that the script was executed indirectly
     ## in this case __init__ is already loaded
     pass
@@ -40,7 +40,7 @@ import argparse
 # from PyQt5 import QtCore
 from PyQt5.QtWidgets import QApplication
 
-import rsscast.logger as logger
+from rsscast import logger
 from rsscast.gui.sigint import setup_interrupt_handling
 from rsscast.gui.widget.logwidget import create_window
 

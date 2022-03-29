@@ -30,7 +30,7 @@ import logging
 
 from PyQt5.QtWidgets import QApplication, QMessageBox
 
-import rsscast.logger as logger
+from rsscast import logger
 
 from rsscast import maincli
 from rsscast.gui.mainwindow import MainWindow

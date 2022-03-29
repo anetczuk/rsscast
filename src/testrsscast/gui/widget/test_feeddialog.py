@@ -23,7 +23,7 @@
 
 import unittest
 
-import rsscast.gui.widget.feeddialog as feeddialog
+from rsscast.gui.widget import feeddialog
 
 
 class FeedDialogTest(unittest.TestCase):

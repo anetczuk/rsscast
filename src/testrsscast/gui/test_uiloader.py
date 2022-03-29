@@ -23,7 +23,7 @@
 
 import unittest
 
-import rsscast.gui.uiloader as uiloader
+from rsscast.gui import uiloader
 
 
 class UiLoaderTest(unittest.TestCase):

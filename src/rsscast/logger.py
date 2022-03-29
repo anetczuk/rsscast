@@ -23,8 +23,8 @@
 
 import os
 import sys
-# import logging
-import logging.handlers
+import logging
+from logging import handlers
 
 
 script_dir = os.path.dirname(__file__)
@@ -34,7 +34,9 @@ log_file = None
 def get_logging_output_file():
     logDir = os.path.join(script_dir, "../../tmp/log")
     logDir = os.path.abspath( logDir )
+    os.makedirs( logDir, exist_ok=True )
     if os.path.isdir( logDir ) is False:
+        ## something bad happened (or unable to create directory)
         logDir = os.getcwd()
 
     logFile = os.path.join(logDir, "log.txt")
@@ -53,8 +55,7 @@ def configure( logFile=None, logLevel=None ):
         logLevel = logging.DEBUG
 
     ## rotation of log files, 1048576 equals to 1MB
-    fileHandler    = logging.handlers.RotatingFileHandler( filename=log_file, mode="a+",
-                                                           maxBytes=1048576, backupCount=999 )
+    fileHandler    = handlers.RotatingFileHandler( filename=log_file, mode="a+", maxBytes=1048576, backupCount=999 )
     ## fileHandler    = logging.FileHandler( filename=log_file, mode="a+" )
     consoleHandler = logging.StreamHandler( stream=sys.stdout )
 
@@ -67,7 +68,7 @@ def configure( logFile=None, logLevel=None ):
     logging.root.addHandler( fileHandler )
     logging.root.setLevel( logLevel )
 
-    logging.getLogger('matplotlib').setLevel(logging.WARNING)
+    logging.getLogger('matplotlib').setLevel( logging.WARNING )
 
 ##     loggerFormat   = '%(asctime)s,%(msecs)-3d %(levelname)-8s %(threadName)s [%(filename)s:%(lineno)d] %(message)s'
 ##     dateFormat     = '%Y-%m-%d %H:%M:%S'
@@ -121,17 +122,3 @@ class EmptyLineFormatter(logging.Formatter):
             # empty
             return msg
         return super().format( record )
-
-
-def get_all_loggers():
-    loggers = [logging.getLogger(name) for name in logging.root.manager.loggerDict]
-    return loggers
-
-
-def get_all_handlers():
-    logHandlers = []
-    logHandlers.append( logging.root.handlers )
-    for name in logging.root.manager.loggerDict:
-        loggerObj = logging.getLogger(name)
-        logHandlers.append( loggerObj.handlers )
-    return logHandlers

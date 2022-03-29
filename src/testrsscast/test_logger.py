@@ -26,7 +26,7 @@ import unittest
 import logging
 import io
 
-import rsscast.logger as logger
+from rsscast import logger
 
 
 class LoggerTest(unittest.TestCase):

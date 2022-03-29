@@ -13,8 +13,6 @@ except ImportError:
     ## in this case __init__ is already loaded
     pass
 
-import os
-import sys
 import logging
 
 from rsscast.rss.ytconverter import get_yt_duration
@@ -32,4 +30,4 @@ duration = get_yt_duration( url )
 length_m = int(duration / 60)
 length_s = int(duration % 60)
 
-print('length: %ss = %sm %ss' % (duration, length_m, length_s) )
+print( f'length: {duration} = {length_m}m {length_s}s' )

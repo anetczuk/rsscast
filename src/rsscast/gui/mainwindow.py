@@ -228,7 +228,7 @@ class MainWindow( QtBaseClass ):           # type: ignore
 
     ## ====================================================================
 
-    def setStatusMessage(self, firstStatus, changeStatus: list=None, timeout=6000):
+    def setStatusMessage(self, firstStatus, changeStatus: list = None, timeout=6000):
         if not changeStatus:
             changeStatus = [ firstStatus + " +", firstStatus + " =" ]
         statusBar = self.statusBar()
