@@ -41,7 +41,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class RSSItem( persist.Versionable ):
-    """RSS item in channel."""
+    """Single RSS item in channel."""
 
     ## 0 - first version
     ## 1 - added 'enabled' field
@@ -102,7 +102,7 @@ class RSSItem( persist.Versionable ):
 
 
 class RSSChannel( persist.Versionable ):
-    """RSS data structure."""
+    """RSS data structure representing channel's RSS with list of items"""
 
     ## 0 - first version
     _class_version = 0
@@ -134,7 +134,7 @@ class RSSChannel( persist.Versionable ):
 #         return self.items
 
     def addItem(self, rssItem: RSSItem):
-        found = self.findItem( rssItem.id )
+        found = self.findItemById( rssItem.id )
         if found is not None:
             return False
         self.items.append( rssItem )
@@ -147,7 +147,7 @@ class RSSChannel( persist.Versionable ):
     def itemIndex(self, rssItem: RSSItem) -> int:
         return self.items.index( rssItem )
 
-    def findItem(self, itemId) -> RSSItem:
+    def findItemById(self, itemId) -> RSSItem:
         for item in self.items:
             if item.id == itemId:
                 return item

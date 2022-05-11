@@ -26,6 +26,7 @@ import glob
 import os
 import re
 from typing import List
+from collections import Counter
 
 from rsscast import persist
 from rsscast.rss.rssparser import parse_rss, RSSChannel, RSSItem,\
@@ -37,6 +38,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class FeedEntry( persist.Versionable ):
+    """RSS channel wrapped in form of entry in channels list"""
 
     ## 0 - first version
     ## 1 - add 'enabled' field
@@ -72,7 +74,20 @@ class FeedEntry( persist.Versionable ):
     def countItems(self):
         return self.channel.size()
 
+    def update(self, channel: RSSChannel):
+        if self.channel is None:
+            self.channel = channel
+            return
+        self.channel.update( channel )
+        
+    def updateFromContent(self, feedContent):
+        rssChannel = RSSChannel()
+        rssChannel.parse( feedContent )
+        self.update( rssChannel )
+
     def updateLocalData(self):
+        """Read media size from files stored locally"""
+        
         if self.channel is None:
             return
         feedId = self.feedId.replace(":", "_")
@@ -89,11 +104,15 @@ class FeedEntry( persist.Versionable ):
             else:
                 rssItem.mediaSize = -1
 
-    def update(self, channel: RSSChannel):
+    def fixRepeatedTitles( self ):
         if self.channel is None:
-            self.channel = channel
             return
-        self.channel.update( channel )
+        titleCounter = Counter()
+        for rssItem in self.channel.items:
+            titleCounter.update( [rssItem.title] )
+            counted = titleCounter[ rssItem.title ]
+            if counted > 1:
+                rssItem.title += " [R" + str(counted) + "]"
 
     def addItem(self, rssItem: RSSItem):
         if self.channel is None:
@@ -116,6 +135,7 @@ def fetch_feed( feed: FeedEntry ):
     rssChannel: RSSChannel = parse_rss( feedId, feed.url )
     feed.update( rssChannel )
     feed.updateLocalData()
+    feed.fixRepeatedTitles()
 
 
 def parse_feed( feed: FeedEntry ):
@@ -132,6 +152,7 @@ def parse_feed( feed: FeedEntry ):
 
 
 class FeedContainer( persist.Versionable ):
+    """RSS channels list"""
 
     ## 0 - first version
     _class_version = 0
@@ -195,6 +216,7 @@ class FeedContainer( persist.Versionable ):
 
 
 class UserContainer():
+    """Application's user data container"""
 
     ## 0 - first version
     ## 1 - feed container

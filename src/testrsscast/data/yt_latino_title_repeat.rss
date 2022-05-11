@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns:yt="http://www.youtube.com/xml/schemas/2015" xmlns:media="http://search.yahoo.com/mrss/" xmlns="http://www.w3.org/2005/Atom">
+ <link rel="self" href="http://www.youtube.com/feeds/videos.xml?channel_id=UCBrGE6cmFbcwzlwAyIDMGpw"/>
+ <id>yt:channel:UCBrGE6cmFbcwzlwAyIDMGpw</id>
+ <yt:channelId>UCBrGE6cmFbcwzlwAyIDMGpw</yt:channelId>
+ <title>YouTube Latinoamérica</title>
+ <link rel="alternate" href="https://www.youtube.com/channel/UCBrGE6cmFbcwzlwAyIDMGpw"/>
+ <author>
+  <name>YouTube Latinoamérica</name>
+  <uri>https://www.youtube.com/channel/UCBrGE6cmFbcwzlwAyIDMGpw</uri>
+ </author>
+ <published>2013-10-07T19:27:52+00:00</published>
+  
+ <entry>
+  <id>yt:video:kztwPl8QQTA</id>
+  <yt:videoId>kztwPl8QQTA</yt:videoId>
+  <yt:channelId>UCBrGE6cmFbcwzlwAyIDMGpw</yt:channelId>
+  <title>Desde Casa #Conmigo</title>
+  <link rel="alternate" href="https://www.youtube.com/watch?v=kztwPl8QQTA"/>
+  <author>
+   <name>YouTube Latinoamérica</name>
+   <uri>https://www.youtube.com/channel/UCBrGE6cmFbcwzlwAyIDMGpw</uri>
+  </author>
+  <published>2020-10-09T20:58:27+00:00</published>
+  <updated>2020-12-21T10:24:22+00:00</updated>
+  <media:group>
+   <media:title>Desde Casa #Conmigo</media:title>
+   <media:content url="https://www.youtube.com/v/kztwPl8QQTA?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i4.ytimg.com/vi/kztwPl8QQTA/hqdefault.jpg" width="480" height="360"/>
+   <media:description></media:description>
+   <media:community>
+    <media:starRating count="2549" average="3.00" min="1" max="5"/>
+    <media:statistics views="10377332"/>
+   </media:community>
+  </media:group>
+ </entry>
+ 
+ <entry>
+  <id>yt:video:kztwPl8QQTA2</id>
+  <yt:videoId>kztwPl8QQTA2</yt:videoId>
+  <yt:channelId>UCBrGE6cmFbcwzlwAyIDMGpw2</yt:channelId>
+  <title>Desde Casa #Conmigo</title>
+  <link rel="alternate" href="https://www.youtube.com/watch?v=kztwPl8QQTA2"/>
+  <author>
+   <name>YouTube Latinoamérica</name>
+   <uri>https://www.youtube.com/channel/UCBrGE6cmFbcwzlwAyIDMGpw2</uri>
+  </author>
+  <published>2020-10-09T20:58:27+00:00</published>
+  <updated>2020-12-21T10:24:22+00:00</updated>
+  <media:group>
+   <media:title>Desde Casa #Conmigo</media:title>
+   <media:content url="https://www.youtube.com/v/kztwPl8QQTA?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i4.ytimg.com/vi/kztwPl8QQTA/hqdefault.jpg" width="480" height="360"/>
+   <media:description></media:description>
+   <media:community>
+    <media:starRating count="2549" average="3.00" min="1" max="5"/>
+    <media:statistics views="10377332"/>
+   </media:community>
+  </media:group>
+ </entry>
+ 
+ <entry>
+  <id>yt:video:omY5FahfTrI</id>
+  <yt:videoId>omY5FahfTrI</yt:videoId>
+  <yt:channelId>UCBrGE6cmFbcwzlwAyIDMGpw</yt:channelId>
+  <title>#RegresoAClases con Julioprofe</title>
+  <link rel="alternate" href="https://www.youtube.com/watch?v=omY5FahfTrI"/>
+  <author>
+   <name>YouTube Latinoamérica</name>
+   <uri>https://www.youtube.com/channel/UCBrGE6cmFbcwzlwAyIDMGpw</uri>
+  </author>
+  <published>2020-08-24T20:58:16+00:00</published>
+  <updated>2020-12-28T23:27:31+00:00</updated>
+  <media:group>
+   <media:title>#RegresoAClases con Julioprofe</media:title>
+   <media:content url="https://www.youtube.com/v/omY5FahfTrI?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i4.ytimg.com/vi/omY5FahfTrI/hqdefault.jpg" width="480" height="360"/>
+   <media:description>Ya estamos más que listos para este regreso a clases, y aunque son tiempo extraordinarios, sabemos que con la ayuda de Julioprofe estaremos aprendiendo y disfrutando de la escuela.</media:description>
+   <media:community>
+    <media:starRating count="1496" average="4.30" min="1" max="5"/>
+    <media:statistics views="22636"/>
+   </media:community>
+  </media:group>
+ </entry>
+</feed>
