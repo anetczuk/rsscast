@@ -149,7 +149,7 @@ def generate_items_rss( host, feedId, rssChannel: RSSChannel, itemsList: List[RS
             mediaThumbnailNode = f"""<media:thumbnail url="{rssItem.thumb_url}" width="{rssItem.thumb_width}" height="{rssItem.thumb_height}"/>"""
 
         description = rssItem.summary
-        description = fix_url_text( description )       ## fix URLs
+        description = fix_description( description )       ## fix URLs
         # description = html.escape( description )
 
         defaultIconURL = f"http://{host}/rss-icon.png"      ## must have absolute path
@@ -200,7 +200,7 @@ def generate_items_rss( host, feedId, rssChannel: RSSChannel, itemsList: List[RS
     return succeed
 
 
-def fix_url_text( inputText ):
+def fix_description( inputText ):
     outputText = inputText
     link_regex = re.compile( r'((https?):((//)|(\\\\))+([\w\d:#@%/;$()~_?\+-=\\\.&](#!)?)*)', re.DOTALL )
     links = re.findall( link_regex, inputText )
@@ -211,6 +211,9 @@ def fix_url_text( inputText ):
         if fixedURL is None:
             continue
         outputText = outputText.replace( sourceURL, fixedURL )
+
+    ## fix invalid token reported by AntennaPod
+    outputText = re.sub( r" & ", " &amp; ", outputText )
 
     return outputText
 

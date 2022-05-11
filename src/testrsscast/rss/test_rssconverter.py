@@ -23,7 +23,7 @@
 
 import unittest
 
-from rsscast.rss.rssconverter import fix_url, fix_url_text
+from rsscast.rss.rssconverter import fix_url, fix_description
 
 
 class RSSConverterTest(unittest.TestCase):
@@ -43,8 +43,13 @@ class RSSConverterTest(unittest.TestCase):
         fixedURL = fix_url( "https://www.xyz.com/aaa?bbb=ccc&sub;ddd=1" )
         self.assertEqual( fixedURL, "https://www.xyz.com/aaa?bbb=ccc&amp;subddd=1" )
 
-    def test_fix_url_text_semicolon(self):
+    def test_fix_description_semicolon(self):
         text = "Word https://www.xyz.com/aaa?bbb=ccc&sub;ddd=1 other word http://example.com/blah"
-        fixedText = fix_url_text( text )
+        fixedText = fix_description( text )
         self.assertEqual( fixedText,
                           "Word https://www.xyz.com/aaa?bbb=ccc&amp;subddd=1 other word http://example.com/blah" )
+
+    def test_fix_description_and(self):
+        text = "aaa & bbb & ccc"
+        fixedText = fix_description( text )
+        self.assertEqual( fixedText, "aaa &amp; bbb &amp; ccc" )
