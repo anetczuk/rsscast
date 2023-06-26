@@ -38,6 +38,7 @@ import ssl
 import pycurl
 
 from pytube import YouTube
+# import pafy
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -93,13 +94,33 @@ def read_yt_rss_from_source( site_content ):
 
 
 ## returns value in seconds
-def get_yt_duration( link ):
+def get_yt_duration_pytube( link ):
     try:
         yt = YouTube( link )
+        # pprint.pprint( yt.vid_info )
+        video_info  = yt.vid_info
+        status_info = video_info.get( "playabilityStatus", {} )
+        status      = status_info.get( "status", "Ok" )
+        if status == "ERROR":
+            reason = status_info.get( "reason", "" )
+            _LOGGER.error( "unable to get length of video, reason: %s", reason )
+            return -1
+
         return yt.length
     except TypeError as e:
-        _LOGGER.warning( "unable to get video duration: %s", e )
+        _LOGGER.exception( "unable to get video duration: %s", e )
     return -1
+
+
+# def get_yt_duration_pafy( link ):
+#     video = pafy.new( link )
+#     return video.length
+
+
+## requires "youtube_dl"
+def get_yt_duration( link ):
+    return get_yt_duration_pytube( link )
+    # return get_yt_duration_pafy( link )
 
 
 def convert_yt( link, output, mimicHuman=True ):
