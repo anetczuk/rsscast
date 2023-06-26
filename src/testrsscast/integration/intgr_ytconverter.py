@@ -36,7 +36,7 @@ else:
     length_s = int(duration % 60)
     _LOGGER.info( f'length: {duration} = {length_m}m {length_s}s' )
 
-output_path = "/tmp/test_convert.mp4"
+output_path = "/tmp/test_convert.data"
 _LOGGER.info( "converting video: %s into %s", url, output_path )
 
 status = convert_yt( url, output_path )

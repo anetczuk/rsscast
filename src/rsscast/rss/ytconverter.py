@@ -39,6 +39,7 @@ import pycurl
 
 from pytube import YouTube
 # import pafy
+import filetype
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -125,7 +126,15 @@ def get_yt_duration( link ):
 
 def convert_yt( link, output, mimicHuman=True ):
 #     return convert_yt_dwnldr( link, output )
-    return convert_yt_yt1s( link, output, mimicHuman )
+    succeed = convert_yt_yt1s( link, output, mimicHuman )
+    if not succeed:
+        return False
+    kind = filetype.guess( output )
+    if kind.extension != "mp3":
+        _LOGGER.error( f"failed to convert '{link}' - bad type ({kind.extension})" )
+        os.remove( output )
+        return False
+    return True
 
 
 ## ===================================================================

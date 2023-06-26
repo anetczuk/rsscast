@@ -6,3 +6,4 @@ watchdog
 #youtube-dl
 ## required to read video duration
 pytube
+filetype
