@@ -165,9 +165,12 @@ class RSSChannelTableModel( QAbstractTableModel ):
 
     def attribute(self, entry: RSSItem, index):
         if index == 0:
-            modelIndex = self.getIndex( entry )
-            row = modelIndex.row()
-            return row + 1
+            entry_index = self._rawData.itemIndex( entry )
+            return entry_index + 1
+            # ## very slow on large lists
+            # modelIndex = self.getIndex( entry )
+            # row = modelIndex.row()
+            # return row + 1
         if index == 1:
             return entry.title
         if index == 2:
