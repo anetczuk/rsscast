@@ -142,6 +142,7 @@ def convert_yt( link, output, mimicHuman=True ):
     if kind is None:
         ## server respond with HTML page instead of audio file
         _LOGGER.warning( f"failed to convert '{link}' - trying other method" )
+        os.remove( output )
 
         succeed = convert_yt_y2down( link, output )
         if not succeed:
@@ -161,6 +162,7 @@ def convert_yt( link, output, mimicHuman=True ):
         _LOGGER.error( f"failed to convert '{link}' - bad type ({kind.extension})" )
         os.remove( output )
         return False
+
     return True
 
 
