@@ -37,7 +37,8 @@ class YtconverterTest(unittest.TestCase):
         ## Called after testfunction was executed
         pass
 
-    def test_read_yt_rss_from_source(self):
+    def test_read_yt_channel_rss_from_source(self):
+        # get RSS address from channel webpage
         siteContent = read_data( "wideoprezentacje.html" )
 
         rss_url_data = read_yt_rss_from_source( siteContent )

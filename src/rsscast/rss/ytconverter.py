@@ -48,6 +48,7 @@ import filetype
 _LOGGER = logging.getLogger(__name__)
 
 
+# read name and URL of RSS
 def read_yt_rss( yt_url ):
     try:
         buffer = BytesIO()

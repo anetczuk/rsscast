@@ -77,6 +77,32 @@ class RSSChannelTest(unittest.TestCase):
         self.assertTrue( items is not None )
         self.assertEqual( len(items), 0 )
 
+    def test_parse_playlist(self):
+        feedContent = read_data( "yt_playlist.rss" )
+        channel = RSSChannel()
+        channel.parse( feedContent )
+
+        self.assertTrue( channel is not None )
+        self.assertEqual( "Gwiazdowski mówi Interii", channel.title )
+        self.assertEqual( "https://www.youtube.com/channel/UC0DpwRtGw4K9tNLnUJqx9qA", channel.link )
+        self.assertEqual( "2022-09-06T05:28:43+00:00", channel.publishDate )
+
+        items = channel.items
+        self.assertTrue( items is not None )
+        self.assertEqual( len(items), 15 )
+
+        self.assertEqual( "yt:video:KQYfHfqjV1Q", items[0].id )
+        self.assertEqual( "https://www.youtube.com/watch?v=KQYfHfqjV1Q", items[0].link )
+        self.assertEqual( "Gwiazdowski mówi Interii. Odc. 1: Kłamstwo bardziej atrakcyjne od prawdy", items[0].title )
+        self.assertEqual( "Felietonista Interii Bizne", items[0].summary[0:26] )
+        self.assertEqual( "2022-09-06T14:30:04+00:00", items[0].publishDate )
+        self.assertEqual( "https://i4.ytimg.com/vi/KQYfHfqjV1Q/hqdefault.jpg", items[0].thumb_url )
+        self.assertEqual( "480", items[0].thumb_width )
+        self.assertEqual( "360", items[0].thumb_height )
+
+        self.assertEqual( "yt:video:CortTsAlPD0", items[1].id )
+        self.assertEqual( "yt:video:uQnqMPe4S08", items[2].id )
+
     def test_update(self):
         channelFrom = RSSChannel()
         channelFrom.addItem( RSSItem( itemId="xxx1", link="aaa1" ) )
