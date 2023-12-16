@@ -61,11 +61,11 @@ def parse_playlist( feedId, video_url, items_num=15 ) -> RSSChannel:
     with YoutubeDL(params) as ydl:
         info_dict = ydl.extract_info(video_url, download=False)
 
-    channel_epoch = info_dict.get("epoch")
+    channel_modified_date = info_dict.get("modified_date")
     data_feed = {
         "title": info_dict.get("title"),
         "href": info_dict.get("channel_url"),
-        "published": epoch_to_datetime(channel_epoch)
+        "published": num_date_to_date(channel_modified_date)
     }
 
     data_entries = []
@@ -77,14 +77,14 @@ def parse_playlist( feedId, video_url, items_num=15 ) -> RSSChannel:
             continue
         yt_id = yt_entry["id"]
         thumb_dict = get_thumbnail_data(yt_entry)
-        item_epoch = yt_entry.get("epoch")
+        item_upload_date = yt_entry.get("upload_date")
         item = {
             "id": f"yt:video:{yt_id}",
             "title": yt_entry.get("title", ""),
             "link": yt_link,
             "media_thumbnail": thumb_dict,
             "summary": yt_entry.get("description", ""),
-            "published": epoch_to_datetime(item_epoch)
+            "published": num_date_to_date(item_upload_date)
         }
         data_entries.append(item)
 
@@ -108,6 +108,13 @@ def parse_playlist( feedId, video_url, items_num=15 ) -> RSSChannel:
 def epoch_to_datetime(epoch_value):
     date_time = datetime.datetime.fromtimestamp(epoch_value, tz=datetime.timezone.utc)
     return date_time.isoformat()
+
+
+# input format: '20171027'
+# output format: '2014-05-24'
+def num_date_to_date(num_date):
+    date_time = datetime.datetime.strptime(num_date, "%Y%m%d")
+    return date_time.date().isoformat()
 
 
 def get_thumbnail_data(yt_entry):

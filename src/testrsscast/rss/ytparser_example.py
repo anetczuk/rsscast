@@ -34,6 +34,8 @@ except ImportError:
     pass
 
 import sys
+import json
+import pprint
 
 from rsscast import logger
 from rsscast.rss.rssparser import RSSChannel
@@ -47,22 +49,28 @@ def parse(url) -> RSSChannel:
     return parse_url("xxx", url, write_content=False)
 
 
+def get_json(obj):
+    return json.loads(
+        json.dumps(obj, default=lambda o: getattr(o, '__dict__', str(o)))
+    )
+
+
 def main():
     logger.configure()
 
     # check case - should return 15 items
     data: RSSChannel = parse("http://www.youtube.com/feeds/videos.xml?user=KNPvsUE")
     print("user case found items:", data.size())
-
+    
     # check case - should return 15 items
     # Niebezpiecznik
     data: RSSChannel = parse("https://www.youtube.com/feeds/videos.xml?channel_id=UCe6nK69Yc1zna7QSJEfA9pw")
     print("channel case found items:", data.size())
-
+    
     # check case - should return 15 items
     data: RSSChannel = parse("https://www.youtube.com/user/KNPvsUE")
     print("channel case found items:", data.size())
-
+    
     # check case - should return 15 items
     data: RSSChannel = parse("https://www.youtube.com/@NiebezpiecznikTV/videos")
     print("playlist case found items:", data.size())
@@ -70,6 +78,10 @@ def main():
     # wideoprezentacje sublist
     data: RSSChannel = parse("https://www.youtube.com/playlist?list=PLE58asSGZSR3PC9dKk9taK9YDvlcUphzv")
     print("playlist case found items:", data.size())
+    pprint.pprint( get_json(data) )
+
+
+# =============================================================
 
 
 if __name__ == '__main__':
