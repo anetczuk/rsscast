@@ -7,3 +7,4 @@ watchdog
 ## required to read video duration
 pytube
 filetype
+yt-dlp

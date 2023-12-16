@@ -26,6 +26,8 @@ import logging
 from typing import List
 from functools import cmp_to_key
 
+# import pprint
+
 import html
 import requests
 import requests_file
@@ -163,24 +165,47 @@ class RSSChannel( persist.Versionable ):
 
     def parse(self, feedContent):
         parsedDict = feedparser.parse( feedContent )
-
         if parsedDict.get('bozo', False):
             reason = parsedDict.get('bozo_exception', "<unknown>")
             _LOGGER.warning( "malformed rss detected, reason %s", reason )
-            return
+            return False
 
-#         pprint.pprint( parsedDict )
+        parsedDict = feedparser.parse( feedContent )
+        # pprint.pprint( parsedDict )
+        return self.parseData(parsedDict)
 
-#         _LOGGER.info( "detected entries %s", len(parsedDict.entries) )
-    #     pprint( parsedDict.feed )
-    #     pprint( parsedDict.entries )
+    def parseData(self, parsedDict):
+        """ Parse data dict.
 
+        Expects following dict:
+        {
+            "feed": {
+                "title": string
+                "href": string
+                "published": string, in format '2014-05-24T20:50:40+00:00'
+            }
+            "entries": [ {
+                    "id": string
+                    "title": string
+                    "link": string
+                    "media_thumbnail": [ {
+                            "url": string
+                            "width": string
+                            "height": string
+                        }
+                    ]
+                    "summary": string
+                    "published": string, in format '2020-06-14T13:45:00+00:00'
+                }
+            ]
+        }
+        """
         parsedFeed = parsedDict['feed']
         self.title = parsedFeed['title']
         self.link = parsedFeed.get('href', "")
         self.publishDate = parsedFeed.get('published', "")
 
-        for post in parsedDict.entries:
+        for post in parsedDict.get('entries', []):
     #         pprint( post )
 
             rssItem = RSSItem()
@@ -205,6 +230,8 @@ class RSSChannel( persist.Versionable ):
 #                 rssItem.mediaSize = linkSize
 
             self.addItem( rssItem )
+
+        return True
 
     def _sortItems( self ):
 #         def sort_key( rssItem: RSSItem ):
@@ -244,15 +271,18 @@ class RSSChannel( persist.Versionable ):
 ## ============================================================
 
 
-def parse_rss( feedId, feedUrl ) -> RSSChannel:
+def parse_rss( feedId, feedUrl, write_content=True ) -> RSSChannel:
     _LOGGER.info( "feed %s: reading url %s", feedId, feedUrl )
     feedContent = read_url( feedUrl )
-    channelPath = get_channel_output_dir( feedId )
-    sourceRSS = os.path.abspath( os.path.join(channelPath, "source.rss") )
-    write_text( feedContent, sourceRSS )
+    if write_content:
+        channelPath = get_channel_output_dir( feedId )
+        sourceRSS = os.path.abspath( os.path.join(channelPath, "source.rss") )
+        write_text( feedContent, sourceRSS )
     _LOGGER.info( "feed %s: parsing rss", feedId )
     rssChannel = RSSChannel()
-    rssChannel.parse( feedContent )
+    if not rssChannel.parse( feedContent ):
+        # unable to parse
+        return None
     _LOGGER.info( "feed %s: parsing done", feedId )
     return rssChannel
 

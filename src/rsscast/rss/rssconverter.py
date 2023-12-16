@@ -152,8 +152,6 @@ def generate_items_rss( host, feedId, rssChannel: RSSChannel, itemsList: List[RS
         description = fix_description( description )       ## fix URLs
         # description = html.escape( description )
 
-        defaultIconURL = f"http://{host}/rss-icon.png"      ## must have absolute path
-
         postTitle = rssItem.itemTitle()
 
         item_result = f"""
@@ -171,6 +169,8 @@ def generate_items_rss( host, feedId, rssChannel: RSSChannel, itemsList: List[RS
         </item>
 """
         items_result += item_result
+
+    defaultIconURL = f"http://{host}/rss-icon.png"      ## must have absolute path
 
     result = f"""<rss version="2.0"
  xmlns:content="http://purl.org/rss/1.0/modules/content/"

@@ -51,3 +51,4 @@ For example `Id` field with value `examplechannel` will lead to following RSS: `
 - https://www.rssboard.org/rss-profile
 - https://yt1s.com
 - https://docs.python.org/3/library/http.server.html
+- https://github.com/yt-dlp/yt-dlp

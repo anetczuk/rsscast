@@ -270,7 +270,7 @@ def convert_yt_y2down( link, output ):
         if recent_progress_value == progress_value:
             stalled_progress_counter += 1
             if stalled_progress_counter >= 20:
-                _LOGGER.info( f"downloading stalled - breaking" )
+                _LOGGER.info( "downloading stalled - breaking" )
                 return False
         else:
             recent_progress_value = progress_value
@@ -494,7 +494,7 @@ def urlretrieve( url, outputPath=None, timeout=30, write_empty=True ):
         content_data = result.read()
 
         if outputPath:
-            if len(content_data) > 0 or write_empty: 
+            if len(content_data) > 0 or write_empty:
                 try:
                     with open(outputPath, 'wb') as of:
                         of.write( content_data )
@@ -506,7 +506,7 @@ def urlretrieve( url, outputPath=None, timeout=30, write_empty=True ):
                 except UnicodeDecodeError as ex:
                     _LOGGER.exception( "unable to access: %s %s", url, ex, exc_info=False )
                     raise
-    
+
         #     urllib.request.urlretrieve( url, outputPath, context=ctx_no_secure )
         #     urllib.request.urlretrieve( url, outputPath )
 

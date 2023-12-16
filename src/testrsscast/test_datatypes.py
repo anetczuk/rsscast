@@ -39,12 +39,12 @@ class FeedEntryTest(unittest.TestCase):
     def test_fixRepeatedTitles(self):
         feedContent = read_data( "yt_latino_title_repeat.rss" )
         self.entry.updateFromContent( feedContent )
-        
+
         self.entry.fixRepeatedTitles()
 
         channel = self.entry.channel
         self.assertEqual( channel.size(), 3 )
-        
+
         self.assertEqual( channel.get(0).title, "#RegresoAClases con Julioprofe" )
         self.assertEqual( channel.get(1).title, "Desde Casa #Conmigo" )
         self.assertEqual( channel.get(2).title, "Desde Casa #Conmigo [R2]" )

@@ -36,14 +36,14 @@ def test_01():
         length_m = int(duration / 60)
         length_s = int(duration % 60)
         _LOGGER.info( f'length: {duration} = {length_m}m {length_s}s' )
-    
+
     output_path = "/tmp/test_convert_00.data"
     _LOGGER.info( "converting video: %s into %s", url, output_path )
-    
+
     status = convert_yt( url, output_path )
     _LOGGER.info( "conversion status: %s", status )
     if not status:
-        _LOGGER.error( "===== test failed: unable to convert video" ) 
+        _LOGGER.error( "===== test failed: unable to convert video" )
 
 
 def test_02():
