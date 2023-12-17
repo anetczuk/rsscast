@@ -26,6 +26,8 @@ import datetime
 
 # import pprint
 
+import requests
+
 from yt_dlp import YoutubeDL
 
 from rsscast.rss.rssparser import RSSChannel, parse_rss
@@ -55,11 +57,22 @@ def parse_url( feedId, feedUrl, full_list=False, write_content=True ) -> RSSChan
 def parse_playlist( feedId, video_url, items_num=15 ) -> RSSChannel:
     _LOGGER.info( "feed %s: reading url %s", feedId, video_url )
 
-    params = {"skip_download": True,
-              "playlist_items": f"1:{items_num}"}
-
-    with YoutubeDL(params) as ydl:
-        info_dict = ydl.extract_info(video_url, download=False)
+    info_dict = fetch_info(video_url, items_num)
+    
+    # import pprint
+    # # pprint.pprint(info_dict)
+    #
+    # entries_list = []
+    # for item in info_dict.get("entries"):
+    #     yt_link = item.get("url", "")
+    #     if not yt_link:
+    #         continue
+    #     with YoutubeDL(params) as ydl:
+    #         vid_info_dict = ydl.extract_info(yt_link, download=False, process=False)
+    #     entries_list.append(vid_info_dict)
+    # info_dict["entries"] = entries_list
+    #
+    # pprint.pprint(info_dict)
 
     channel_modified_date = info_dict.get("modified_date")
     data_feed = {
@@ -73,6 +86,7 @@ def parse_playlist( feedId, video_url, items_num=15 ) -> RSSChannel:
     yt_entries = info_dict.get('entries', [])
     for yt_entry in yt_entries:
         yt_link = yt_entry.get("original_url", "")
+        # yt_link = yt_entry.get("original_url", "")
         if not yt_link:
             continue
         yt_id = yt_entry["id"]
@@ -104,6 +118,16 @@ def parse_playlist( feedId, video_url, items_num=15 ) -> RSSChannel:
     return rssChannel
 
 
+def fetch_info(video_url, items_num=15):
+    params = {"skip_download": True,
+              "playlist_items": f"1:{items_num}"}
+
+    with YoutubeDL(params) as ydl:
+        info_dict = ydl.extract_info(video_url, download=False, process=True)
+        # info_dict = ydl.extract_info(video_url, download=False, process=False)
+        return info_dict
+
+
 # output format: '2014-05-24T20:50:40+00:00'
 def epoch_to_datetime(epoch_value):
     date_time = datetime.datetime.fromtimestamp(epoch_value, tz=datetime.timezone.utc)
@@ -118,16 +142,61 @@ def num_date_to_date(num_date):
 
 
 def get_thumbnail_data(yt_entry):
-    thumb_url = yt_entry.get("thumbnail")
-    if not thumb_url:
-        return [{}]
-    ret_dict = {
-        "url": thumb_url
-    }
+    # thumb_url = yt_entry.get("thumbnail")
+    # if not thumb_url:
+    #     return [{}]
+    # ret_dict = {
+    #     "url": thumb_url
+    # }
+
+    ret_dict = {}
+
+    # thumbs_list = yt_entry.get("thumbnails", [])
+    # for thumb_item in reversed(thumbs_list):
+    #     thumb_url = thumb_item.get("url")
+    #     thumb_url = check_url(thumb_url)
+    #     if not thumb_url:
+    #         continue
+    #
+    #     ret_dict["url"] = thumb_url
+    #
+    #     width = thumb_item.get('width')
+    #     if width:
+    #         ret_dict["width"] = width
+    #     height = thumb_item.get('height')
+    #     if height:
+    #         ret_dict["height"] = height
+    #
+    #     # found valid thumbnail
+    #     break
+
     thumbs_list = yt_entry.get("thumbnails", [])
-    for thumb_item in thumbs_list:
-        if thumb_item["url"] == thumb_url:
-            ret_dict["width"] = thumb_item.get("width", "")
-            ret_dict["height"] = thumb_item.get("height", "")
-            break
+    if thumbs_list:
+        thumb_item = thumbs_list[-1]
+        ret_dict["url"] = thumb_item.get("url")
+        ret_dict["width"] = thumb_item.get("width")
+        ret_dict["height"] = thumb_item.get("height")
+
+    # for thumb_item in thumbs_list:
+    #     if thumb_item["url"] == thumb_url:
+    #         ret_dict["width"] = thumb_item.get("width", "")
+    #         ret_dict["height"] = thumb_item.get("height", "")
+    #         break
+
     return [ret_dict]
+
+
+def check_url(thumb_url):
+    if not thumb_url:
+        return thumb_url
+    try:
+        headers = {
+            'User-Agent': 'My User Agent 1.0'
+        }
+        response = requests.head(thumb_url, timeout=15, headers=headers, allow_redirects=True)
+        # _LOGGER.info("link %s response code: %s", url, response.status_code)
+        if response.status_code == 200:
+            return thumb_url
+        return None
+    except requests.exceptions.ConnectionError:
+        return None

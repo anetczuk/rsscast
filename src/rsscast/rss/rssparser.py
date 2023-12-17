@@ -219,8 +219,12 @@ class RSSChannel( persist.Versionable ):
             if 'media_thumbnail' in post:
                 thumbnail = post['media_thumbnail'][0]
                 rssItem.thumb_url    = thumbnail['url']
-                rssItem.thumb_width  = thumbnail['width']
-                rssItem.thumb_height = thumbnail['height']
+                width = thumbnail.get('width')
+                if width:
+                    rssItem.thumb_width = width
+                height = thumbnail.get('height')
+                if height:
+                    rssItem.thumb_height = height
 
             rssItem.summary = post.get('summary', '')
             rssItem.publishDate = post['published']

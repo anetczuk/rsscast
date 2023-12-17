@@ -1,6 +1,6 @@
 # RssCast
 
-Convert (forward) Youtube RSS channels to podcast RSS.
+Convert (forward) Youtube channels and playlists to podcast RSS.
 
 Main rationale behind the project was to provide simple and lightweight application allowing to
 provide Youtube videos in form of audio feed. Application does not need any form of Youtube API key.
