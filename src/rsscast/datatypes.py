@@ -74,6 +74,9 @@ class FeedEntry( persist.Versionable ):
     def countItems(self):
         return self.channel.size()
 
+    def getItemsURLs(self):
+        return self.channel.getItemsURLs()
+
     def update(self, channel: RSSChannel):
         if self.channel is None:
             self.channel = channel
@@ -133,13 +136,9 @@ class FeedEntry( persist.Versionable ):
 
 def fetch_feed( feed: FeedEntry ):
     """Download channel's source RSS."""
-    feedId = feed.feedId
-    rssChannel: RSSChannel = None
-    if feed.countItems() < 1:
-        # empty list
-        rssChannel = parse_url( feedId, feed.url, full_list=True )
-    else:
-        rssChannel = parse_url( feedId, feed.url )
+    current_links = feed.getItemsURLs()
+    rssChannel: RSSChannel = parse_url( feed.feedId, feed.url, known_items=current_links )
+    _LOGGER.info( "updating feed %s with %s new items", feed.feedId, rssChannel.size() )
     feed.update( rssChannel )
     feed.updateLocalData()
     feed.fixRepeatedTitles()

@@ -139,6 +139,9 @@ class RSSChannel( persist.Versionable ):
 #     def getList(self) -> List[  RSSItem ]:
 #         return self.items
 
+    def getItemsURLs(self):
+        return { item.link for item in self.items }
+
     def addItem(self, rssItem: RSSItem):
         found = self.findItemById( rssItem.id )
         if found is not None:

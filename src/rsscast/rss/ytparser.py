@@ -41,15 +41,16 @@ _LOGGER = logging.getLogger(__name__)
 ## ============================================================
 
 
-def parse_url( feedId, feedUrl, full_list=False, write_content=True ) -> RSSChannel:
+def parse_url( feedId, feedUrl, write_content=True, known_items=None ) -> RSSChannel:
     # 'parse_rss' for backward compatibility
     channel = parse_rss(feedId, feedUrl, write_content)
     if channel:
         return channel
-    if full_list:
+    if not known_items:
+        # empty list
         channel = parse_playlist_raw(feedUrl, items_num=9999)
     else:
-        channel = parse_playlist_raw(feedUrl)
+        channel = parse_playlist_lazy(feedUrl, known_items=known_items)
     if channel:
         return channel
     # no data found
@@ -128,7 +129,7 @@ def convert_info_to_channel(info_dict) -> RSSChannel:
     # pprint.pprint(feedContent)
 
     _LOGGER.info( "feed parsing done" )
-    _LOGGER.info( "adding feed items" )
+    _LOGGER.info( "adding feed items %s", len(data_entries) )
 
     rssChannel = RSSChannel()
     if not rssChannel.parseData( feedContent ):

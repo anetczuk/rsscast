@@ -137,12 +137,12 @@ def generate_items_rss( rssChannel: RSSChannel, itemsList: List[RSSItem],
                 _LOGGER.info( "feed %s: unable to find video: %s", feed_dir_name, postLocalPath )
                 continue
 
-        enclosure_size = 0
-        try:
-            file_stats = os.stat(postLocalPath)
-            enclosure_size = file_stats.st_size
-        except FileNotFoundError:
-            pass
+        enclosure_size = rssItem.localFileSize()
+        if not enclosure_size or enclosure_size < 0:
+            try:
+                enclosure_size = os.path.getsize( postLocalPath )
+            except OSError:
+                enclosure_size = 0
 
         postLink = rssItem.link
         postTitle = rssItem.title
