@@ -42,6 +42,9 @@ _LOGGER = logging.getLogger(__name__)
 ## ============================================================
 
 
+FEED_SUBDIR = "feed"
+
+
 class RSSItem( persist.Versionable ):
     """Single RSS item in channel."""
 
@@ -87,9 +90,10 @@ class RSSItem( persist.Versionable ):
     def videoId(self):
         return self.id.replace(":", "_")
 
-    def enclosureURL(self, host, feedId):
+    # returns public URL to resource
+    def getExternalURL(self, host, feedId):
         videoId = self.videoId()
-        return f"http://{host}/feed/{feedId}/{videoId}.mp3"             ## must have absolute path
+        return f"http://{host}/{FEED_SUBDIR}/{feedId}/{videoId}.mp3"             ## must have absolute path
 
     def itemTitle(self):
         return html.escape( self.title )
@@ -301,8 +305,8 @@ def read_url( urlpath ):
     return response.text
 
 
-def get_channel_output_dir( feedId ):
-    channelPath = os.path.abspath( os.path.join(DATA_DIR, "feed", feedId) )
+def get_channel_output_dir( feed_dir_name ):
+    channelPath = os.path.abspath( os.path.join(DATA_DIR, FEED_SUBDIR, feed_dir_name) )
     os.makedirs( channelPath, exist_ok=True )
     return channelPath
 

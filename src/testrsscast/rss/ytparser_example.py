@@ -39,7 +39,7 @@ import pprint
 
 from rsscast import logger
 from rsscast.rss.rssparser import RSSChannel
-from rsscast.rss.ytparser import parse_url
+from rsscast.rss.ytparser import parse_url, parse_playlist_raw
 
 
 ## https://github.com/yt-dlp/yt-dlp
@@ -58,27 +58,37 @@ def get_json(obj):
 def main():
     logger.configure()
 
-    # check case - should return 15 items
-    data: RSSChannel = parse("http://www.youtube.com/feeds/videos.xml?user=KNPvsUE")
-    print("user case found items:", data.size())
-    
-    # check case - should return 15 items
-    # Niebezpiecznik
-    data: RSSChannel = parse("https://www.youtube.com/feeds/videos.xml?channel_id=UCe6nK69Yc1zna7QSJEfA9pw")
-    print("channel case found items:", data.size())
-    
-    # check case - should return 15 items
-    data: RSSChannel = parse("https://www.youtube.com/user/KNPvsUE")
-    print("channel case found items:", data.size())
-    
-    # check case - should return 15 items
-    data: RSSChannel = parse("https://www.youtube.com/@NiebezpiecznikTV/videos")
-    print("playlist case found items:", data.size())
+    # info_dict = fetch_info("https://www.youtube.com/watch?v=oONGCDBU32I")
+    # pprint.pprint(info_dict)
+    # return
 
-    # wideoprezentacje sublist
-    data: RSSChannel = parse("https://www.youtube.com/playlist?list=PLE58asSGZSR3PC9dKk9taK9YDvlcUphzv")
-    print("playlist case found items:", data.size())
-    pprint.pprint( get_json(data) )
+    # # check case - should return 15 items
+    # data: RSSChannel = parse("http://www.youtube.com/feeds/videos.xml?user=KNPvsUE")
+    # print("user case found items:", data.size())
+    #
+    # # check case - should return 15 items
+    # # Niebezpiecznik
+    # data: RSSChannel = parse("https://www.youtube.com/feeds/videos.xml?channel_id=UCe6nK69Yc1zna7QSJEfA9pw")
+    # print("channel case found items:", data.size())
+    #
+    # # check case - should return 15 items
+    # data: RSSChannel = parse("https://www.youtube.com/user/KNPvsUE")
+    # print("channel case found items:", data.size())
+    #
+    # # check case - should return 15 items
+    # data: RSSChannel = parse("https://www.youtube.com/@NiebezpiecznikTV/videos")
+    # print("playlist case found items:", data.size())
+
+    url = "https://www.youtube.com/playlist?list=PLC9xjKm8G0LpgFgi-eF4YgvtMuogd1dHw"
+    channel_data: RSSChannel = parse_playlist_raw(url, items_num=2)     # gwiazdowski
+    print("playlist case found items:", channel_data.size())
+    print("extracted rss channel data:")
+    ret_dict = get_json(channel_data)
+    pprint.pprint( ret_dict )
+
+    # content = generate_items_rss( channel_data, channel_data.items, "host.xxx", "feedxxx", "/tmp/xxx",
+    #                               store=False, check_local=False )
+    # print(content)
 
 
 # =============================================================
