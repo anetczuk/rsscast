@@ -75,7 +75,7 @@ feedContent = read_data( "yt_latino_short.rss" )
 # feedContent = read_data( "yt_konfederacja.rss" )
 
 rssChannel = RSSChannel()
-rssChannel.parse( feedContent )
+rssChannel.parseRSS( feedContent )
 generate_rss( hostAddress, "test/abc", rssChannel )
 
 

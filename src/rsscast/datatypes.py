@@ -87,7 +87,7 @@ class FeedEntry( persist.Versionable ):
 
     def updateFromContent(self, feedContent):
         rssChannel = RSSChannel()
-        rssChannel.parse( feedContent )
+        rssChannel.parseRSS( feedContent )
         self.update( rssChannel )
 
     def updateLocalData(self):
@@ -137,7 +137,7 @@ class FeedEntry( persist.Versionable ):
 def fetch_feed( feed: FeedEntry ):
     """Download channel's source RSS."""
     current_links = feed.getItemsURLs()
-    rssChannel: RSSChannel = parse_url( feed.feedId, feed.url, known_items=current_links )
+    rssChannel: RSSChannel = parse_url( feed.feedId, feed.url, known_items=current_links, write_content=False )
     _LOGGER.info( "updating feed %s with %s new items", feed.feedId, rssChannel.size() )
     feed.update( rssChannel )
     feed.updateLocalData()

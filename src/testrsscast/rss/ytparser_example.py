@@ -80,7 +80,8 @@ def main():
     # print("playlist case found items:", data.size())
 
     url = "https://www.youtube.com/playlist?list=PLC9xjKm8G0LpgFgi-eF4YgvtMuogd1dHw"
-    channel_data: RSSChannel = parse_playlist_raw(url, items_num=2)     # gwiazdowski
+    channel_data: RSSChannel = parse_playlist_raw(url, items_num=10)     # gwiazdowski
+    channel_data.sort()
     print("playlist case found items:", channel_data.size())
     print("extracted rss channel data:")
     ret_dict = get_json(channel_data)

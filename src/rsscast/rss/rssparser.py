@@ -23,6 +23,7 @@
 
 import os
 import logging
+import datetime
 from typing import List
 from functools import cmp_to_key
 
@@ -32,6 +33,7 @@ import html
 import requests
 import requests_file
 import feedparser
+from email import utils
 
 from rsscast import DATA_DIR, persist
 
@@ -51,14 +53,15 @@ class RSSItem( persist.Versionable ):
     ## 0 - first version
     ## 1 - added 'enabled' field
     ## 2 - added 'mediaSize' field
-    _class_version = 2
+    ## 3 - publishDate as datetime.datetime
+    _class_version = 3
 
     def __init__(self, itemId=None, link=None):
         self.id = itemId
         self.link = link
         self.title = None
         self.summary = None
-        self.publishDate = None
+        self.publishDate: datetime.datetime = None
         self.mediaSize = -1                 ## in bytes
 
         ## thumbnail
@@ -84,6 +87,10 @@ class RSSItem( persist.Versionable ):
             dict_["mediaSize"] = -1
             dictVersion_ = 2
 
+        if dictVersion_ == 2:
+            dict_["publishDate"] = convert_string_to_datetime( dict_["publishDate"] )
+            dictVersion_ = 3
+
         # pylint: disable=W0201
         self.__dict__ = dict_
 
@@ -106,17 +113,21 @@ class RSSItem( persist.Versionable ):
     def switchEnabled(self):
         self.enabled = not self.enabled
 
+    def getPublishDateRFC(self):
+        return datetime_to_RFC(self.publishDate)
+
 
 class RSSChannel( persist.Versionable ):
     """RSS data structure representing channel's RSS with list of items"""
 
     ## 0 - first version
-    _class_version = 0
+    ## 1 - publishDate as datetime.datetime
+    _class_version = 1
 
     def __init__(self):
         self.title                   = None
         self.link                    = None
-        self.publishDate             = None
+        self.publishDate: datetime.datetime = None
         self.items: List[ RSSItem ]  = []
 
     def _convertstate_( self, dict_, dictVersion_ ):
@@ -127,8 +138,18 @@ class RSSChannel( persist.Versionable ):
 
         dictVersion_ = max(dictVersion_, 0)
 
+        sort_items = False
+
+        if dictVersion_ < 1:
+            dict_["publishDate"] = convert_string_to_datetime( dict_["publishDate"] )
+            sort_items = True
+            dictVersion_ = 1
+
         # pylint: disable=W0201
         self.__dict__ = dict_
+
+        if sort_items:
+            self._sortItems()
 
     def size(self):
         return len( self.items )
@@ -141,6 +162,12 @@ class RSSChannel( persist.Versionable ):
 
     def getItemsURLs(self):
         return { item.link for item in self.items }
+
+    def getPublishDateRFC(self):
+        return datetime_to_RFC(self.publishDate)
+
+    def sort(self):
+        self._sortItems()
 
     def addItem(self, rssItem: RSSItem):
         found = self.findItemById( rssItem.id )
@@ -170,11 +197,11 @@ class RSSChannel( persist.Versionable ):
             self.addItem( item )
         self._sortItems()
 
-    def parse(self, feedContent):
+    def parseRSS(self, feedContent):
         parsedDict = feedparser.parse( feedContent )
         if parsedDict.get('bozo', False):
             reason = parsedDict.get('bozo_exception', "<unknown>")
-            _LOGGER.warning( "malformed rss detected, reason %s", reason )
+            _LOGGER.warning( "channel[%s]: malformed rss detected, reason %s", self.title, reason )
             return False
 
         parsedDict = feedparser.parse( feedContent )
@@ -210,7 +237,8 @@ class RSSChannel( persist.Versionable ):
         parsedFeed = parsedDict['feed']
         self.title = parsedFeed['title']
         self.link = parsedFeed.get('href', "")
-        self.publishDate = parsedFeed.get('published', "")
+        pub_date = parsedFeed.get('published', "")
+        self.publishDate = datetime.datetime.fromisoformat( pub_date )
 
         for post in parsedDict.get('entries', []):
     #         pprint( post )
@@ -234,7 +262,7 @@ class RSSChannel( persist.Versionable ):
                     rssItem.thumb_height = height
 
             rssItem.summary = post.get('summary', '')
-            rssItem.publishDate = post['published']
+            rssItem.publishDate = datetime.datetime.fromisoformat( post['published'] )
 
 #             linkSize = get_media_size( rssItem.link, False )
 #             if linkSize != None:
@@ -291,7 +319,7 @@ def parse_rss( feedId, feedUrl, write_content=True ) -> RSSChannel:
         write_text( feedContent, sourceRSS )
     _LOGGER.info( "feed %s: parsing rss", feedId )
     rssChannel = RSSChannel()
-    if not rssChannel.parse( feedContent ):
+    if not rssChannel.parseRSS( feedContent ):
         # unable to parse
         return None
     _LOGGER.info( "feed %s: parsing done", feedId )
@@ -317,3 +345,21 @@ def get_channel_output_dir( feed_dir_name ):
 def write_text( content, outputPath ):
     with open( outputPath, 'wt', encoding="utf-8" ) as fp:
         fp.write( content )
+
+
+# output format: 'Wed, 02 Oct 2002 15:00:00 +0200'
+def datetime_to_RFC(datetime_object: datetime.datetime):
+    if datetime_object is None:
+        return None
+    return utils.format_datetime(datetime_object)
+
+
+def convert_string_to_datetime(datetime_string):
+    if datetime_string is None:
+        return None
+    try:
+        return datetime.datetime.fromisoformat( datetime_string )
+    except ValueError as exc:
+        _LOGGER.warning("unable to convert: %s", exc)
+
+    return utils.parsedate_to_datetime( datetime_string )

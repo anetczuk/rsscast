@@ -26,7 +26,6 @@ import datetime
 
 # import pprint
 
-from email import utils
 from xml.sax.saxutils import escape
 import requests
 
@@ -174,19 +173,18 @@ def reduce_entry_info(item):
         item["tags"] = "tags_reduced"
 
 
-# output format: '2014-05-24T20:50:40+00:00'
+# output string, in format '2014-05-24T20:50:40+00:00'
 def epoch_to_datetime(epoch_value):
     date_time = datetime.datetime.fromtimestamp(epoch_value, tz=datetime.timezone.utc)
     return date_time.isoformat()
 
 
 # input format: '20171027'
-# output must be an RFC-822 date-time
-# output format: 'Wed, 02 Oct 2002 15:00:00 +0200'
+# output string, in format '2014-05-24T20:50:40+00:00'
 def num_date_to_datetime(num_date):
     date_time = datetime.datetime.strptime(num_date, "%Y%m%d")
-    return utils.format_datetime(date_time)
-    # return date_time.isoformat()
+    # return utils.format_datetime(date_time)
+    return date_time.isoformat()
 
 
 def get_thumbnail_data(yt_entry):

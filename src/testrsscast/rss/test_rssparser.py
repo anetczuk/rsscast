@@ -22,6 +22,7 @@
 #
 
 import unittest
+import datetime
 
 from rsscast.rss.rssparser import RSSChannel, RSSItem
 
@@ -40,12 +41,14 @@ class RSSChannelTest(unittest.TestCase):
     def test_parse(self):
         feedContent = read_data( "yt_latino_short.rss" )
         channel = RSSChannel()
-        channel.parse( feedContent )
+        channel.parseRSS( feedContent )
 
         self.assertTrue( channel is not None )
         self.assertEqual( channel.title, "YouTube Latinoamérica" )
         self.assertEqual( channel.link, "https://www.youtube.com/channel/UCBrGE6cmFbcwzlwAyIDMGpw" )
-        self.assertEqual( channel.publishDate, "2013-10-07T19:27:52+00:00" )
+        self.assertEqual( channel.publishDate, datetime.datetime(2013, 10, 7, 19, 27, 52,
+                                                                 tzinfo=datetime.timezone.utc) )
+        self.assertEqual( channel.getPublishDateRFC(), "Mon, 07 Oct 2013 19:27:52 +0000" )
 
         items = channel.items
         self.assertTrue( items is not None )
@@ -55,7 +58,9 @@ class RSSChannelTest(unittest.TestCase):
         self.assertEqual( items[0].link, "https://www.youtube.com/watch?v=omY5FahfTrI" )
         self.assertEqual( items[0].title, "#RegresoAClases con Julioprofe" )
         self.assertEqual( items[0].summary[0:26], "Ya estamos más que listos " )
-        self.assertEqual( items[0].publishDate, "2020-08-24T20:58:16+00:00" )
+        self.assertEqual( items[0].publishDate, datetime.datetime(2020, 8, 24, 20, 58, 16,
+                                                                  tzinfo=datetime.timezone.utc) )
+        self.assertEqual( items[0].getPublishDateRFC(), "Mon, 24 Aug 2020 20:58:16 +0000" )
         self.assertEqual( items[0].thumb_url, "https://i4.ytimg.com/vi/omY5FahfTrI/hqdefault.jpg" )
         self.assertEqual( items[0].thumb_width, "480" )
         self.assertEqual( items[0].thumb_height, "360" )
@@ -66,12 +71,13 @@ class RSSChannelTest(unittest.TestCase):
     def test_parse_404(self):
         feedContent = read_data( "404.rss" )
         channel = RSSChannel()
-        channel.parse( feedContent )
+        channel.parseRSS( feedContent )
 
         self.assertTrue( channel is not None )
         self.assertEqual( channel.title, None )
         self.assertEqual( channel.link, None )
         self.assertEqual( channel.publishDate, None )
+        self.assertEqual( channel.getPublishDateRFC(), None )
 
         items = channel.items
         self.assertTrue( items is not None )
@@ -80,12 +86,13 @@ class RSSChannelTest(unittest.TestCase):
     def test_parse_playlist(self):
         feedContent = read_data( "yt_playlist.rss" )
         channel = RSSChannel()
-        channel.parse( feedContent )
+        channel.parseRSS( feedContent )
 
         self.assertTrue( channel is not None )
         self.assertEqual( "Gwiazdowski mówi Interii", channel.title )
         self.assertEqual( "https://www.youtube.com/channel/UC0DpwRtGw4K9tNLnUJqx9qA", channel.link )
-        self.assertEqual( "2022-09-06T05:28:43+00:00", channel.publishDate )
+        self.assertEqual( channel.publishDate, datetime.datetime(2022, 9, 6, 5, 28, 43, tzinfo=datetime.timezone.utc) )
+        self.assertEqual( channel.getPublishDateRFC(), "Tue, 06 Sep 2022 05:28:43 +0000" )
 
         items = channel.items
         self.assertTrue( items is not None )
@@ -95,7 +102,8 @@ class RSSChannelTest(unittest.TestCase):
         self.assertEqual( "https://www.youtube.com/watch?v=KQYfHfqjV1Q", items[0].link )
         self.assertEqual( "Gwiazdowski mówi Interii. Odc. 1: Kłamstwo bardziej atrakcyjne od prawdy", items[0].title )
         self.assertEqual( "Felietonista Interii Bizne", items[0].summary[0:26] )
-        self.assertEqual( "2022-09-06T14:30:04+00:00", items[0].publishDate )
+        self.assertEqual( items[0].publishDate, datetime.datetime(2022, 9, 6, 14, 30, 4, tzinfo=datetime.timezone.utc) )
+        self.assertEqual( items[0].getPublishDateRFC(), "Tue, 06 Sep 2022 14:30:04 +0000" )
         self.assertEqual( "https://i4.ytimg.com/vi/KQYfHfqjV1Q/hqdefault.jpg", items[0].thumb_url )
         self.assertEqual( "480", items[0].thumb_width )
         self.assertEqual( "360", items[0].thumb_height )

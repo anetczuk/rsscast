@@ -170,7 +170,7 @@ def generate_items_rss( rssChannel: RSSChannel, itemsList: List[RSSItem],
         <item>
             <title>{postTitle}</title>
             <link>{postLink}</link>
-            <pubDate>{rssItem.publishDate}</pubDate>
+            <pubDate>{rssItem.getPublishDateRFC()}</pubDate>
             <guid>{rssItem.id}</guid>
             {mediaThumbnailNode}
 
@@ -185,6 +185,14 @@ def generate_items_rss( rssChannel: RSSChannel, itemsList: List[RSSItem],
     rss_url = f"http://{host}/feed/{feed_dir_name}/rss"     ## must have absolute path
     defaultIconURL = f"http://{host}/rss-icon.png"          ## must have absolute path
 
+    # <!--
+    # <image>
+    #   <url>https://cppcast.com/static/cppcast-logo-square.png</url>
+    #   <title>CppCast</title>
+    #   <link>https://cppcast.com</link>
+    # </image>
+    # -->
+
     result = f"""<rss version="2.0"
  xmlns:content="http://purl.org/rss/1.0/modules/content/"
  xmlns:media="http://search.yahoo.com/mrss/"
@@ -195,7 +203,7 @@ def generate_items_rss( rssChannel: RSSChannel, itemsList: List[RSSItem],
         <title>{rssChannel.title}</title>
         <link>{rssChannel.link}</link>
         <description>YouTube channel converted to RSS by RSSCast service.</description>
-        <lastBuildDate>{rssChannel.publishDate}</lastBuildDate>
+        <lastBuildDate>{rssChannel.getPublishDateRFC()}</lastBuildDate>
         <copyright></copyright>
         <image>
             <url>{defaultIconURL}</url>
