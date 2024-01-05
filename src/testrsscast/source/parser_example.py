@@ -38,8 +38,10 @@ import json
 import pprint
 
 from rsscast import logger
-from rsscast.rss.rssparser import RSSChannel
-from rsscast.rss.ytparser import parse_url, parse_playlist_raw
+from rsscast.rss.rsschannel import RSSChannel
+
+from rsscast.source.youtube.ytdlpparser import parse_playlist_raw
+from rsscast.source.parser import parse_url
 
 
 ## https://github.com/yt-dlp/yt-dlp
@@ -70,7 +72,24 @@ def main():
     # # Niebezpiecznik
     # data: RSSChannel = parse("https://www.youtube.com/feeds/videos.xml?channel_id=UCe6nK69Yc1zna7QSJEfA9pw")
     # print("channel case found items:", data.size())
-    #
+
+    # # przygody przedsiebiorcow
+    # # check case - should return 15 items
+    # channel_data: RSSChannel = parse("https://www.youtube.com/feeds/videos.xml?channel_id=UCjHJwETvfm2y9vPIyJpVgZA")
+    # channel_data.sort()
+    # print("channel case found items:", channel_data.size())
+    # print("extracted rss channel data:")
+    # ret_dict = get_json(channel_data)
+    # pprint.pprint( ret_dict )
+
+    url = "https://www.youtube.com/@PrzygodyPrzedsiebiorcow/videos"
+    channel_data: RSSChannel = parse_playlist_raw(url, items_num=10)
+    channel_data.sort()
+    print("playlist case found items:", channel_data.size())
+    print("extracted rss channel data:")
+    ret_dict = get_json(channel_data)
+    pprint.pprint( ret_dict )
+
     # # check case - should return 15 items
     # data: RSSChannel = parse("https://www.youtube.com/user/KNPvsUE")
     # print("channel case found items:", data.size())
@@ -79,13 +98,14 @@ def main():
     # data: RSSChannel = parse("https://www.youtube.com/@NiebezpiecznikTV/videos")
     # print("playlist case found items:", data.size())
 
-    url = "https://www.youtube.com/playlist?list=PLC9xjKm8G0LpgFgi-eF4YgvtMuogd1dHw"
-    channel_data: RSSChannel = parse_playlist_raw(url, items_num=10)     # gwiazdowski
-    channel_data.sort()
-    print("playlist case found items:", channel_data.size())
-    print("extracted rss channel data:")
-    ret_dict = get_json(channel_data)
-    pprint.pprint( ret_dict )
+    # ## gwaizdowski
+    # url = "https://www.youtube.com/playlist?list=PLC9xjKm8G0LpgFgi-eF4YgvtMuogd1dHw"
+    # channel_data: RSSChannel = parse_playlist_raw(url, items_num=10)     # gwiazdowski
+    # channel_data.sort()
+    # print("playlist case found items:", channel_data.size())
+    # print("extracted rss channel data:")
+    # ret_dict = get_json(channel_data)
+    # pprint.pprint( ret_dict )
 
     # content = generate_items_rss( channel_data, channel_data.items, "host.xxx", "feedxxx", "/tmp/xxx",
     #                               store=False, check_local=False )

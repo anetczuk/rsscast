@@ -22,33 +22,34 @@
 #
 
 import unittest
-from testrsscast.data import read_data
 
-from rsscast.datatypes import FeedEntry
-from rsscast.rss.rsschannel import RSSChannel
-from rsscast.source.youtube.ytfeedparser import parse_rss_content
+from rsscast.rss.rssgenerator import fix_url, fix_description
 
 
-class FeedEntryTest(unittest.TestCase):
+class RSSConverterTest(unittest.TestCase):
     def setUp(self):
         ## Called before testfunction is executed
-        self.entry = FeedEntry()
+        pass
 
     def tearDown(self):
         ## Called after testfunction was executed
-        self.entry = None
+        pass
 
-    def test_fixRepeatedTitles(self):
-        feedContent = read_data( "yt_latino_title_repeat.rss" )
-        rssChannel = RSSChannel()
-        parse_rss_content(rssChannel, feedContent )
-        self.entry.update( rssChannel )
+    def test_fix_url_valid(self):
+        fixedURL = fix_url( "https://www.xyz.com/aaa" )
+        self.assertIsNone( fixedURL )
 
-        self.entry.fixRepeatedTitles()
+    def test_fix_url_semicolon(self):
+        fixedURL = fix_url( "https://www.xyz.com/aaa?bbb=ccc&sub;ddd=1" )
+        self.assertEqual( fixedURL, "https://www.xyz.com/aaa?bbb=ccc&amp;subddd=1" )
 
-        channel = self.entry.channel
-        self.assertEqual( channel.size(), 3 )
+    def test_fix_description_semicolon(self):
+        text = "Word https://www.xyz.com/aaa?bbb=ccc&sub;ddd=1 other word http://example.com/blah"
+        fixedText = fix_description( text )
+        self.assertEqual( fixedText,
+                          "Word https://www.xyz.com/aaa?bbb=ccc&amp;subddd=1 other word http://example.com/blah" )
 
-        self.assertEqual( channel.get(0).title, "#RegresoAClases con Julioprofe" )
-        self.assertEqual( channel.get(1).title, "Desde Casa #Conmigo" )
-        self.assertEqual( channel.get(2).title, "Desde Casa #Conmigo [R2]" )
+    def test_fix_description_and(self):
+        text = "aaa & bbb & ccc"
+        fixedText = fix_description( text )
+        self.assertEqual( fixedText, "aaa &amp; bbb &amp; ccc" )

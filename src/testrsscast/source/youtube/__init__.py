@@ -21,28 +21,8 @@
 # SOFTWARE.
 #
 
-import unittest
+import sys
+import os
 
-from rsscast.rss.ytconverter import read_yt_rss_from_source
-
-from testrsscast.data import read_data
-
-
-class YtconverterTest(unittest.TestCase):
-    def setUp(self):
-        ## Called before testfunction is executed
-        pass
-
-    def tearDown(self):
-        ## Called after testfunction was executed
-        pass
-
-    def test_read_yt_channel_rss_from_source(self):
-        # get RSS address from channel webpage
-        siteContent = read_data( "wideoprezentacje.html" )
-
-        rss_url_data = read_yt_rss_from_source( siteContent )
-        self.assertTrue( rss_url_data is not None )
-        self.assertEqual( rss_url_data[0], "wideoprezentacje" )
-        self.assertEqual( rss_url_data[1],
-                          "https://www.youtube.com/feeds/videos.xml?channel_id=UCViVL2aOkLWKcFVi0_p6u6g" )
+#### append source root
+sys.path.append(os.path.abspath( os.path.join(os.path.dirname(__file__), "..", "..", "..") ))

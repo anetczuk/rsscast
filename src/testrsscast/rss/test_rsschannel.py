@@ -22,33 +22,27 @@
 #
 
 import unittest
-from testrsscast.data import read_data
 
-from rsscast.datatypes import FeedEntry
-from rsscast.rss.rsschannel import RSSChannel
-from rsscast.source.youtube.ytfeedparser import parse_rss_content
+from rsscast.rss.rsschannel import RSSChannel, RSSItem
 
 
-class FeedEntryTest(unittest.TestCase):
+class RSSChannelTest(unittest.TestCase):
     def setUp(self):
         ## Called before testfunction is executed
-        self.entry = FeedEntry()
+        pass
 
     def tearDown(self):
         ## Called after testfunction was executed
-        self.entry = None
+        pass
 
-    def test_fixRepeatedTitles(self):
-        feedContent = read_data( "yt_latino_title_repeat.rss" )
-        rssChannel = RSSChannel()
-        parse_rss_content(rssChannel, feedContent )
-        self.entry.update( rssChannel )
+    def test_update(self):
+        channelFrom = RSSChannel()
+        channelFrom.addItem( RSSItem( itemId="xxx1", link="aaa1" ) )
+        channelFrom.addItem( RSSItem( itemId="xxx2" ) )
+        self.assertEqual( len( channelFrom.items ), 2 )
 
-        self.entry.fixRepeatedTitles()
-
-        channel = self.entry.channel
-        self.assertEqual( channel.size(), 3 )
-
-        self.assertEqual( channel.get(0).title, "#RegresoAClases con Julioprofe" )
-        self.assertEqual( channel.get(1).title, "Desde Casa #Conmigo" )
-        self.assertEqual( channel.get(2).title, "Desde Casa #Conmigo [R2]" )
+        channelTo = RSSChannel()
+        channelTo.addItem( RSSItem( itemId="xxx1", link="aaa1-b" ) )
+        channelTo.update( channelFrom )
+        self.assertEqual( len( channelTo.items ), 2 )
+        self.assertEqual( channelTo.items[0].link, "aaa1-b" )

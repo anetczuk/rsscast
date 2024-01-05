@@ -29,9 +29,9 @@ from typing import List
 from collections import Counter
 
 from rsscast import persist
-from rsscast.rss.rssparser import RSSChannel, RSSItem, get_channel_output_dir
-from rsscast.rss.rssconverter import generate_channel_rss, remove_item_data
-from rsscast.rss.ytparser import parse_url
+from rsscast.rss.rsschannel import RSSChannel, RSSItem, get_channel_output_dir
+from rsscast.rss.rssgenerator import generate_channel_rss, remove_item_data
+from rsscast.source.parser import parse_url
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -84,11 +84,6 @@ class FeedEntry( persist.Versionable ):
         if channel is None:
             return
         self.channel.update( channel )
-
-    def updateFromContent(self, feedContent):
-        rssChannel = RSSChannel()
-        rssChannel.parseRSS( feedContent )
-        self.update( rssChannel )
 
     def updateLocalData(self):
         """Read media size from files stored locally"""

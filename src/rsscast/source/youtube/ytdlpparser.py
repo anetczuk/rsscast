@@ -31,7 +31,7 @@ import requests
 
 from yt_dlp import YoutubeDL
 
-from rsscast.rss.rssparser import RSSChannel, parse_rss
+from rsscast.rss.rsschannel import RSSChannel
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -40,38 +40,22 @@ _LOGGER = logging.getLogger(__name__)
 ## ============================================================
 
 
-def parse_url( feedId, feedUrl, write_content=True, known_items=None ) -> RSSChannel:
-    # 'parse_rss' for backward compatibility
-    channel = parse_rss(feedId, feedUrl, write_content)
-    if channel:
-        return channel
-    if not known_items:
-        # empty list
-        channel = parse_playlist_raw(feedUrl, items_num=9999)
-    else:
-        channel = parse_playlist_lazy(feedUrl, known_items=known_items)
-    if channel:
-        return channel
-    # no data found
-    return RSSChannel()
+def parse_playlist_raw( page_url, items_num=15 ) -> RSSChannel:
+    _LOGGER.info( "feed raw parsing url %s", page_url )
 
-
-def parse_playlist_raw( video_url, items_num=15 ) -> RSSChannel:
-    _LOGGER.info( "feed raw parsing url %s", video_url )
-
-    info_dict = fetch_info(video_url, items_num)
+    info_dict = fetch_info(page_url, items_num)
     reduce_info(info_dict)
 
     return convert_info_to_channel(info_dict)
 
 
-def parse_playlist_lazy( video_url, known_items=None ) -> RSSChannel:
-    _LOGGER.info( "feed lazy parsing url %s", video_url )
+def parse_playlist_lazy( page_url, known_items=None ) -> RSSChannel:
+    _LOGGER.info( "feed lazy parsing url %s", page_url )
 
     if not known_items:
         known_items = set()
 
-    info_dict = fetch_info(video_url, items_num=9999, process=False)
+    info_dict = fetch_info(page_url, items_num=9999, process=False)
 
     entries_list = []
     entries_gen = info_dict.get("entries")

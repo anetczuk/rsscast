@@ -21,35 +21,30 @@
 # SOFTWARE.
 #
 
-import unittest
+import logging
 
-from rsscast.rss.rssconverter import fix_url, fix_description
+from rsscast.rss.rsschannel import RSSChannel
+from rsscast.source.youtube.ytfeedparser import parse_rss
+from rsscast.source.youtube.ytdlpparser import parse_playlist_raw, parse_playlist_lazy
 
 
-class RSSConverterTest(unittest.TestCase):
-    def setUp(self):
-        ## Called before testfunction is executed
-        pass
+_LOGGER = logging.getLogger(__name__)
 
-    def tearDown(self):
-        ## Called after testfunction was executed
-        pass
 
-    def test_fix_url_valid(self):
-        fixedURL = fix_url( "https://www.xyz.com/aaa" )
-        self.assertIsNone( fixedURL )
+## ============================================================
 
-    def test_fix_url_semicolon(self):
-        fixedURL = fix_url( "https://www.xyz.com/aaa?bbb=ccc&sub;ddd=1" )
-        self.assertEqual( fixedURL, "https://www.xyz.com/aaa?bbb=ccc&amp;subddd=1" )
 
-    def test_fix_description_semicolon(self):
-        text = "Word https://www.xyz.com/aaa?bbb=ccc&sub;ddd=1 other word http://example.com/blah"
-        fixedText = fix_description( text )
-        self.assertEqual( fixedText,
-                          "Word https://www.xyz.com/aaa?bbb=ccc&amp;subddd=1 other word http://example.com/blah" )
-
-    def test_fix_description_and(self):
-        text = "aaa & bbb & ccc"
-        fixedText = fix_description( text )
-        self.assertEqual( fixedText, "aaa &amp; bbb &amp; ccc" )
+def parse_url( feedId, feedUrl, write_content=True, known_items=None ) -> RSSChannel:
+    # 'parse_rss' for backward compatibility
+    channel = parse_rss(feedId, feedUrl, write_content)
+    if channel:
+        return channel
+    if not known_items:
+        # empty list
+        channel = parse_playlist_raw(feedUrl, items_num=9999)
+    else:
+        channel = parse_playlist_lazy(feedUrl, known_items=known_items)
+    if channel:
+        return channel
+    # no data found
+    return RSSChannel()

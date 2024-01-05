@@ -31,9 +31,10 @@ import argparse
 import json
 
 from rsscast import logger
-from rsscast.rss.rssparser import RSSChannel
-from rsscast.rss.rssconverter import generate_items_rss
-from rsscast.rss.ytparser import reduce_info, convert_info_to_channel
+from rsscast.rss.rsschannel import RSSChannel
+from rsscast.rss.rssgenerator import generate_items_rss
+from rsscast.source.youtube.ytfeedparser import parse_rss_content
+from rsscast.source.youtube.ytdlpparser import reduce_info, convert_info_to_channel
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -47,7 +48,7 @@ def process_ytrss(args):
         input_data = in_file.read()
 
     rssChannel = RSSChannel()
-    if not rssChannel.parseRSS( input_data ):
+    if not parse_rss_content(rssChannel, input_data ):
         # unable to parse
         return
     write_channel_rss(rssChannel, output_dir_path)

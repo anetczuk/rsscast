@@ -31,10 +31,6 @@ from functools import cmp_to_key
 
 import html
 from email import utils
-import feedparser
-
-import requests
-import requests_file
 
 from rsscast import DATA_DIR, persist
 
@@ -198,17 +194,6 @@ class RSSChannel( persist.Versionable ):
             self.addItem( item )
         self._sortItems()
 
-    def parseRSS(self, feedContent):
-        parsedDict = feedparser.parse( feedContent )
-        if parsedDict.get('bozo', False):
-            reason = parsedDict.get('bozo_exception', "<unknown>")
-            _LOGGER.warning( "channel[%s]: malformed rss detected, reason %s", self.title, reason )
-            return False
-
-        parsedDict = feedparser.parse( feedContent )
-        # pprint.pprint( parsedDict )
-        return self.parseData(parsedDict)
-
     def parseData(self, parsedDict):
         """ Parse data dict.
 
@@ -311,42 +296,10 @@ class RSSChannel( persist.Versionable ):
 ## ============================================================
 
 
-def parse_rss( feedId, feedUrl, write_content=True ) -> RSSChannel:
-    _LOGGER.info( "feed %s: reading url %s", feedId, feedUrl )
-    feedContent = read_url( feedUrl )
-
-    if write_content:
-        channelPath = get_channel_output_dir( feedId )
-        sourceRSS = os.path.abspath( os.path.join(channelPath, "source.rss") )
-        write_text( feedContent, sourceRSS )
-    _LOGGER.info( "feed %s: parsing rss", feedId )
-    rssChannel = RSSChannel()
-    if not rssChannel.parseRSS( feedContent ):
-        # unable to parse
-        return None
-    _LOGGER.info( "feed %s: parsing done", feedId )
-    return rssChannel
-
-
-def read_url( urlpath ):
-    session = requests.Session()
-    session.mount( 'file://', requests_file.FileAdapter() )
-#     session.config['keep_alive'] = False
-#     response = requests.get( urlpath, timeout=5 )
-    response = session.get( urlpath, timeout=5 )
-#     response = requests.get( urlpath, timeout=5, hooks={'response': print_url} )
-    return response.text
-
-
 def get_channel_output_dir( feed_dir_name ):
     channelPath = os.path.abspath( os.path.join(DATA_DIR, FEED_SUBDIR, feed_dir_name) )
     os.makedirs( channelPath, exist_ok=True )
     return channelPath
-
-
-def write_text( content, outputPath ):
-    with open( outputPath, 'wt', encoding="utf-8" ) as fp:
-        fp.write( content )
 
 
 # output format: 'Wed, 02 Oct 2002 15:00:00 +0200'

@@ -22,33 +22,27 @@
 #
 
 import unittest
+
+from rsscast.source.youtube.ytfeedreader import read_yt_rss_from_source
+
 from testrsscast.data import read_data
 
-from rsscast.datatypes import FeedEntry
-from rsscast.rss.rsschannel import RSSChannel
-from rsscast.source.youtube.ytfeedparser import parse_rss_content
 
-
-class FeedEntryTest(unittest.TestCase):
+class YTFeedReaderTest(unittest.TestCase):
     def setUp(self):
         ## Called before testfunction is executed
-        self.entry = FeedEntry()
+        pass
 
     def tearDown(self):
         ## Called after testfunction was executed
-        self.entry = None
+        pass
 
-    def test_fixRepeatedTitles(self):
-        feedContent = read_data( "yt_latino_title_repeat.rss" )
-        rssChannel = RSSChannel()
-        parse_rss_content(rssChannel, feedContent )
-        self.entry.update( rssChannel )
+    def test_read_yt_channel_rss_from_source(self):
+        # get RSS address from channel webpage
+        siteContent = read_data( "wideoprezentacje.html" )
 
-        self.entry.fixRepeatedTitles()
-
-        channel = self.entry.channel
-        self.assertEqual( channel.size(), 3 )
-
-        self.assertEqual( channel.get(0).title, "#RegresoAClases con Julioprofe" )
-        self.assertEqual( channel.get(1).title, "Desde Casa #Conmigo" )
-        self.assertEqual( channel.get(2).title, "Desde Casa #Conmigo [R2]" )
+        rss_url_data = read_yt_rss_from_source( siteContent )
+        self.assertTrue( rss_url_data is not None )
+        self.assertEqual( rss_url_data[0], "wideoprezentacje" )
+        self.assertEqual( rss_url_data[1],
+                          "https://www.youtube.com/feeds/videos.xml?channel_id=UCViVL2aOkLWKcFVi0_p6u6g" )

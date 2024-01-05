@@ -38,7 +38,7 @@ from rsscast.datatypes import FeedEntry, fetch_feed, parse_feed
 from rsscast.gui.dataobject import DataObject, FeedContainer
 
 from rsscast.gui import guistate
-from rsscast.rss.rssconverter import generate_channel_rss
+from rsscast.rss.rssgenerator import generate_channel_rss
 from rsscast.pprint import print_timedelta
 
 

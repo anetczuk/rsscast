@@ -25,7 +25,7 @@ import logging
 
 from PyQt5.QtWidgets import QUndoCommand
 
-from rsscast.rss.rssparser import RSSItem
+from rsscast.rss.rsschannel import RSSItem
 from rsscast.gui.dataobject import DataObject
 from rsscast.datatypes import FeedEntry
 

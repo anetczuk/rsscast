@@ -1,5 +1,3 @@
-#!/usr/bin/python3
-#
 # MIT License
 #
 # Copyright (c) 2021 Arkadiusz Netczuk <dev.arnet@gmail.com>
@@ -23,35 +21,7 @@
 # SOFTWARE.
 #
 
-try:
-    ## following import success only when file is directly executed from command line
-    ## otherwise will throw exception when executing as parameter for "python -m"
-    # pylint: disable=W0611
-    import __init__
-except ImportError:
-    ## when import fails then it means that the script was executed indirectly
-    ## in this case __init__ is already loaded
-    pass
 
-import sys
-import argparse
-
-from rsscast import logger
-from rsscast.rss.ytconverter import convert_yt
-
-
-if __name__ != '__main__':
-    sys.exit(0)
-
-
-parser = argparse.ArgumentParser(description='YouTube convert example')
-
-args = parser.parse_args()
-
-
-logger.configure_console()
-
-
-converted = convert_yt( "https://www.youtube.com/watch?v=BLRUiVXeZKU", "/tmp/yt_example.mp3" )
-
-print("converted:", converted)
+def write_text( content, outputPath ):
+    with open( outputPath, 'wt', encoding="utf-8" ) as fp:
+        fp.write( content )

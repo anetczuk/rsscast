@@ -30,7 +30,7 @@ import unidecode
 from rsscast.datatypes import FeedEntry
 
 from rsscast.gui import uiloader
-from rsscast.rss.ytconverter import read_yt_rss
+from rsscast.source.youtube.ytfeedreader import read_yt_rss
 
 
 UiTargetClass, QtBaseClass = uiloader.load_ui_from_class_name( __file__ )

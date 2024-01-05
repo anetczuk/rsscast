@@ -15,7 +15,7 @@ except ImportError:
 
 import logging
 
-from rsscast.rss.ytconverter import get_yt_duration, convert_yt
+from rsscast.source.youtube.ytconverter import get_yt_duration, convert_yt
 
 
 _LOGGER = logging.getLogger(__name__)

@@ -34,58 +34,24 @@ except ImportError:
     pass
 
 import sys
-import logging
 import argparse
 
-# from PyQt5.QtWidgets import QApplication
-
 from rsscast import logger
-from rsscast.rss.rssconverter import generate_rss
-from rsscast.rss.rssparser import RSSChannel
-from rsscast.rss.rssserver import RSSServerManager
-
-from testrsscast.data import read_data
-
-
-## ============================= main section ===================================
+from rsscast.source.youtube.ytconverter import convert_yt
 
 
 if __name__ != '__main__':
     sys.exit(0)
 
 
-parser = argparse.ArgumentParser(description='RSS Cast Example')
-# parser.add_argument('-lud', '--loadUserData', action='store_const', const=True, default=False, help='Load user data' )
-# parser.add_argument('--minimized', action='store_const', const=True, default=False, help='Start minimized' )
+parser = argparse.ArgumentParser(description='YouTube convert example')
 
 args = parser.parse_args()
 
 
-# logFile = logger.get_logging_output_file()
-# logger.configure( logFile )
-
 logger.configure_console()
 
-_LOGGER = logging.getLogger(__name__)
 
+converted = convert_yt( "https://www.youtube.com/watch?v=BLRUiVXeZKU", "/tmp/yt_example.mp3" )
 
-hostAddress = RSSServerManager.getPrimaryIp()
-
-feedContent = read_data( "yt_latino_short.rss" )
-# feedContent = read_data( "yt_konfederacja.rss" )
-
-rssChannel = RSSChannel()
-rssChannel.parseRSS( feedContent )
-generate_rss( hostAddress, "test/abc", rssChannel )
-
-
-#         read_rss( "https://www.youtube.com/feeds/videos.xml?channel_id=UCbbz3_jH582xS93hxszPvjQ" )
-
-# read_rss( "http://www.youtube.com/feeds/videos.xml?user=TheNWOChannelTV" )
-
-# read_rss( "http://rss.cnn.com/rss/edition.rss" )
-#         read_rss( "https://blogs.nasa.gov/stationreport/feed/" )
-
-# read_rss( "http://www.google.pl" )
-# read_rss( "http://www.onet.pl" )
-#         read_rss( 'https://www.nasa.gov/rss/dyn/lg_image_of_the_day.rss' )
+print("converted:", converted)

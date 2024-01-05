@@ -21,34 +21,8 @@
 # SOFTWARE.
 #
 
-import unittest
-from testrsscast.data import read_data
+import sys
+import os
 
-from rsscast.datatypes import FeedEntry
-from rsscast.rss.rsschannel import RSSChannel
-from rsscast.source.youtube.ytfeedparser import parse_rss_content
-
-
-class FeedEntryTest(unittest.TestCase):
-    def setUp(self):
-        ## Called before testfunction is executed
-        self.entry = FeedEntry()
-
-    def tearDown(self):
-        ## Called after testfunction was executed
-        self.entry = None
-
-    def test_fixRepeatedTitles(self):
-        feedContent = read_data( "yt_latino_title_repeat.rss" )
-        rssChannel = RSSChannel()
-        parse_rss_content(rssChannel, feedContent )
-        self.entry.update( rssChannel )
-
-        self.entry.fixRepeatedTitles()
-
-        channel = self.entry.channel
-        self.assertEqual( channel.size(), 3 )
-
-        self.assertEqual( channel.get(0).title, "#RegresoAClases con Julioprofe" )
-        self.assertEqual( channel.get(1).title, "Desde Casa #Conmigo" )
-        self.assertEqual( channel.get(2).title, "Desde Casa #Conmigo [R2]" )
+#### append source root
+sys.path.append(os.path.abspath( os.path.join(os.path.dirname(__file__), "..", "..") ))

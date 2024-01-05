@@ -24,12 +24,13 @@
 import unittest
 import datetime
 
-from rsscast.rss.rssparser import RSSChannel, RSSItem
+from rsscast.rss.rsschannel import RSSChannel
+from rsscast.source.youtube.ytfeedparser import parse_rss_content
 
 from testrsscast.data import read_data
 
 
-class RSSChannelTest(unittest.TestCase):
+class YTFeedParserTest(unittest.TestCase):
     def setUp(self):
         ## Called before testfunction is executed
         pass
@@ -41,7 +42,7 @@ class RSSChannelTest(unittest.TestCase):
     def test_parse_latino(self):
         feedContent = read_data( "yt_latino_short.rss" )
         channel = RSSChannel()
-        channel.parseRSS( feedContent )
+        parse_rss_content(channel, feedContent)
 
         self.assertTrue( channel is not None )
         self.assertEqual( channel.title, "YouTube Latinoamérica" )
@@ -71,7 +72,7 @@ class RSSChannelTest(unittest.TestCase):
     def test_parse_przygody(self):
         feedContent = read_data( "yt_feed_przygody.xml" )
         channel = RSSChannel()
-        channel.parseRSS( feedContent )
+        parse_rss_content(channel, feedContent)
 
         self.assertTrue( channel is not None )
         self.assertEqual( "Przygody Przedsiębiorców", channel.title )
@@ -101,7 +102,7 @@ class RSSChannelTest(unittest.TestCase):
     def test_parse_404(self):
         feedContent = read_data( "404.rss" )
         channel = RSSChannel()
-        channel.parseRSS( feedContent )
+        parse_rss_content(channel, feedContent)
 
         self.assertTrue( channel is not None )
         self.assertEqual( channel.title, None )
@@ -116,7 +117,7 @@ class RSSChannelTest(unittest.TestCase):
     def test_parse_playlist(self):
         feedContent = read_data( "yt_playlist.rss" )
         channel = RSSChannel()
-        channel.parseRSS( feedContent )
+        parse_rss_content(channel, feedContent)
 
         self.assertTrue( channel is not None )
         self.assertEqual( "Gwiazdowski mówi Interii", channel.title )
@@ -140,15 +141,3 @@ class RSSChannelTest(unittest.TestCase):
 
         self.assertEqual( "yt:video:CortTsAlPD0", items[1].id )
         self.assertEqual( "yt:video:uQnqMPe4S08", items[2].id )
-
-    def test_update(self):
-        channelFrom = RSSChannel()
-        channelFrom.addItem( RSSItem( itemId="xxx1", link="aaa1" ) )
-        channelFrom.addItem( RSSItem( itemId="xxx2" ) )
-        self.assertEqual( len( channelFrom.items ), 2 )
-
-        channelTo = RSSChannel()
-        channelTo.addItem( RSSItem( itemId="xxx1", link="aaa1-b" ) )
-        channelTo.update( channelFrom )
-        self.assertEqual( len( channelTo.items ), 2 )
-        self.assertEqual( channelTo.items[0].link, "aaa1-b" )
