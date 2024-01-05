@@ -91,11 +91,16 @@ def parse_playlist_lazy( video_url, known_items=None ) -> RSSChannel:
 
 
 def convert_info_to_channel(info_dict) -> RSSChannel:
-    channel_modified_date = info_dict.get("modified_date")
+    # channel_modified_date = info_dict.get("modified_date")
+    # published_date = num_date_to_datetime(channel_modified_date)
+
+    epoch_date = info_dict.get("epoch")
+    published_date = epoch_to_datetime(epoch_date)
+
     data_feed = {
         "title": info_dict.get("title"),
         "href": info_dict.get("channel_url"),
-        "published": num_date_to_datetime(channel_modified_date)
+        "published": published_date
     }
 
     data_entries = []

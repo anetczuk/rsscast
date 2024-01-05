@@ -30,10 +30,11 @@ from functools import cmp_to_key
 # import pprint
 
 import html
+from email import utils
+import feedparser
+
 import requests
 import requests_file
-import feedparser
-from email import utils
 
 from rsscast import DATA_DIR, persist
 
@@ -114,7 +115,7 @@ class RSSItem( persist.Versionable ):
         self.enabled = not self.enabled
 
     def getPublishDateRFC(self):
-        return datetime_to_RFC(self.publishDate)
+        return datetime_to_rfc(self.publishDate)
 
 
 class RSSChannel( persist.Versionable ):
@@ -164,7 +165,7 @@ class RSSChannel( persist.Versionable ):
         return { item.link for item in self.items }
 
     def getPublishDateRFC(self):
-        return datetime_to_RFC(self.publishDate)
+        return datetime_to_rfc(self.publishDate)
 
     def sort(self):
         self._sortItems()
@@ -313,6 +314,7 @@ class RSSChannel( persist.Versionable ):
 def parse_rss( feedId, feedUrl, write_content=True ) -> RSSChannel:
     _LOGGER.info( "feed %s: reading url %s", feedId, feedUrl )
     feedContent = read_url( feedUrl )
+
     if write_content:
         channelPath = get_channel_output_dir( feedId )
         sourceRSS = os.path.abspath( os.path.join(channelPath, "source.rss") )
@@ -348,7 +350,7 @@ def write_text( content, outputPath ):
 
 
 # output format: 'Wed, 02 Oct 2002 15:00:00 +0200'
-def datetime_to_RFC(datetime_object: datetime.datetime):
+def datetime_to_rfc(datetime_object: datetime.datetime):
     if datetime_object is None:
         return None
     return utils.format_datetime(datetime_object)

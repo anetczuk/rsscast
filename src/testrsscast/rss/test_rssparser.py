@@ -38,7 +38,7 @@ class RSSChannelTest(unittest.TestCase):
         ## Called after testfunction was executed
         pass
 
-    def test_parse(self):
+    def test_parse_latino(self):
         feedContent = read_data( "yt_latino_short.rss" )
         channel = RSSChannel()
         channel.parseRSS( feedContent )
@@ -67,6 +67,36 @@ class RSSChannelTest(unittest.TestCase):
 
         self.assertEqual( items[1].id, "yt:video:kztwPl8QQTA" )
         self.assertEqual( items[2].id, "yt:video:DXU6PBpv-eI" )
+
+    def test_parse_przygody(self):
+        feedContent = read_data( "yt_feed_przygody.xml" )
+        channel = RSSChannel()
+        channel.parseRSS( feedContent )
+
+        self.assertTrue( channel is not None )
+        self.assertEqual( "Przygody Przedsiębiorców", channel.title )
+        self.assertEqual( "https://www.youtube.com/channel/UCjHJwETvfm2y9vPIyJpVgZA", channel.link )
+        self.assertEqual( channel.publishDate,
+                          datetime.datetime(2017, 6, 20, 15, 32, 16, tzinfo=datetime.timezone.utc) )
+        self.assertEqual( "Tue, 20 Jun 2017 15:32:16 +0000", channel.getPublishDateRFC() )
+
+        items = channel.items
+        self.assertTrue( items is not None )
+        self.assertEqual( len(items), 15 )
+
+        self.assertEqual( items[0].id, "yt:video:dsqoDfskU7k" )
+        self.assertEqual( items[0].link, "https://www.youtube.com/watch?v=dsqoDfskU7k" )
+        self.assertEqual( items[0].title, "WYJĄTKOWOŚĆ ZŁOTEJ 44 [SUBSKRYBUJ] RAFAŁ ZAORSKI" )
+        self.assertEqual( items[0].summary[0:26], "" )
+        self.assertEqual( items[0].publishDate,
+                          datetime.datetime(2023, 12, 30, 23, 25, 5, tzinfo=datetime.timezone.utc) )
+        self.assertEqual( items[0].getPublishDateRFC(), "Sat, 30 Dec 2023 23:25:05 +0000" )
+        self.assertEqual( items[0].thumb_url, "https://i1.ytimg.com/vi/dsqoDfskU7k/hqdefault.jpg" )
+        self.assertEqual( items[0].thumb_width, "480" )
+        self.assertEqual( items[0].thumb_height, "360" )
+
+        self.assertEqual( items[1].id, "yt:video:7wqXJ2njwLU" )
+        self.assertEqual( items[2].id, "yt:video:E1xPm9olCuM" )
 
     def test_parse_404(self):
         feedContent = read_data( "404.rss" )
