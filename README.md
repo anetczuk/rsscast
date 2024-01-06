@@ -22,13 +22,39 @@ so it's advisable not to expose the server to public network.
 [![Feed tab](doc/mainwindow-feed-small.png "Feed tab")](doc/mainwindow-feed-big.png)
 
 
+## Running 
+
+To run application simply execute `startrsscast` script:
+```
+startrsscast
+```
+
+Application accepts following arguments:
+
+<!-- insertstart include="doc/cmdargs.md" -->## <a name="main_help"></a> startrsscast --help
+```
+usage: startrsscast [-h] [--minimized] [--fetchRSS] [--refreshRSS]
+                    [--startServer]
+
+RSS Cast
+
+optional arguments:
+  -h, --help     show this help message and exit
+  --minimized    Start minimized
+  --fetchRSS     Update RSS channels
+  --refreshRSS   Update RSS channels and download content
+  --startServer  Start RSS server
+```
+<!-- insertend -->
+
+
 ## How it works?
 
 Application reads Youtube feeds taken from `Feed` table. Each feed is parsed and converted to proper RSS 
 compatible with podcast applications. From each video audio file is extracted. RSS and audio files are 
 stored locally and exposed to local network using configuration from `Server` tab.
 
-Published content by default can be seen on [http://localhost:8080](http://localhost:8080). 
+Published content by default can be seen on `http://localhost:8080`. 
 
 Meaning of _Feed_ table columns:
 - _Name_ -- descriptive name of given feed
