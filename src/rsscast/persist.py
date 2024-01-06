@@ -44,6 +44,8 @@ class RenamingUnpickler(pickle.Unpickler):
         renamed_module = module
         if module == "rsscast.gui.datatypes":
             renamed_module = "rsscast.datatypes"
+        if module == "rsscast.rss.rssparser":
+            renamed_module = "rsscast.rss.rsschannel"
         return super().find_class( renamed_module, name )
 
 
