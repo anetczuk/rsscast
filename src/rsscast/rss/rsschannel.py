@@ -115,7 +115,7 @@ class RSSItem( persist.Versionable ):
 
 
 class RSSChannel( persist.Versionable ):
-    """RSS data structure representing channel's RSS with list of items"""
+    """RSS data structure representing channel's RSS with list of items."""
 
     ## 0 - first version
     ## 1 - publishDate as datetime.datetime
@@ -195,7 +195,7 @@ class RSSChannel( persist.Versionable ):
         self._sortItems()
 
     def parseData(self, parsedDict):
-        """ Parse data dict.
+        """Parse data dict.
 
         Expects following dict:
         {

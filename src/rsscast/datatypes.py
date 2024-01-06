@@ -38,7 +38,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class FeedEntry( persist.Versionable ):
-    """RSS channel wrapped in form of entry in channels list"""
+    """RSS channel wrapped in form of entry in channels list."""
 
     ## 0 - first version
     ## 1 - add 'enabled' field
@@ -86,8 +86,7 @@ class FeedEntry( persist.Versionable ):
         self.channel.update( channel )
 
     def updateLocalData(self):
-        """Read media size from files stored locally"""
-
+        """Read media size from files stored locally."""
         if self.channel is None:
             return
         feedId = self.feedId.replace(":", "_")
@@ -153,7 +152,7 @@ def parse_feed( feed: FeedEntry ):
 
 
 class FeedContainer( persist.Versionable ):
-    """RSS channels list"""
+    """RSS channels list."""
 
     ## 0 - first version
     _class_version = 0
@@ -217,7 +216,7 @@ class FeedContainer( persist.Versionable ):
 
 
 class UserContainer():
-    """Application's user data container"""
+    """Application's user data container."""
 
     ## 0 - first version
     ## 1 - feed container
