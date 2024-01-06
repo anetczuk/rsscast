@@ -1,0 +1,59 @@
+<rss version="2.0"
+ xmlns:content="http://purl.org/rss/1.0/modules/content/"
+ xmlns:media="http://search.yahoo.com/mrss/"
+ xmlns:atom="http://www.w3.org/2005/Atom"
+>
+    <channel>
+        <atom:link href="http://rsshost/feed/feed_dir/rss" rel="self" type="application/rss+xml" />
+        <title>YouTube Latinoamérica</title>
+        <link>https://www.youtube.com/channel/UCBrGE6cmFbcwzlwAyIDMGpw</link>
+        <description>YouTube channel converted to RSS by RSSCast service.</description>
+        <lastBuildDate>Mon, 07 Oct 2013 19:27:52 +0000</lastBuildDate>
+        <copyright></copyright>
+        <image>
+            <url>http://rsshost/rss-icon.png</url>
+            <title>YouTube Latinoamérica</title>
+            <link>https://www.youtube.com/channel/UCBrGE6cmFbcwzlwAyIDMGpw</link>
+        </image>
+
+        <item>
+            <title>#RegresoAClases con Julioprofe</title>
+            <link>https://www.youtube.com/watch?v=omY5FahfTrI</link>
+            <pubDate>Mon, 24 Aug 2020 20:58:16 +0000</pubDate>
+            <guid>yt:video:omY5FahfTrI</guid>
+            <media:thumbnail url="https://i4.ytimg.com/vi/omY5FahfTrI/hqdefault.jpg" width='480' height='360'/>
+
+            <description>Ya estamos más que listos para este regreso a clases, y aunque son tiempo extraordinarios, sabemos que con la ayuda de Julioprofe estaremos aprendiendo y disfrutando de la escuela.</description>
+
+            <content:encoded></content:encoded>
+            <enclosure url="http://rsshost/feed/feed_dir/yt_video_omY5FahfTrI.mp3" length="0" type="audio/mpeg"/>
+        </item>
+
+        <item>
+            <title>Desde Casa #Conmigo</title>
+            <link>https://www.youtube.com/watch?v=kztwPl8QQTA</link>
+            <pubDate>Fri, 09 Oct 2020 20:58:27 +0000</pubDate>
+            <guid>yt:video:kztwPl8QQTA</guid>
+            <media:thumbnail url="https://i4.ytimg.com/vi/kztwPl8QQTA/hqdefault.jpg" width='480' height='360'/>
+
+            <description></description>
+
+            <content:encoded></content:encoded>
+            <enclosure url="http://rsshost/feed/feed_dir/yt_video_kztwPl8QQTA.mp3" length="0" type="audio/mpeg"/>
+        </item>
+
+        <item>
+            <title>Reflexiona sobre el 2020 #conmigo</title>
+            <link>https://www.youtube.com/watch?v=DXU6PBpv-eI</link>
+            <pubDate>Tue, 15 Dec 2020 20:00:30 +0000</pubDate>
+            <guid>yt:video:DXU6PBpv-eI</guid>
+            <media:thumbnail url="https://i1.ytimg.com/vi/DXU6PBpv-eI/hqdefault.jpg" width='480' height='360'/>
+
+            <description>El 2020 nos llenó de dudas y nos acercamos a Youtube para buscar respuestas. Gracias a ti, las encontramos. Aprendimos a mantenernos sanos y ocupados. A descubrir cosas nuevas, a amarlas, a aceptar las pérdidas. Y así, siendo creativos, pudimos ver la parte buena de un año que podría haber sido simplemente malo. A todos los que preguntaron "cómo" en 2020 (y a todos los que respondieron): hoy queremos decirles gracias.</description>
+
+            <content:encoded></content:encoded>
+            <enclosure url="http://rsshost/feed/feed_dir/yt_video_DXU6PBpv-eI.mp3" length="0" type="audio/mpeg"/>
+        </item>
+
+    </channel>
+</rss>

@@ -1,0 +1,340 @@
+<rss version="2.0"
+ xmlns:content="http://purl.org/rss/1.0/modules/content/"
+ xmlns:media="http://search.yahoo.com/mrss/"
+ xmlns:atom="http://www.w3.org/2005/Atom"
+>
+    <channel>
+        <atom:link href="http://rsshost/feed/feed_dir/rss" rel="self" type="application/rss+xml" />
+        <title>Przygody Przedsiębiorców</title>
+        <link>https://www.youtube.com/channel/UCjHJwETvfm2y9vPIyJpVgZA</link>
+        <description>YouTube channel converted to RSS by RSSCast service.</description>
+        <lastBuildDate>Tue, 20 Jun 2017 15:32:16 +0000</lastBuildDate>
+        <copyright></copyright>
+        <image>
+            <url>http://rsshost/rss-icon.png</url>
+            <title>Przygody Przedsiębiorców</title>
+            <link>https://www.youtube.com/channel/UCjHJwETvfm2y9vPIyJpVgZA</link>
+        </image>
+
+        <item>
+            <title>WYJĄTKOWOŚĆ ZŁOTEJ 44 [SUBSKRYBUJ] RAFAŁ ZAORSKI</title>
+            <link>https://www.youtube.com/watch?v=dsqoDfskU7k</link>
+            <pubDate>Sat, 30 Dec 2023 23:25:05 +0000</pubDate>
+            <guid>yt:video:dsqoDfskU7k</guid>
+            <media:thumbnail url="https://i1.ytimg.com/vi/dsqoDfskU7k/hqdefault.jpg" width='480' height='360'/>
+
+            <description></description>
+
+            <content:encoded></content:encoded>
+            <enclosure url="http://rsshost/feed/feed_dir/yt_video_dsqoDfskU7k.mp3" length="0" type="audio/mpeg"/>
+        </item>
+
+        <item>
+            <title>PATRZENIE PRZEZ PRYZMAT PIENIĘDZY [SUBSKRYBUJ] RAFAŁ ZAORSKI</title>
+            <link>https://www.youtube.com/watch?v=7wqXJ2njwLU</link>
+            <pubDate>Sun, 31 Dec 2023 22:21:56 +0000</pubDate>
+            <guid>yt:video:7wqXJ2njwLU</guid>
+            <media:thumbnail url="https://i4.ytimg.com/vi/7wqXJ2njwLU/hqdefault.jpg" width='480' height='360'/>
+
+            <description></description>
+
+            <content:encoded></content:encoded>
+            <enclosure url="http://rsshost/feed/feed_dir/yt_video_7wqXJ2njwLU.mp3" length="0" type="audio/mpeg"/>
+        </item>
+
+        <item>
+            <title>UDZIAŁY W SPÓŁCE A NIERUCHOMOŚCI [SUBSKRYBUJ] RAFAŁ ZAORSKI</title>
+            <link>https://www.youtube.com/watch?v=E1xPm9olCuM</link>
+            <pubDate>Sun, 31 Dec 2023 22:23:33 +0000</pubDate>
+            <guid>yt:video:E1xPm9olCuM</guid>
+            <media:thumbnail url="https://i2.ytimg.com/vi/E1xPm9olCuM/hqdefault.jpg" width='480' height='360'/>
+
+            <description></description>
+
+            <content:encoded></content:encoded>
+            <enclosure url="http://rsshost/feed/feed_dir/yt_video_E1xPm9olCuM.mp3" length="0" type="audio/mpeg"/>
+        </item>
+
+        <item>
+            <title>KREATYWNOŚĆ NIE ZNA GRANIC [SUBSKRYBUJ] RAFAŁ ZAORSKI</title>
+            <link>https://www.youtube.com/watch?v=IkY18g0m9Qk</link>
+            <pubDate>Sun, 31 Dec 2023 22:29:33 +0000</pubDate>
+            <guid>yt:video:IkY18g0m9Qk</guid>
+            <media:thumbnail url="https://i2.ytimg.com/vi/IkY18g0m9Qk/hqdefault.jpg" width='480' height='360'/>
+
+            <description></description>
+
+            <content:encoded></content:encoded>
+            <enclosure url="http://rsshost/feed/feed_dir/yt_video_IkY18g0m9Qk.mp3" length="0" type="audio/mpeg"/>
+        </item>
+
+        <item>
+            <title>RYNEK WTÓRNY A CENA [SUBSKRYBUJ] RAFAŁ ZAORSKI</title>
+            <link>https://www.youtube.com/watch?v=YeFAxVrFi-w</link>
+            <pubDate>Mon, 01 Jan 2024 23:49:10 +0000</pubDate>
+            <guid>yt:video:YeFAxVrFi-w</guid>
+            <media:thumbnail url="https://i2.ytimg.com/vi/YeFAxVrFi-w/hqdefault.jpg" width='480' height='360'/>
+
+            <description></description>
+
+            <content:encoded></content:encoded>
+            <enclosure url="http://rsshost/feed/feed_dir/yt_video_YeFAxVrFi-w.mp3" length="0" type="audio/mpeg"/>
+        </item>
+
+        <item>
+            <title>REGULAMIN ZŁOTEJ [SUBSKRYBUJ] RAFAŁ ZAORSKI</title>
+            <link>https://www.youtube.com/watch?v=j7pBbAoAjvI</link>
+            <pubDate>Mon, 01 Jan 2024 23:49:59 +0000</pubDate>
+            <guid>yt:video:j7pBbAoAjvI</guid>
+            <media:thumbnail url="https://i3.ytimg.com/vi/j7pBbAoAjvI/hqdefault.jpg" width='480' height='360'/>
+
+            <description></description>
+
+            <content:encoded></content:encoded>
+            <enclosure url="http://rsshost/feed/feed_dir/yt_video_j7pBbAoAjvI.mp3" length="0" type="audio/mpeg"/>
+        </item>
+
+        <item>
+            <title>WOLNY CZŁOWIEK [SUBSKRYBUJ] RAFAŁ ZAORSKI</title>
+            <link>https://www.youtube.com/watch?v=-bYwW3677F0</link>
+            <pubDate>Mon, 01 Jan 2024 23:50:50 +0000</pubDate>
+            <guid>yt:video:-bYwW3677F0</guid>
+            <media:thumbnail url="https://i2.ytimg.com/vi/-bYwW3677F0/hqdefault.jpg" width='480' height='360'/>
+
+            <description></description>
+
+            <content:encoded></content:encoded>
+            <enclosure url="http://rsshost/feed/feed_dir/yt_video_-bYwW3677F0.mp3" length="0" type="audio/mpeg"/>
+        </item>
+
+        <item>
+            <title>POLSKA KIEDYŚ A DZIŚ [SUBSKRYBUJ] MACIEJ FILIPKOWSKI</title>
+            <link>https://www.youtube.com/watch?v=FIegAL1dPas</link>
+            <pubDate>Tue, 02 Jan 2024 23:36:38 +0000</pubDate>
+            <guid>yt:video:FIegAL1dPas</guid>
+            <media:thumbnail url="https://i3.ytimg.com/vi/FIegAL1dPas/hqdefault.jpg" width='480' height='360'/>
+
+            <description></description>
+
+            <content:encoded></content:encoded>
+            <enclosure url="http://rsshost/feed/feed_dir/yt_video_FIegAL1dPas.mp3" length="0" type="audio/mpeg"/>
+        </item>
+
+        <item>
+            <title>SYTUACJE LOSOWE [SUBSKRYBUJ] RAFAŁ ZAORSKI</title>
+            <link>https://www.youtube.com/watch?v=7pPeqTlAct0</link>
+            <pubDate>Wed, 03 Jan 2024 00:32:21 +0000</pubDate>
+            <guid>yt:video:7pPeqTlAct0</guid>
+            <media:thumbnail url="https://i4.ytimg.com/vi/7pPeqTlAct0/hqdefault.jpg" width='480' height='360'/>
+
+            <description></description>
+
+            <content:encoded></content:encoded>
+            <enclosure url="http://rsshost/feed/feed_dir/yt_video_7pPeqTlAct0.mp3" length="0" type="audio/mpeg"/>
+        </item>
+
+        <item>
+            <title>OCHRONA W APARTAMENCIE [SUBSKRYBUJ]</title>
+            <link>https://www.youtube.com/watch?v=Mwo3rD66qzw</link>
+            <pubDate>Wed, 03 Jan 2024 00:32:54 +0000</pubDate>
+            <guid>yt:video:Mwo3rD66qzw</guid>
+            <media:thumbnail url="https://i2.ytimg.com/vi/Mwo3rD66qzw/hqdefault.jpg" width='480' height='360'/>
+
+            <description></description>
+
+            <content:encoded></content:encoded>
+            <enclosure url="http://rsshost/feed/feed_dir/yt_video_Mwo3rD66qzw.mp3" length="0" type="audio/mpeg"/>
+        </item>
+
+        <item>
+            <title>GROŹBY ZA EPICKIEGO FLIPA [SUBSKRYBUJ]</title>
+            <link>https://www.youtube.com/watch?v=x-5GQ044wJc</link>
+            <pubDate>Wed, 03 Jan 2024 00:33:24 +0000</pubDate>
+            <guid>yt:video:x-5GQ044wJc</guid>
+            <media:thumbnail url="https://i1.ytimg.com/vi/x-5GQ044wJc/hqdefault.jpg" width='480' height='360'/>
+
+            <description></description>
+
+            <content:encoded></content:encoded>
+            <enclosure url="http://rsshost/feed/feed_dir/yt_video_x-5GQ044wJc.mp3" length="0" type="audio/mpeg"/>
+        </item>
+
+        <item>
+            <title>ZYSKOWNY e-commerce! Jak UNIKAĆ Pułapek i ZWIĘKSZAĆ SPRZEDAŻ? | Dawid Jakubowski | PP</title>
+            <link>https://www.youtube.com/watch?v=judmc8Aijrw</link>
+            <pubDate>Wed, 03 Jan 2024 16:00:26 +0000</pubDate>
+            <guid>yt:video:judmc8Aijrw</guid>
+            <media:thumbnail url="https://i3.ytimg.com/vi/judmc8Aijrw/hqdefault.jpg" width='480' height='360'/>
+
+            <description>💰 Dołącz do Loży Kapitalistów. Twórz z nami elitarną, zamkniętą grupę, która zrzesza przedsiębiorców i liderów biznesu: https://lozakapitalistow.pl/ 
+
+========================================
+Odkryj tajniki e-commerce i poznaj strategie marketingowe, które zwiększą Twoje zyski, dowiedz się, jak stworzyć ofertę, która przyciąga klientów, i odkryj, co zabija sprzedaż w świecie e-commerce. Ten przewodnik zawiera case study, praktyczne wskazówki i sprawdzone metody, które pomogą Ci osiągnąć sukces. Idealny dla przedsiębiorców, właścicieli sklepów online i marketerów. Wejdź na rynek e-commerce z kluczem do sukcesu!
+
+
+Adrian Gorzycki
+
+========================================
+
+Kontakt do Dawida
+👉 https://www.youtube.com/@ecommway/videos
+
+========================================
+
+🎙️ Chcesz u nas wystąpić? Napisz: kontakt@przygodyprzedsiebiorcow.pl 
+➡️ Współpraca: https://przygody.tv 
+📰 Zapisz się na newsletter: https://przygody.tv/newsletter/
+👉 Kup bilet na Święto Kapitalizmu: https://swietokapitalizmu.pl/
+🎥 YouTube dla biznesu: https://przygody.tv/uslugi/
+
+========================================
+
+🌟 OBSERWUJ Przygody Przedsiębiorców:
+♦ Instagram: https://www.instagram.com/przygodyprzedsiebiorcow/
+♦ TikTok: https://www.tiktok.com/@przygodyprzedsiebiorcow?lang=pl-PL
+
+🔥 OBSERWUJ Święto Kapitalizmu - najbardziej kontrowersyjną konferencję biznesową:
+♦ https://www.instagram.com/swietokapitalizmu/
+
+💰 OBSERWUJ Lożę Kapitalistów - zamkniętą, elitarną społeczność zrzeszającą zamożnych ludzi biznesu:
+♦ https://www.instagram.com/lozakapitalistow/
+
+========================================
+
+Zobacz poprzednie filmy:
+1. https://youtu.be/judmc8Aijrw
+2. https://youtu.be/Ul8POU8bQVo
+3. https://youtu.be/_QynxarEFlo
+4. https://youtu.be/gIE71MccMM4
+5. https://youtu.be/fqM-LuiL8To
+
+========================================
+
+Spis Treści:
+00:00 Zyskowny e-commerce! Jak Unikać Pułapek i Zwiększać Sprzedaż? 
+02:09 Nowa fala rynku e-commerce
+07:00 Jak dobrze robić własny sklep internetowy?
+07:15 Produkt
+13:07 Sklep i oferta
+15:27 Marketing
+20:22 Case study
+23:02 Co zabija sprzedaż i zysk w ecommerce?
+
+
+
+========================================
+
+Przygody Przedsiębiorców jako podcast: 
+🎧 Spotify: https://open.spotify.com/show/5VdADT8JVEH9zhDL9HaEnN
+🎧 Apple Podcasts: https://podcasts.apple.com/pl/podcast/przygody-przedsi%C4%99biorc%C3%B3w/id1393824546
+🎧 Podtail: https://podtail.com/podcast/przygody-przedsi-biorcow/
+
+#przygodyprzedsiebiorców #ecommerce #biznes #sprzedaż</description>
+
+            <content:encoded></content:encoded>
+            <enclosure url="http://rsshost/feed/feed_dir/yt_video_judmc8Aijrw.mp3" length="0" type="audio/mpeg"/>
+        </item>
+
+        <item>
+            <title>PROBLEMY ZACZYNAJĄ SIĘ W JELITACH [SUBSKRYBUJ] PREMIERA SYLWESTER KŁOS 05.01 17:00</title>
+            <link>https://www.youtube.com/watch?v=DUHoA8sjGjk</link>
+            <pubDate>Wed, 03 Jan 2024 19:42:47 +0000</pubDate>
+            <guid>yt:video:DUHoA8sjGjk</guid>
+            <media:thumbnail url="https://i1.ytimg.com/vi/DUHoA8sjGjk/hqdefault.jpg" width='480' height='360'/>
+
+            <description></description>
+
+            <content:encoded></content:encoded>
+            <enclosure url="http://rsshost/feed/feed_dir/yt_video_DUHoA8sjGjk.mp3" length="0" type="audio/mpeg"/>
+        </item>
+
+        <item>
+            <title>SPODNIE CIĄŻOWE NA WAKACJACH [SUBSKRYBUJ] SYLWESTER KŁOS PREMIERA 05.01 17:00</title>
+            <link>https://www.youtube.com/watch?v=hftgQFT5BGI</link>
+            <pubDate>Thu, 04 Jan 2024 22:26:22 +0000</pubDate>
+            <guid>yt:video:hftgQFT5BGI</guid>
+            <media:thumbnail url="https://i1.ytimg.com/vi/hftgQFT5BGI/hqdefault.jpg" width='480' height='360'/>
+
+            <description></description>
+
+            <content:encoded></content:encoded>
+            <enclosure url="http://rsshost/feed/feed_dir/yt_video_hftgQFT5BGI.mp3" length="0" type="audio/mpeg"/>
+        </item>
+
+        <item>
+            <title>Objawy DEPRESJI? Czy TWOJE FLAKI Wysyłają Sygnały? | Sylwester Kłos | Przygody Przedsiębiorców</title>
+            <link>https://www.youtube.com/watch?v=tJHDWjBgT4w</link>
+            <pubDate>Fri, 05 Jan 2024 16:00:39 +0000</pubDate>
+            <guid>yt:video:tJHDWjBgT4w</guid>
+            <media:thumbnail url="https://i1.ytimg.com/vi/tJHDWjBgT4w/hqdefault.jpg" width='480' height='360'/>
+
+            <description>💰 Dołącz do Loży Kapitalistów. Twórz z nami elitarną, zamkniętą grupę, która zrzesza przedsiębiorców i liderów biznesu: https://lozakapitalistow.pl/ 
+
+========================================
+Odkryj sekrety zdrowia układu pokarmowego i jego wpływu na depresję w naszym przełomowym filmie. Zbadaj z nami naukowe powiązania między jelitami a samopoczuciem psychicznym, rozpoczynając od omówienia układu pokarmowego, przez objawy depresji związane z jelitami. Dowiedz się, jak efektywnie wyjść z depresji, jakie są zalety i wady diety wegetariańskiej i wegańskiej, a także co oznacza krew w stolcu. Poznaj niezbędne badania i odkryj, jakie śniadanie będzie najlepsze dla Twojego dziecka. Nie przegap tej esencjonalnej wiedzy!
+
+
+Adrian Gorzycki
+
+========================================
+
+Kontakt do Sylwestra :
+👉 kontakt@sports-med.pl
+Kurs:
+👉 https://sports-med.pl/produkt/strategia1/
+========================================
+
+🎙️ Chcesz u nas wystąpić? Napisz: kontakt@przygodyprzedsiebiorcow.pl 
+➡️ Współpraca: https://przygody.tv 
+📰 Zapisz się na newsletter: https://przygody.tv/newsletter/
+👉 Kup bilet na Święto Kapitalizmu: https://swietokapitalizmu.pl/
+🎥 YouTube dla biznesu: https://przygody.tv/uslugi/
+
+========================================
+
+🌟 OBSERWUJ Przygody Przedsiębiorców:
+♦ Instagram: https://www.instagram.com/przygodyprzedsiebiorcow/
+♦ TikTok: https://www.tiktok.com/@przygodyprzedsiebiorcow?lang=pl-PL
+
+🔥 OBSERWUJ Święto Kapitalizmu - najbardziej kontrowersyjną konferencję biznesową:
+♦ https://www.instagram.com/swietokapitalizmu/
+
+💰 OBSERWUJ Lożę Kapitalistów - zamkniętą, elitarną społeczność zrzeszającą zamożnych ludzi biznesu:
+♦ https://www.instagram.com/lozakapitalistow/
+
+========================================
+
+Zobacz poprzednie filmy:
+1. https://youtu.be/judmc8Aijrw
+2. https://youtu.be/Ul8POU8bQVo
+3. https://youtu.be/_QynxarEFlo
+4. https://youtu.be/gIE71MccMM4
+5. https://youtu.be/fqM-LuiL8To
+
+========================================
+
+Spis Treści:
+00:00 Objawy DEPRESJI? Czy TWOJE FLAKI Wysyłają Sygnały? 
+02:20 Układ pokarmowy
+08:45 Objawy depresji są we „flakach”? 
+12:50 Jak wyjść z depresji?
+33:42 Dieta wege i wegetariańska
+38:05 Krew w stolcu
+42:54 Badania jakie należy zrobić 
+56:12 Jak powinno wyglądać śniadanie dla dziecka
+
+========================================
+
+Przygody Przedsiębiorców jako podcast: 
+🎧 Spotify: https://open.spotify.com/show/5VdADT8JVEH9zhDL9HaEnN
+🎧 Apple Podcasts: https://podcasts.apple.com/pl/podcast/przygody-przedsi%C4%99biorc%C3%B3w/id1393824546
+🎧 Podtail: https://podtail.com/podcast/przygody-przedsi-biorcow/
+
+#przygodyprzedsiebiorców #zdrowie #biznes</description>
+
+            <content:encoded></content:encoded>
+            <enclosure url="http://rsshost/feed/feed_dir/yt_video_tJHDWjBgT4w.mp3" length="0" type="audio/mpeg"/>
+        </item>
+
+    </channel>
+</rss>

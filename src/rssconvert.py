@@ -24,7 +24,6 @@
 #
 
 import sys
-import os
 import logging
 import argparse
 
@@ -42,7 +41,7 @@ _LOGGER = logging.getLogger(__name__)
 
 def process_ytrss(args):
     input_file_path = args.infile
-    output_dir_path = args.outdir
+    output_file_path = args.outfile
 
     with open(input_file_path, 'rt', encoding="utf-8") as in_file:
         input_data = in_file.read()
@@ -51,27 +50,28 @@ def process_ytrss(args):
     if not parse_rss_content(rssChannel, input_data ):
         # unable to parse
         return
-    write_channel_rss(rssChannel, output_dir_path)
+    write_channel_rss(rssChannel, output_file_path)
 
 
 def process_ytdlp(args):
     input_file_path = args.infile
-    output_dir_path = args.outdir
+    output_file_path = args.outfile
 
     with open(input_file_path, 'rt', encoding="utf-8") as in_file:
         info_dict = json.load(in_file)
 
     reduce_info(info_dict)
     rssChannel: RSSChannel = convert_info_to_channel(info_dict)
-    write_channel_rss(rssChannel, output_dir_path)
+    write_channel_rss(rssChannel, output_file_path)
 
 
 ## =======================================================================================================
 
 
-def write_channel_rss(rssChannel, output_dir_path):
-    os.makedirs(output_dir_path, exist_ok=True )
-    generate_items_rss( rssChannel, "rsshost", "feed_dir", output_dir_path, store=True, check_local=False )
+def write_channel_rss(rssChannel, output_file_path):
+    rss_content = generate_items_rss( rssChannel, "rsshost", "feed_dir", "local_dir", store=False, check_local=False )
+    with open(output_file_path, 'wt', encoding="utf-8") as out_file:
+        out_file.write(rss_content)
 
 
 ## =======================================================================================================
@@ -98,11 +98,11 @@ def main():
         help="Input file containing YouTube RSS",
     )
     subparser.add_argument(
-        "--outdir",
+        "--outfile",
         action="store",
         required=False,
         default="",
-        help="Output dir to store converted RSS",
+        help="Output file to store converted RSS",
     )
 
     ## =================================================
@@ -119,11 +119,11 @@ def main():
         help="Input file containing yt-dlp info dict",
     )
     subparser.add_argument(
-        "--outdir",
+        "--outfile",
         action="store",
         required=False,
         default="",
-        help="Output dir to store converted RSS",
+        help="Output file to store converted RSS",
     )
 
     ## =================================================
