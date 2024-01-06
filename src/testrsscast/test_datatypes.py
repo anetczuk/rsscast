@@ -39,7 +39,7 @@ class FeedEntryTest(unittest.TestCase):
         self.entry = None
 
     def test_fixRepeatedTitles(self):
-        feedContent = read_data( "yt_latino_title_repeat.rss" )
+        feedContent = read_data( "yt_feed_latino_title_repeat.xml" )
         rssChannel = RSSChannel()
         parse_rss_content(rssChannel, feedContent )
         self.entry.update( rssChannel )

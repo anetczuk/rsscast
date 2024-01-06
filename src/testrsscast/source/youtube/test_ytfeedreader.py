@@ -39,7 +39,7 @@ class YTFeedReaderTest(unittest.TestCase):
 
     def test_read_yt_channel_rss_from_source(self):
         # get RSS address from channel webpage
-        siteContent = read_data( "wideoprezentacje.html" )
+        siteContent = read_data( "yt_html_wideoprezentacje.html" )
 
         rss_url_data = read_yt_rss_from_source( siteContent )
         self.assertTrue( rss_url_data is not None )

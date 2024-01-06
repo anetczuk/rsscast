@@ -72,8 +72,8 @@ _LOGGER = logging.getLogger(__name__)
 
 hostAddress = RSSServerManager.getPrimaryIp()
 
-feedContent = read_data( "yt_latino_short.rss" )
-# feedContent = read_data( "yt_konfederacja.rss" )
+feedContent = read_data( "yt_feed_latino_short.xml" )
+# feedContent = read_data( "yt_feed_konfederacja.xml" )
 
 rssChannel = RSSChannel()
 parse_rss_content(rssChannel, feedContent )

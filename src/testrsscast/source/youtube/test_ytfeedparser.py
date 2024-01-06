@@ -40,7 +40,7 @@ class YTFeedParserTest(unittest.TestCase):
         pass
 
     def test_parse_latino(self):
-        feedContent = read_data( "yt_latino_short.rss" )
+        feedContent = read_data( "yt_feed_latino_short.xml" )
         channel = RSSChannel()
         parse_rss_content(channel, feedContent)
 
@@ -100,7 +100,7 @@ class YTFeedParserTest(unittest.TestCase):
         self.assertEqual( items[2].id, "yt:video:E1xPm9olCuM" )
 
     def test_parse_404(self):
-        feedContent = read_data( "404.rss" )
+        feedContent = read_data( "yt_feed_404.xml" )
         channel = RSSChannel()
         parse_rss_content(channel, feedContent)
 
@@ -115,7 +115,7 @@ class YTFeedParserTest(unittest.TestCase):
         self.assertEqual( len(items), 0 )
 
     def test_parse_playlist(self):
-        feedContent = read_data( "yt_playlist.rss" )
+        feedContent = read_data( "yt_feed_playlist_gwiazdowski.xml" )
         channel = RSSChannel()
         parse_rss_content(channel, feedContent)
 
