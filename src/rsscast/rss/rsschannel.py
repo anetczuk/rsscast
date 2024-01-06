@@ -157,6 +157,14 @@ class RSSChannel( persist.Versionable ):
 #     def getList(self) -> List[  RSSItem ]:
 #         return self.items
 
+    def getItemsEnabled(self):
+        items = []
+        for rssItem in self.items:
+            if rssItem.enabled is False:
+                continue
+            items.append( rssItem )
+        return items
+
     def getItemsURLs(self):
         return { item.link for item in self.items }
 
@@ -227,19 +235,15 @@ class RSSChannel( persist.Versionable ):
         self.publishDate = datetime.datetime.fromisoformat( pub_date )
 
         for post in parsedDict.get('entries', []):
-    #         pprint( post )
-
             rssItem = RSSItem()
-
             rssItem.id = post['id']
-    #         rssItem.id = post['yt_videoid']
 
             rssItem.link = post['link']
             rssItem.title = post['title']
 
             if 'media_thumbnail' in post:
                 thumbnail = post['media_thumbnail'][0]
-                rssItem.thumb_url    = thumbnail['url']
+                rssItem.thumb_url = thumbnail.get('url')
                 width = thumbnail.get('width')
                 if width:
                     rssItem.thumb_width = width
@@ -248,7 +252,12 @@ class RSSChannel( persist.Versionable ):
                     rssItem.thumb_height = height
 
             rssItem.summary = post.get('summary', '')
-            rssItem.publishDate = datetime.datetime.fromisoformat( post['published'] )
+            publish_date = post['published']
+            rssItem.publishDate = datetime.datetime.fromisoformat( publish_date )
+            # if publish_date:
+            #     rssItem.publishDate = datetime.datetime.fromisoformat( publish_date )
+            # else:
+            #     rssItem.publishDate = None
 
 #             linkSize = get_media_size( rssItem.link, False )
 #             if linkSize != None:

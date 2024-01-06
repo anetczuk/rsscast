@@ -33,60 +33,34 @@ except ImportError:
     ## in this case __init__ is already loaded
     pass
 
-import sys
 import logging
-import argparse
 
 # from PyQt5.QtWidgets import QApplication
 
 from rsscast import logger
-from rsscast.rss.rssgenerator import generate_rss
+from rsscast.rss.rssgenerator import generate_channel_rss
 from rsscast.rss.rsschannel import RSSChannel
-from rsscast.rss.rssserver import RSSServerManager
 from rsscast.source.youtube.ytfeedparser import parse_rss_content
 
 from testrsscast.data import read_data
 
 
-## ============================= main section ===================================
-
-
-if __name__ != '__main__':
-    sys.exit(0)
-
-
-parser = argparse.ArgumentParser(description='RSS Cast Example')
-# parser.add_argument('-lud', '--loadUserData', action='store_const', const=True, default=False, help='Load user data' )
-# parser.add_argument('--minimized', action='store_const', const=True, default=False, help='Start minimized' )
-
-args = parser.parse_args()
-
-
-# logFile = logger.get_logging_output_file()
-# logger.configure( logFile )
-
-logger.configure_console()
-
 _LOGGER = logging.getLogger(__name__)
 
 
-hostAddress = RSSServerManager.getPrimaryIp()
-
-feedContent = read_data( "yt_feed_latino_short.xml" )
-# feedContent = read_data( "yt_feed_konfederacja.xml" )
-
-rssChannel = RSSChannel()
-parse_rss_content(rssChannel, feedContent )
-generate_rss( hostAddress, "test/abc", rssChannel )
+## ============================= main section ===================================
 
 
-#         read_rss( "https://www.youtube.com/feeds/videos.xml?channel_id=UCbbz3_jH582xS93hxszPvjQ" )
+def main():
+    logger.configure_console()
 
-# read_rss( "http://www.youtube.com/feeds/videos.xml?user=TheNWOChannelTV" )
+    feedContent = read_data( "yt_feed_latino_short.xml" )
+    # feedContent = read_data( "yt_feed_konfederacja.xml" )
 
-# read_rss( "http://rss.cnn.com/rss/edition.rss" )
-#         read_rss( "https://blogs.nasa.gov/stationreport/feed/" )
+    rssChannel = RSSChannel()
+    parse_rss_content(rssChannel, feedContent )
+    generate_channel_rss( "test/abc", rssChannel )
 
-# read_rss( "http://www.google.pl" )
-# read_rss( "http://www.onet.pl" )
-#         read_rss( 'https://www.nasa.gov/rss/dyn/lg_image_of_the_day.rss' )
+
+if __name__ != '__main__':
+    main()

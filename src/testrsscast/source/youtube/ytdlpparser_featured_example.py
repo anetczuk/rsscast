@@ -39,11 +39,8 @@ import pprint
 
 from rsscast import logger
 from rsscast.rss.rsschannel import RSSChannel
-from rsscast.source.parser import parse_url
 
-
-def parse(url) -> RSSChannel:
-    return parse_url("xxx", url, write_content=False)
+from rsscast.source.youtube.ytdlpparser import parse_playlist
 
 
 def get_json(obj):
@@ -55,9 +52,9 @@ def get_json(obj):
 def main():
     logger.configure()
 
-    channel_data: RSSChannel = parse("http://www.youtube.com/feeds/videos.xml?user=KNPvsUE")
-    # channel_data: RSSChannel = parse("https://www.youtube.com/@NiebezpiecznikTV/videos")
-
+    # przygody przedsiebiorcow
+    url = "https://www.youtube.com/@PrzygodyPrzedsiebiorcow/featured"
+    channel_data: RSSChannel = parse_playlist(url)
     channel_data.sort()
     print("extracted rss channel data:")
     ret_dict = get_json(channel_data)

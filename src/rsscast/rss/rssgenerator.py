@@ -36,29 +36,131 @@ from rsscast.utils import write_text
 _LOGGER = logging.getLogger(__name__)
 
 
-def generate_channel_rss( feedId, rssChannel: RSSChannel, downloadContent=True ):
+def generate_channel_rss( feedId, rssChannel: RSSChannel, host=None, downloadContent=True, storeRSS=True ):
     """Generate channel's converted RSS."""
-    host = RSSServerManager.getPrimaryIp()
-    generate_rss( host, feedId, rssChannel, downloadContent )
-
-
-def generate_rss( host, feedId, rssChannel: RSSChannel, downloadContent=True ):
-    """Generate channel's converted RSS."""
-    duration_limit = 60 * 60 * 2        # 2 hours
-    items = []
-    for rssItem in rssChannel.items:
-        if rssItem.enabled is False:
-            continue
-        items.append( rssItem )
+    if host is None:
+        host = RSSServerManager.getPrimaryIp()
 
     if downloadContent:
+        items = rssChannel.getItemsEnabled()
+        duration_limit = 60 * 60 * 2        # 2 hours
         download_items( feedId, items, duration_limit )
 
-    feed_dir_name = feedId.replace(":", "_")
-    feed_dir_name = re.sub( r"\s+", "", feed_dir_name )
+    url_dir_path = feedId.replace(":", "_")
+    url_dir_path = re.sub( r"\s+", "", url_dir_path )
 
-    channelPath = get_channel_output_dir( feed_dir_name )
-    generate_items_rss( rssChannel, items, host, feed_dir_name, channelPath, True )
+    local_dir_path = get_channel_output_dir( url_dir_path )
+    return generate_items_rss( rssChannel, host, url_dir_path, local_dir_path, store=storeRSS )
+
+
+##
+## podcast generation: https://feedgen.kiesow.be/
+##
+## download required media and generate RSS file
+def generate_items_rss( rssChannel: RSSChannel, host, url_dir_path, local_dir_path, store=True, check_local=True ):
+    """Generate channel's converted RSS content."""
+    itemsList = rssChannel.getItemsEnabled()
+    items_result = ""
+#     rssItem: RSSItem = None
+    for rssItem in itemsList:
+#         pprint( rssItem )
+
+        videoId = rssItem.videoId()
+        postLocalPath = f"{local_dir_path}/{videoId}.mp3"
+
+        if check_local:
+            if not os.path.exists(postLocalPath):
+                ## item file not exists -- convert and download
+                _LOGGER.info( "feed %s: unable to find video: %s", url_dir_path, postLocalPath )
+                continue
+
+        enclosure_size = rssItem.localFileSize()
+        if not enclosure_size or enclosure_size < 0:
+            try:
+                enclosure_size = os.path.getsize( postLocalPath )
+            except OSError:
+                enclosure_size = 0
+
+        postLink = rssItem.link
+        postTitle = rssItem.title
+
+        enclosureURL = rssItem.getExternalURL( host, url_dir_path )              ## must have absolute path
+
+        mediaThumbnailNode = ""
+        if rssItem.thumb_url is not None:
+            # pylint: disable=C0301
+            width_content = ""
+            if rssItem.thumb_width:
+                width_content = f""" width='{rssItem.thumb_width}'"""
+            height_content = ""
+            if rssItem.thumb_height:
+                height_content = f""" height='{rssItem.thumb_height}'"""
+            mediaThumbnailNode = f"""<media:thumbnail url="{rssItem.thumb_url}"{width_content}{height_content}/>"""
+
+        description = rssItem.summary
+        description = fix_description( description )       ## fix URLs
+        # description = html.escape( description )
+
+        postTitle = rssItem.itemTitle()
+
+        item_result = f"""
+        <item>
+            <title>{postTitle}</title>
+            <link>{postLink}</link>
+            <pubDate>{rssItem.getPublishDateRFC()}</pubDate>
+            <guid>{rssItem.id}</guid>
+            {mediaThumbnailNode}
+
+            <description>{description}</description>
+
+            <content:encoded></content:encoded>
+            <enclosure url="{enclosureURL}" length="{enclosure_size}" type="audio/mpeg"/>
+        </item>
+"""
+        items_result += item_result
+
+    rss_url = f"http://{host}/feed/{url_dir_path}/rss"     ## must have absolute path
+    defaultIconURL = f"http://{host}/rss-icon.png"          ## must have absolute path
+
+    # <!--
+    # <image>
+    #   <url>https://cppcast.com/static/cppcast-logo-square.png</url>
+    #   <title>CppCast</title>
+    #   <link>https://cppcast.com</link>
+    # </image>
+    # -->
+
+    result = f"""<rss version="2.0"
+ xmlns:content="http://purl.org/rss/1.0/modules/content/"
+ xmlns:media="http://search.yahoo.com/mrss/"
+ xmlns:atom="http://www.w3.org/2005/Atom"
+>
+    <channel>
+        <atom:link href="{rss_url}" rel="self" type="application/rss+xml" />
+        <title>{rssChannel.title}</title>
+        <link>{rssChannel.link}</link>
+        <description>YouTube channel converted to RSS by RSSCast service.</description>
+        <lastBuildDate>{rssChannel.getPublishDateRFC()}</lastBuildDate>
+        <copyright></copyright>
+        <image>
+            <url>{defaultIconURL}</url>
+            <title>{rssChannel.title}</title>
+            <link>{rssChannel.link}</link>
+        </image>
+{items_result}
+    </channel>
+</rss>
+"""
+
+    if store:
+        rss_local_output = f"{local_dir_path}/rss"
+        _LOGGER.info( "feed %s: writing converted rss output to %s", url_dir_path, rss_local_output )
+        write_text( result, rss_local_output )
+
+    return result
+
+
+## =================================================================================
 
 
 def download_items( feedId, itemsList: List[RSSItem], videoDurationLimit=None ):
@@ -113,113 +215,6 @@ def remove_item_data( feedId, rssItem: RSSItem ):
         return
 
     os.remove( postLocalPath )
-
-
-##
-## podcast generation: https://feedgen.kiesow.be/
-##
-## download required media and generate RSS file
-def generate_items_rss( rssChannel: RSSChannel, itemsList: List[RSSItem],
-                        host, feed_dir_name, channel_local_path, store=True, check_local=True ):
-    """Generate channel's converted RSS content."""
-    items_result = ""
-#     rssItem: RSSItem = None
-    for rssItem in itemsList:
-#         pprint( rssItem )
-
-        videoId = rssItem.videoId()
-        postLocalPath = f"{channel_local_path}/{videoId}.mp3"
-
-        if check_local:
-            if not os.path.exists(postLocalPath):
-                ## item file not exists -- convert and download
-                _LOGGER.info( "feed %s: unable to find video: %s", feed_dir_name, postLocalPath )
-                continue
-
-        enclosure_size = rssItem.localFileSize()
-        if not enclosure_size or enclosure_size < 0:
-            try:
-                enclosure_size = os.path.getsize( postLocalPath )
-            except OSError:
-                enclosure_size = 0
-
-        postLink = rssItem.link
-        postTitle = rssItem.title
-
-        enclosureURL = rssItem.getExternalURL( host, feed_dir_name )              ## must have absolute path
-
-        mediaThumbnailNode = ""
-        if rssItem.thumb_url is not None:
-            # pylint: disable=C0301
-            width_content = ""
-            if rssItem.thumb_width:
-                width_content = f""" width='{rssItem.thumb_width}'"""
-            height_content = ""
-            if rssItem.thumb_height:
-                height_content = f""" height='{rssItem.thumb_height}'"""
-            mediaThumbnailNode = f"""<media:thumbnail url="{rssItem.thumb_url}"{width_content}{height_content}/>"""
-
-        description = rssItem.summary
-        description = fix_description( description )       ## fix URLs
-        # description = html.escape( description )
-
-        postTitle = rssItem.itemTitle()
-
-        item_result = f"""
-        <item>
-            <title>{postTitle}</title>
-            <link>{postLink}</link>
-            <pubDate>{rssItem.getPublishDateRFC()}</pubDate>
-            <guid>{rssItem.id}</guid>
-            {mediaThumbnailNode}
-
-            <description>{description}</description>
-
-            <content:encoded></content:encoded>
-            <enclosure url="{enclosureURL}" length="{enclosure_size}" type="audio/mpeg"/>
-        </item>
-"""
-        items_result += item_result
-
-    rss_url = f"http://{host}/feed/{feed_dir_name}/rss"     ## must have absolute path
-    defaultIconURL = f"http://{host}/rss-icon.png"          ## must have absolute path
-
-    # <!--
-    # <image>
-    #   <url>https://cppcast.com/static/cppcast-logo-square.png</url>
-    #   <title>CppCast</title>
-    #   <link>https://cppcast.com</link>
-    # </image>
-    # -->
-
-    result = f"""<rss version="2.0"
- xmlns:content="http://purl.org/rss/1.0/modules/content/"
- xmlns:media="http://search.yahoo.com/mrss/"
- xmlns:atom="http://www.w3.org/2005/Atom"
->
-    <channel>
-        <atom:link href="{rss_url}" rel="self" type="application/rss+xml" />
-        <title>{rssChannel.title}</title>
-        <link>{rssChannel.link}</link>
-        <description>YouTube channel converted to RSS by RSSCast service.</description>
-        <lastBuildDate>{rssChannel.getPublishDateRFC()}</lastBuildDate>
-        <copyright></copyright>
-        <image>
-            <url>{defaultIconURL}</url>
-            <title>{rssChannel.title}</title>
-            <link>{rssChannel.link}</link>
-        </image>
-{items_result}
-    </channel>
-</rss>
-"""
-
-    if store:
-        rss_local_output = f"{channel_local_path}/rss"
-        _LOGGER.info( "feed %s: writing converted rss output to %s", feed_dir_name, rss_local_output )
-        write_text( result, rss_local_output )
-
-    return result
 
 
 def fix_description( inputText ):

@@ -71,8 +71,7 @@ def process_ytdlp(args):
 
 def write_channel_rss(rssChannel, output_dir_path):
     os.makedirs(output_dir_path, exist_ok=True )
-    items = rssChannel.items
-    generate_items_rss( rssChannel, items, "rsshost", "feed_dir", output_dir_path, store=True, check_local=False )
+    generate_items_rss( rssChannel, "rsshost", "feed_dir", output_dir_path, store=True, check_local=False )
 
 
 ## =======================================================================================================

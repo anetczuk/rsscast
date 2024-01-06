@@ -25,7 +25,7 @@ import logging
 
 from rsscast.rss.rsschannel import RSSChannel
 from rsscast.source.youtube.ytfeedparser import parse_rss
-from rsscast.source.youtube.ytdlpparser import parse_playlist_raw, parse_playlist_lazy
+from rsscast.source.youtube.ytdlpparser import parse_playlist
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -39,12 +39,10 @@ def parse_url( feedId, feedUrl, write_content=True, known_items=None ) -> RSSCha
     channel = parse_rss(feedId, feedUrl, write_content)
     if channel:
         return channel
-    if not known_items:
-        # empty list
-        channel = parse_playlist_raw(feedUrl, items_num=9999)
-    else:
-        channel = parse_playlist_lazy(feedUrl, known_items=known_items)
+
+    channel = parse_playlist(feedUrl, known_items=known_items)
     if channel:
         return channel
+
     # no data found
     return RSSChannel()

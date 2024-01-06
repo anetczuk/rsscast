@@ -39,11 +39,8 @@ import pprint
 
 from rsscast import logger
 from rsscast.rss.rsschannel import RSSChannel
-from rsscast.source.parser import parse_url
-
-
-def parse(url) -> RSSChannel:
-    return parse_url("xxx", url, write_content=False)
+# from rsscast.rss.rssgenerator import generate_items_rss
+from rsscast.source.youtube.ytdlpparser import parse_playlist
 
 
 def get_json(obj):
@@ -55,14 +52,22 @@ def get_json(obj):
 def main():
     logger.configure()
 
-    channel_data: RSSChannel = parse("http://www.youtube.com/feeds/videos.xml?user=KNPvsUE")
-    # channel_data: RSSChannel = parse("https://www.youtube.com/@NiebezpiecznikTV/videos")
-
+    ## playlist - gwaizdowski
+    # url = "https://www.youtube.com/playlist?list=PLC9xjKm8G0LpgFgi-eF4YgvtMuogd1dHw"
+    ## playlist - youtube latino
+    url = "https://www.youtube.com/playlist?list=PL1ebpFrA3ctH0QN6bribofTNpG4z2loWy"
+    known = ["https://www.youtube.com/watch?v=aAbfzUJLJJE", "https://www.youtube.com/watch?v=3Q1DIHK2AIw"]
+    channel_data: RSSChannel = parse_playlist(url, known)
     channel_data.sort()
     print("extracted rss channel data:")
     ret_dict = get_json(channel_data)
     pprint.pprint( ret_dict )
     print("playlist case found items:", channel_data.size())
+
+    # rss_content = generate_items_rss(channel_data, host="the_host",
+    #                                  url_dir_path="url_dir", local_dir_path="local_dir",
+    #                                  store=False, check_local=False)
+    # print(rss_content)
 
 
 # =============================================================
