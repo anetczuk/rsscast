@@ -35,6 +35,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 def parse_url( feedId, feedUrl, write_content=True, known_items=None ) -> RSSChannel:
+    _LOGGER.info("fetching feed data: %s %s", feedId, feedUrl)
     # 'parse_rss' for backward compatibility
     channel = parse_rss(feedId, feedUrl, write_content)
     if channel:
@@ -45,4 +46,5 @@ def parse_url( feedId, feedUrl, write_content=True, known_items=None ) -> RSSCha
         return channel
 
     # no data found
+    _LOGGER.error("unable to fetch data from %s %s", feedId, feedUrl)
     return RSSChannel()

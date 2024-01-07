@@ -30,7 +30,7 @@ from typing import List
 from xml.sax.saxutils import escape
 import requests
 
-from yt_dlp import YoutubeDL
+import yt_dlp
 
 from rsscast.rss.rsschannel import RSSChannel
 
@@ -48,6 +48,8 @@ def parse_playlist( page_url, known_items=None, max_fetch=10 ) -> RSSChannel:
         known_items = set()
 
     info_dict = fetch_info(page_url, items_num=999999)
+    if info_dict is None:
+        return None
 
     if max_fetch > 0:
         _LOGGER.info( "fetching youtube videos" )
@@ -66,6 +68,8 @@ def parse_playlist( page_url, known_items=None, max_fetch=10 ) -> RSSChannel:
 
             # _LOGGER.info("fetching video: %s", yt_link)
             sub_info_dict = fetch_info(yt_link, items_num=999)
+            if sub_info_dict is None:
+                continue
 
             sub_items = sub_info_dict.get("entries")
             if sub_items is not None:
@@ -151,17 +155,20 @@ class YTDLPLogger:
 
     @staticmethod
     def error(msg):
-        _LOGGER.error(msg)
+        pass
+        # _LOGGER.error(msg)
         # print("Captured Error: " + msg)
 
     @staticmethod
     def warning(msg):
-        _LOGGER.warning(msg)
+        pass
+        # _LOGGER.warning(msg)
         # print("Captured Warning: " + msg)
 
     @staticmethod
     def debug(msg):
-        _LOGGER.debug(msg)
+        pass
+        # _LOGGER.debug(msg)
         # print("Captured Log: " + msg)
         # if "[download]" in msg:
         #     _LOGGER.debug(msg)
@@ -186,8 +193,12 @@ def fetch_info(video_url, items_num=15):
               #                    }
               }
 
-    with YoutubeDL(params) as ydl:
-        info_dict = ydl.extract_info(video_url, download=False)
+    try:
+        with yt_dlp.YoutubeDL(params) as ydl:
+            info_dict = ydl.extract_info(video_url, download=False)
+    except yt_dlp.utils.DownloadError as exc:
+        _LOGGER.error("could not fetch data: %s", exc)
+        return None
 
     reduce_info(info_dict)
 

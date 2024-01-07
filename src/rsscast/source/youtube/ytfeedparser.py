@@ -42,9 +42,12 @@ _LOGGER = logging.getLogger(__name__)
 
 
 def parse_rss( feedId, feedUrl, write_content=True ) -> RSSChannel:
-    _LOGGER.info( "feed %s: reading url %s", feedId, feedUrl )
-    feedContent = read_url( feedUrl )
+    status, feedContent = read_url( feedUrl )
+    if status == 404:
+        _LOGGER.error("unable to get url content: %s", feedUrl)
+        return None
 
+    _LOGGER.info( "feed %s: reading url %s status code: %s", feedId, feedUrl, status )
     if write_content:
         channelPath = get_channel_output_dir( feedId )
         sourceRSS = os.path.abspath( os.path.join(channelPath, "source.rss") )
@@ -77,4 +80,4 @@ def read_url( urlpath ):
 #     response = requests.get( urlpath, timeout=5 )
     response = session.get( urlpath, timeout=5 )
 #     response = requests.get( urlpath, timeout=5, hooks={'response': print_url} )
-    return response.text
+    return response.status_code, response.text
