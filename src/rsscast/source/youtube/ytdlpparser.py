@@ -176,6 +176,7 @@ def fetch_info(video_url, items_num=15):
               "extract_flat": True,                     # do not download videos from list
               # "dump_single_json": True,                ## will print JSON to stdout
               "playlist_items": f"1:{items_num}",
+              # "playlistreverse": True,                # reverses all items (videos and playlists)
               "logger": YTDLPLogger,
 
               ## restricting player_client causes longer duration of 'extract_info'
@@ -189,6 +190,19 @@ def fetch_info(video_url, items_num=15):
         info_dict = ydl.extract_info(video_url, download=False)
 
     reduce_info(info_dict)
+
+    # item_type = info_dict.get('_type', "")        # applies to videos and playlists
+
+    # 'webpage_url_basename': 'playlist',
+    item_type = info_dict.get('webpage_url_basename', "")   # eg. "playlist" or "videos"
+    if item_type == 'playlist':
+        # playlist
+        entries = info_dict.get("entries")
+        if entries:
+            _LOGGER.info("playlist detected - reversing entries")
+            entries.reverse()
+            info_dict["entries"] = entries
+
     return info_dict
 
 
@@ -224,6 +238,7 @@ def num_date_to_datetime(num_date):
     if num_date is None:
         return None
     date_time = datetime.datetime.strptime(num_date, "%Y%m%d")
+    date_time = date_time.replace(tzinfo=datetime.timezone.utc)
     # return utils.format_datetime(date_time)
     return date_time.isoformat()
 

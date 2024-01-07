@@ -54,6 +54,12 @@ def main():
 
     # przygody przedsiebiorcow
     url = "https://www.youtube.com/@PrzygodyPrzedsiebiorcow/videos"
+
+    # info_dict = fetch_info(url, items_num=999999)
+    # info_dict["entries"] = "xxx"
+    # pprint.pprint( info_dict )
+    # return
+
     channel_data: RSSChannel = parse_playlist(url)
     channel_data.sort()
     print("extracted rss channel data:")

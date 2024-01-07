@@ -271,6 +271,14 @@ class RSSChannel( persist.Versionable ):
 #         def sort_key( rssItem: RSSItem ):
 #             return rssItem.publishDate
 
+        for item in self.items:
+            if item.publishDate is None:
+                continue
+            if is_timezone_aware(item.publishDate):
+                continue
+            _LOGGER.warning("datetime without timezone: %s", item.publishDate)
+            item.publishDate = item.publishDate.replace(tzinfo=datetime.timezone.utc)
+
         def cmp_none( obj1, obj2 ):
             if obj2 is None:
                 if obj1 is None:
@@ -327,3 +335,9 @@ def convert_string_to_datetime(datetime_string):
         _LOGGER.warning("unable to convert: %s", exc)
 
     return utils.parsedate_to_datetime( datetime_string )
+
+
+def is_timezone_aware(dt):
+    # Checks if a given datetime object is timezone aware.
+    # Returns True if the datetime object is timezone aware, False otherwise.
+    return dt.tzinfo is not None and dt.tzinfo.utcoffset(dt) is not None

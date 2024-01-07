@@ -52,11 +52,17 @@ def get_json(obj):
 def main():
     logger.configure()
 
-    ## playlist - gwaizdowski
+    # ## playlist - gwiazdowski
     # url = "https://www.youtube.com/playlist?list=PLC9xjKm8G0LpgFgi-eF4YgvtMuogd1dHw"
+    # info_dict = fetch_info(url, items_num=999999)
+    # info_dict["entries"] = "xxx"
+    # pprint.pprint( info_dict )
+    # return
+
     ## playlist - youtube latino
     url = "https://www.youtube.com/playlist?list=PL1ebpFrA3ctH0QN6bribofTNpG4z2loWy"
     known = ["https://www.youtube.com/watch?v=aAbfzUJLJJE", "https://www.youtube.com/watch?v=3Q1DIHK2AIw"]
+
     channel_data: RSSChannel = parse_playlist(url, known)
     channel_data.sort()
     print("extracted rss channel data:")
