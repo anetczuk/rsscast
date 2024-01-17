@@ -467,7 +467,7 @@ def urlretrieve( url, outputPath=None, timeout=30, write_empty=True ):
 
 
 # download URL content directly to file
-def urldownload( url, outputPath=None, timeout=30, write_empty=True ):
+def urldownload( url, outputPath=None, timeout=45):
     if not outputPath:
         return False
 
@@ -484,7 +484,7 @@ def urldownload( url, outputPath=None, timeout=30, write_empty=True ):
     req = request.Request( url, headers={'User-Agent': 'Mozilla/5.0'} )
     with request.urlopen( req, timeout=timeout, context=ctx_no_secure ) as result:
         try:
-            CHUNK = 32 * 1024
+            CHUNK = 128 * 1024
             with open(outputPath, 'wb') as of:
                 while True:
                     chunk = result.read(CHUNK)

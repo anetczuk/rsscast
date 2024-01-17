@@ -107,6 +107,9 @@ class RSSItem( persist.Versionable ):
             return None
         return self.mediaSize
 
+    def disable(self):
+        self.enabled = False
+
     def switchEnabled(self):
         self.enabled = not self.enabled
 

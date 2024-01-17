@@ -27,10 +27,11 @@ import re
 import html
 from typing import List
 
+from rsscast.utils import write_text
 from rsscast.rss.rsschannel import RSSChannel, RSSItem, get_channel_output_dir
 from rsscast.rss.rssserver import RSSServerManager
-from rsscast.source.youtube.ytconverter import get_yt_duration, convert_yt
-from rsscast.utils import write_text
+from rsscast.source.youtube.ytconverter import convert_yt
+from rsscast.source.youtube.ytdlpparser import is_video_available
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -163,7 +164,8 @@ def generate_items_rss( rssChannel: RSSChannel, host, url_dir_path, local_dir_pa
 ## =================================================================================
 
 
-def download_items( feedId, itemsList: List[RSSItem], videoDurationLimit=None ):
+# def download_items( feedId, itemsList: List[RSSItem], videoDurationLimit=None ):
+def download_items( feedId, itemsList: List[RSSItem], _=None ):
     """Download media."""
     feedId = feedId.replace(":", "_")
     feedId = re.sub( r"\s+", "", feedId )
@@ -192,7 +194,12 @@ def download_items( feedId, itemsList: List[RSSItem], videoDurationLimit=None ):
             #                       feedId, postLink, video_duration / 60, videoDurationLimit / 60 )
             #         continue
 
-            _LOGGER.info( "feed %s: converting video: %s to %s", feedId, postLink, postLocalPath )
+            if not is_video_available(postLink):
+                _LOGGER.warning( "feed %s: '%s' video unavailable: %s -- disabling", feedId, rssItem.title, postLink )
+                rssItem.disable()
+                continue
+
+            _LOGGER.info( "feed %s: %s converting video: %s to %s", feedId, rssItem.title, postLink, postLocalPath )
             converted = convert_yt( postLink, postLocalPath )
             if converted is False:
                 ## skip elements that failed to convert

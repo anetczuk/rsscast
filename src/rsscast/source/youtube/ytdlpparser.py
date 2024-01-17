@@ -151,6 +151,11 @@ def convert_info_to_channel(info_dict) -> RSSChannel:
     return rssChannel
 
 
+def is_video_available(video_url) -> bool:
+    result = fetch_info(video_url)
+    return result is not None
+
+
 class YTDLPLogger:
 
     @staticmethod
@@ -176,6 +181,7 @@ class YTDLPLogger:
 
 # order of items in list seems to be random
 # youtube_url can be URL to channel or playlist or URL to video
+# returns None if failed/invalid url/video not available
 def fetch_info(youtube_url, items_num=15):
     _LOGGER.info( "fetching youtube url %s", youtube_url )
 
