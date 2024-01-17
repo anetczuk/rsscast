@@ -274,8 +274,8 @@ class FeedTable( QTableView ):
             enableAction = contextMenu.addAction("Disable")
         contextMenu.addSeparator()
         fetchAction      = contextMenu.addAction("Fetch")
-        generateAction   = contextMenu.addAction("Generate RSS")
         pullAction       = contextMenu.addAction("Pull")
+        generateAction   = contextMenu.addAction("Generate RSS")
 
         if entry is None:
             editAction.setEnabled( False )
