@@ -183,12 +183,14 @@ def download_items( feedId, itemsList: List[RSSItem], videoDurationLimit=None ):
 
         if not os.path.exists(postLocalPath):
             ## item file not exists -- convert and download
-            if videoDurationLimit is not None:
-                video_duration = get_yt_duration( postLink )
-                if video_duration > videoDurationLimit:
-                    _LOGGER.info( "feed %s: video '%s' exceeds duration limit: %sm > %sm -- skipped",
-                                  feedId, postLink, video_duration / 60, videoDurationLimit / 60 )
-                    continue
+
+            ## is it still needed?
+            # if videoDurationLimit is not None:
+            #     video_duration = get_yt_duration( postLink )
+            #     if video_duration > videoDurationLimit:
+            #         _LOGGER.info( "feed %s: video '%s' exceeds duration limit: %sm > %sm -- skipped",
+            #                       feedId, postLink, video_duration / 60, videoDurationLimit / 60 )
+            #         continue
 
             _LOGGER.info( "feed %s: converting video: %s to %s", feedId, postLink, postLocalPath )
             converted = convert_yt( postLink, postLocalPath )

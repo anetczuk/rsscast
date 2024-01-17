@@ -165,7 +165,8 @@ def convert_yt_yt1s( link, output, mimicHuman=True ):
         dlink = data["dlink"]
 
         _LOGGER.info( "grabbing file: %s to %s", dlink, output )
-        urlretrieve( dlink, output )
+        urldownload( dlink, output )
+
 #         simple_download( dlink, output )
 #         curl_download( session, dlink, output )
 
@@ -463,6 +464,41 @@ def urlretrieve( url, outputPath=None, timeout=30, write_empty=True ):
         #     urllib.request.urlretrieve( url, outputPath )
 
         return content_data
+
+
+# download URL content directly to file
+def urldownload( url, outputPath=None, timeout=30, write_empty=True ):
+    if not outputPath:
+        return False
+
+    ##
+    ## Under Ubuntu 20 SSL configuration has changed causing problems with SSL keys.
+    ## For more details see: https://forums.raspberrypi.com/viewtopic.php?t=255167
+    ##
+    ctx_no_secure = ssl.create_default_context()
+    ctx_no_secure.set_ciphers('HIGH:!DH:!aNULL')
+    ctx_no_secure.check_hostname = False
+    ctx_no_secure.verify_mode = ssl.CERT_NONE
+
+    ## changed "user-agent" fixes blocking by server
+    req = request.Request( url, headers={'User-Agent': 'Mozilla/5.0'} )
+    with request.urlopen( req, timeout=timeout, context=ctx_no_secure ) as result:
+        try:
+            CHUNK = 32 * 1024
+            with open(outputPath, 'wb') as of:
+                while True:
+                    chunk = result.read(CHUNK)
+                    if not chunk:
+                        break
+                    of.write(chunk)
+
+#         content_text = content_data.decode("utf-8")
+#         with open(outputPath, 'wt') as of:
+#             of.write( content_text )
+
+        except UnicodeDecodeError as ex:
+            _LOGGER.exception( "unable to access: %s %s", url, ex, exc_info=False )
+            raise
 
 
 # def simple_download( sourceUrl, outputFile ):

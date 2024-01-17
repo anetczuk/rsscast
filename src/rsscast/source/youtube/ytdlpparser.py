@@ -175,8 +175,9 @@ class YTDLPLogger:
 
 
 # order of items in list seems to be random
-def fetch_info(video_url, items_num=15):
-    _LOGGER.info( "fetching youtube url %s", video_url )
+# youtube_url can be URL to channel or playlist or URL to video
+def fetch_info(youtube_url, items_num=15):
+    _LOGGER.info( "fetching youtube url %s", youtube_url )
 
     params = {"skip_download": True,
               "simulate": True,
@@ -195,7 +196,7 @@ def fetch_info(video_url, items_num=15):
 
     try:
         with yt_dlp.YoutubeDL(params) as ydl:
-            info_dict = ydl.extract_info(video_url, download=False)
+            info_dict = ydl.extract_info(youtube_url, download=False)
     except yt_dlp.utils.DownloadError as exc:
         _LOGGER.error("could not fetch data: %s", exc)
         return None
