@@ -484,13 +484,17 @@ def urldownload( url, outputPath=None, timeout=45):
     req = request.Request( url, headers={'User-Agent': 'Mozilla/5.0'} )
     with request.urlopen( req, timeout=timeout, context=ctx_no_secure ) as result:
         try:
-            CHUNK = 128 * 1024
             with open(outputPath, 'wb') as of:
+                CHUNK = 128 * 1024
+                iteration = 0
                 while True:
                     chunk = result.read(CHUNK)
                     if not chunk:
                         break
                     of.write(chunk)
+                    iteration += 1
+                    if iteration % 128 == 0:
+                        _LOGGER.info( "in progress, already downloaded: %s MB", CHUNK * iteration / 1048576 )
 
 #         content_text = content_data.decode("utf-8")
 #         with open(outputPath, 'wt') as of:
