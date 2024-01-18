@@ -177,8 +177,8 @@ def convert_yt_yt1s( link, output, mimicHuman=True ):
         ## done -- returning
         return True
 
-    except Exception:                                               # pylint: disable=W0703
-        _LOGGER.exception("Unexpected exception", exc_info=False)
+    except Exception as exc:                                               # pylint: disable=W0703
+        _LOGGER.exception("Unexpected exception: %s", exc, exc_info=False)
         return False
 
     finally:
@@ -483,8 +483,10 @@ def urldownload( url, outputPath=None, timeout=45):
     ## changed "user-agent" fixes blocking by server
     req = request.Request( url, headers={'User-Agent': 'Mozilla/5.0'} )
     with request.urlopen( req, timeout=timeout, context=ctx_no_secure ) as result:
+        file_created = False
         try:
             with open(outputPath, 'wb') as of:
+                file_created = True
                 CHUNK = 128 * 1024
                 iteration = 0
                 while True:
@@ -495,13 +497,12 @@ def urldownload( url, outputPath=None, timeout=45):
                     iteration += 1
                     if iteration % 128 == 0:
                         _LOGGER.info( "in progress, already downloaded: %s MB", CHUNK * iteration / 1048576 )
-
-#         content_text = content_data.decode("utf-8")
-#         with open(outputPath, 'wt') as of:
-#             of.write( content_text )
-
-        except UnicodeDecodeError as ex:
-            _LOGGER.exception( "unable to access: %s %s", url, ex, exc_info=False )
+        except BaseException as exc:
+            _LOGGER.error( "unable to write file: %s", exc )
+            if file_created:
+                # exception during storage - remove incomplete file
+                _LOGGER.info( "removing incomplete file: %s", outputPath )
+                os.remove(outputPath)
             raise
 
 
