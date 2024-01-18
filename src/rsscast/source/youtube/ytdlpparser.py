@@ -156,6 +156,18 @@ def is_video_available(video_url) -> bool:
     return result is not None
 
 
+# preferred audio formats: 233, 140
+def download_audio(link, output_path, format_id="233"):
+    try:
+        # {'extract_audio': True, 'format': 'bestaudio', 'outtmpl': '%(title)s.mp3'}
+        with yt_dlp.YoutubeDL({'extract_audio': True, 'format': format_id, 'outtmpl': output_path}) as video:
+            video.download(link)
+    except yt_dlp.utils.DownloadError as exc:
+        _LOGGER.error("could not fetch audio using format %s: %s", format_id, exc)
+        return False
+    return True
+
+
 class YTDLPLogger:
 
     @staticmethod

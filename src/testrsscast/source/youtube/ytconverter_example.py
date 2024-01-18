@@ -51,7 +51,10 @@ args = parser.parse_args()
 
 logger.configure_console()
 
+# long file: 3h 58m
+# converted = convert_yt( "https://www.youtube.com/watch?v=C9HrMN9BjfY", "/tmp/yt_example.mp3" )
 
-converted = convert_yt( "https://www.youtube.com/watch?v=BLRUiVXeZKU", "/tmp/yt_example.mp3" )
+# converted = convert_yt( "https://www.youtube.com/watch?v=BLRUiVXeZKU", "/tmp/yt_example.mp3" )
+converted = convert_yt( "https://www.youtube.com/watch?v=cJuO985zF8E", "/tmp/yt_example.mp3" )
 
 print("converted:", converted)
