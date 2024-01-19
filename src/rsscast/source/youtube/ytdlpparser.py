@@ -21,6 +21,7 @@
 # SOFTWARE.
 #
 
+import os
 import logging
 import datetime
 from typing import List
@@ -66,7 +67,7 @@ def parse_playlist( page_url, known_items=None, max_fetch=10 ) -> RSSChannel:
                 i += 1
                 continue
 
-            # _LOGGER.info("fetching video: %s", yt_link)
+            _LOGGER.info("fetching youtube video: %s", yt_link)
             sub_info_dict = fetch_info(yt_link, items_num=999)
             if sub_info_dict is None:
                 continue
@@ -152,6 +153,7 @@ def convert_info_to_channel(info_dict) -> RSSChannel:
 
 
 def is_video_available(video_url) -> bool:
+    _LOGGER.info( "checking if youtube video is available: %s", video_url )
     result = fetch_info(video_url)
     return result is not None
 
@@ -163,7 +165,18 @@ def download_audio(link, output_path, format_id="233"):
         with yt_dlp.YoutubeDL({'extract_audio': True, 'format': format_id, 'outtmpl': output_path}) as video:
             video.download(link)
     except yt_dlp.utils.DownloadError as exc:
-        _LOGGER.error("could not fetch audio using format %s: %s", format_id, exc)
+        _LOGGER.error("could not download audio using format %s: %s", format_id, exc)
+        if os.path.isfile(output_path):
+            _LOGGER.info( "removing incomplete file: %s", output_path )
+            # exception during storage - remove incomplete file
+            os.remove(output_path)
+        return False
+    except BaseException as exc:
+        _LOGGER.error("error during download of audio using format %s: %s", format_id, exc)
+        if os.path.isfile(output_path):
+            _LOGGER.info( "removing incomplete file: %s", output_path )
+            # exception during storage - remove incomplete file
+            os.remove(output_path)
         return False
     return True
 
@@ -195,8 +208,6 @@ class YTDLPLogger:
 # youtube_url can be URL to channel or playlist or URL to video
 # returns None if failed/invalid url/video not available
 def fetch_info(youtube_url, items_num=15):
-    _LOGGER.info( "fetching youtube url %s", youtube_url )
-
     params = {"skip_download": True,
               "simulate": True,
               "extract_flat": True,                     # do not download videos from list

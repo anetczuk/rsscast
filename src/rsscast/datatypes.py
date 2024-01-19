@@ -85,19 +85,29 @@ class FeedEntry( persist.Versionable ):
             return
         self.channel.update( channel )
 
-    def updateLocalData(self):
-        """Read media size from files stored locally."""
+    def getChannelLocalDir(self):
         if self.channel is None:
-            return
+            return None
         feedId = self.feedId.replace(":", "_")
         feedId = re.sub( r"\s+", "", feedId )
+        return get_channel_output_dir( feedId )
 
-        channelPath = get_channel_output_dir( feedId )
-
+    # returns: [ (RSSItem, <path>) ]
+    def getLocalPaths(self):
+        if self.channel is None:
+            return []
+        channelPath = self.getChannelLocalDir()
+        ret_list = []
         for rssItem in self.channel.items:
             videoId = rssItem.videoId()
-            postLocalPath = f"{channelPath}/{videoId}.mp3"
+            postLocalPath = get_local_path( channelPath, videoId )
+            ret_list.append( (rssItem, postLocalPath) )
+        return ret_list
 
+    def updateLocalData(self):
+        """Read media size from files stored locally."""
+        local_items = self.getLocalPaths()
+        for rssItem, postLocalPath in local_items:
             if os.path.exists(postLocalPath):
                 rssItem.mediaSize = os.path.getsize( postLocalPath )
             else:
@@ -146,6 +156,10 @@ def parse_feed( feed: FeedEntry ):
     except Exception as ex:
         _LOGGER.exception( "unable parse feed: %s reaseon: %s", feed.feedId, ex, exc_info=False )
         raise
+
+
+def get_local_path(channelPath, videoId):
+    return f"{channelPath}/{videoId}.mp3"
 
 
 ## ========================================================

@@ -39,6 +39,7 @@ from rsscast.rss.rssserver import RSSServerManager
 from rsscast.datatypes import FeedEntry, parse_feed, fetch_feed
 from rsscast.gui.resources import get_user_data_path
 from rsscast.gui.dataobject import DataObject
+from rsscast.filelimit import remove_old_files
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -86,6 +87,10 @@ class CliApp:
                 continue
             parse_feed( feed )
 
+    def removeOldFiles(self, files_limit):
+        feedList: List[ FeedEntry ] = self.data.feed.getList()
+        remove_old_files(feedList, files_limit)
+
     def startServer(self):
         pass
 
@@ -114,6 +119,12 @@ def run_cli( args ):
         appData.refreshRSS()
         _LOGGER.info( "refreshing done" )
 
+    if args.reduceFiles:
+        cli_mode = True
+        appData.init()
+        _LOGGER.info( "removing old files: %s", args.reduceFiles )
+        appData.removeOldFiles(args.reduceFiles)
+
     if cli_mode:
         appData.saveData()
 
@@ -139,6 +150,8 @@ def create_parser( parser: argparse.ArgumentParser = None ):
     parser.add_argument('--fetchRSS', action='store_const', const=True, default=False, help='Update RSS channels' )
     parser.add_argument('--refreshRSS', action='store_const', const=True, default=False,
                         help='Update RSS channels and download content' )
+    parser.add_argument('--reduceFiles', action='store', type=int,
+                        help='Remove old files reducing files numbers to given' )
     parser.add_argument('--startServer', action='store_const', const=True, default=False, help='Start RSS server' )
     return parser
 

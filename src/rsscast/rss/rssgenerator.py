@@ -172,8 +172,9 @@ def download_items( feedId, itemsList: List[RSSItem], _=None ):
 
     channelPath = get_channel_output_dir( feedId )
 
+    items_len = len(itemsList)
 #     rssItem: RSSItem = None
-    for rssItem in itemsList:
+    for index, rssItem in enumerate(itemsList):
 #         pprint( rssItem )
         if rssItem.enabled is False:
             _LOGGER.info( "feed %s: video '%s' disabled -- skipped", feedId, rssItem.title )
@@ -199,7 +200,8 @@ def download_items( feedId, itemsList: List[RSSItem], _=None ):
                 rssItem.disable()
                 continue
 
-            _LOGGER.info( "feed %s: %s converting video: %s to %s", feedId, rssItem.title, postLink, postLocalPath )
+            _LOGGER.info( f"{index + 1}/{items_len} feed {feedId}:"
+                          f" {rssItem.title} converting video: {postLink} to {postLocalPath}" )
             converted = convert_yt( postLink, postLocalPath )
             if converted is False:
                 ## skip elements that failed to convert
