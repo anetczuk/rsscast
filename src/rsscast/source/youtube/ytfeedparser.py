@@ -56,6 +56,7 @@ def parse_rss( feedId, feedUrl, write_content=True ) -> RSSChannel:
     rssChannel = RSSChannel()
     if not parse_rss_content(rssChannel, feedContent ):
         # unable to parse
+        _LOGGER.warning( "feed[%s]: unable to parse RSS %s", feedId, sourceRSS )
         return None
     _LOGGER.info( "feed %s: parsing done", feedId )
     return rssChannel
@@ -65,7 +66,7 @@ def parse_rss_content(rss_channel: RSSChannel, feedContent):
     parsedDict = feedparser.parse( feedContent )
     if parsedDict.get('bozo', False):
         reason = parsedDict.get('bozo_exception', "<unknown>")
-        _LOGGER.warning( "channel[%s]: malformed rss detected, reason %s", rss_channel.title, reason )
+        _LOGGER.warning( "channel[%s]: malformed rss detected, reason %s\n", rss_channel.title, reason )
         return False
 
     parsedDict = feedparser.parse( feedContent )
