@@ -181,6 +181,25 @@ def download_audio(link, output_path, format_id="233"):
     return True
 
 
+def list_audio_formats(video_url):
+    info_dict = fetch_info(video_url, reduce=False)
+    foramts = info_dict.get("formats", [])
+    
+    ret_list = []
+    for item in foramts:
+        if item.get("audio_ext", "none") == "none":
+            continue
+        data = item.copy()
+        data['fragments'] = "<removed>"
+        data['fragment_base_url'] = "<removed>"
+        data['http_headers'] = "<removed>"
+        data['manifest_url'] = "<removed>"
+        data['url'] = "<removed>"
+        ret_list.append(data)
+    
+    return ret_list
+
+
 class YTDLPLogger:
 
     @staticmethod
@@ -207,7 +226,7 @@ class YTDLPLogger:
 # order of items in list seems to be random
 # youtube_url can be URL to channel or playlist or URL to video
 # returns None if failed/invalid url/video not available
-def fetch_info(youtube_url, items_num=15):
+def fetch_info(youtube_url, items_num=15, reduce=True):
     params = {"skip_download": True,
               "simulate": True,
               "extract_flat": True,                     # do not download videos from list
@@ -230,7 +249,8 @@ def fetch_info(youtube_url, items_num=15):
         _LOGGER.error("could not fetch data: %s", exc)
         return None
 
-    reduce_info(info_dict)
+    if reduce:
+        reduce_info(info_dict)
 
     # item_type = info_dict.get('_type', "")        # applies to videos and playlists
 
