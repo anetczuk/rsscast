@@ -184,7 +184,7 @@ def download_audio(link, output_path, format_id="233"):
 def list_audio_formats(video_url):
     info_dict = fetch_info(video_url, reduce=False)
     foramts = info_dict.get("formats", [])
-    
+
     ret_list = []
     for item in foramts:
         if item.get("audio_ext", "none") == "none":
@@ -196,7 +196,7 @@ def list_audio_formats(video_url):
         data['manifest_url'] = "<removed>"
         data['url'] = "<removed>"
         ret_list.append(data)
-    
+
     return ret_list
 
 

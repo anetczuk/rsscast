@@ -48,9 +48,9 @@ def parse_rss( feedId, feedUrl, write_content=True ) -> RSSChannel:
         return None
 
     _LOGGER.info( "feed %s: reading url %s status code: %s", feedId, feedUrl, status )
+    channelPath = get_channel_output_dir( feedId )
+    sourceRSS = os.path.abspath( os.path.join(channelPath, "source.rss") )
     if write_content:
-        channelPath = get_channel_output_dir( feedId )
-        sourceRSS = os.path.abspath( os.path.join(channelPath, "source.rss") )
         write_text( feedContent, sourceRSS )
     _LOGGER.info( "feed %s: parsing rss", feedId )
     rssChannel = RSSChannel()
