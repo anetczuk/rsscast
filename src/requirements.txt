@@ -8,3 +8,4 @@ watchdog
 pytube
 filetype
 yt-dlp
+# pydub       # conversion from mp4 to mp3
