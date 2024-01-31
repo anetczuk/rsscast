@@ -46,10 +46,20 @@ class RSSConverterTest(unittest.TestCase):
     def test_fix_description_semicolon(self):
         text = "Word https://www.xyz.com/aaa?bbb=ccc&sub;ddd=1 other word http://example.com/blah"
         fixedText = fix_description( text )
-        self.assertEqual( fixedText,
-                          "Word https://www.xyz.com/aaa?bbb=ccc&amp;subddd=1 other word http://example.com/blah" )
+        self.assertEqual( "Word https://www.xyz.com/aaa?bbb=ccc&amp;sub;ddd=1 other word http://example.com/blah",
+                          fixedText )
 
-    def test_fix_description_and(self):
+    def test_fix_description_ampersant_01(self):
         text = "aaa & bbb & ccc"
         fixedText = fix_description( text )
-        self.assertEqual( fixedText, "aaa &amp; bbb &amp; ccc" )
+        self.assertEqual( "aaa &amp; bbb &amp; ccc", fixedText )
+
+    def test_fix_description_ampersant_02(self):
+        text = """\
+Występ w Poznaniu 1: https://www.youtube.com/watch?v=wZy7CteXdKI&t=298s
+Występ w Poznaniu 2: https://www.youtube.com/watch?v=wZy7CteXdKI&amp;t=298s
+#SEO #Q&A #Onely"""
+        fixedText = fix_description( text )
+        self.assertEqual( """Występ w Poznaniu 1: https://www.youtube.com/watch?v=wZy7CteXdKI&amp;t=298s
+Występ w Poznaniu 2: https://www.youtube.com/watch?v=wZy7CteXdKI&amp;amp;t=298s
+#SEO #Q&amp;A #Onely""", fixedText )

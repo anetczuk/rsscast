@@ -229,20 +229,8 @@ def remove_item_data( feedId, rssItem: RSSItem ):
 
 
 def fix_description( inputText ):
-    outputText = inputText
-    link_regex = re.compile( r'((https?):((//)|(\\\\))+([\w\d:#@%/;$()~_?\+-=\\\.&](#!)?)*)', re.DOTALL )
-    links = re.findall( link_regex, inputText )
-    for lnk in links:
-        sourceURL = lnk[0]
-        # print( sourceURL )
-        fixedURL = fix_url( sourceURL )
-        if fixedURL is None:
-            continue
-        outputText = outputText.replace( sourceURL, fixedURL )
-
-    ## fix invalid token reported by AntennaPod
-    outputText = re.sub( r" & ", " &amp; ", outputText )
-
+    ## fix invalid token (ampersant char) reported by AntennaPod
+    outputText = html.escape( inputText )
     return outputText
 
 
