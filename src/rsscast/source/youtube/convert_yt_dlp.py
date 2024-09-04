@@ -24,7 +24,7 @@
 import os
 import logging
 import datetime
-from typing import List
+from typing import List, Dict, Any
 
 # import pprint
 
@@ -48,8 +48,29 @@ _LOGGER = logging.getLogger(__name__)
 ## ============================================================
 
 
+def convert_yt( link, output, _mimicHuman=True ) -> bool:
+    _LOGGER.info("yt_dlp: converting youtube video %s", link)
+
+    if not download_audio(link, output, format_id="233"):
+        return False
+
+    if not download_audio(link, output, format_id="140"):
+        return False
+
+    _LOGGER.info("downloading completed")
+    return True
+
+
+## ============================================================
+
+
 def parse_playlist( page_url, known_items=None, max_fetch=10 ) -> RSSChannel:
-    _LOGGER.info( "parsing youtube url %s", page_url )
+    info_dict = parse_playlist_data(page_url, known_items, max_fetch)
+    return convert_info_to_channel(info_dict)
+
+
+def parse_playlist_data( page_url, known_items=None, max_fetch=10 ) -> Dict[Any, Any]:
+    _LOGGER.info( "parsing youtube playlist url %s", page_url )
 
     if not known_items:
         known_items = set()
@@ -66,42 +87,47 @@ def parse_playlist( page_url, known_items=None, max_fetch=10 ) -> RSSChannel:
 
         i = 0
         while i < len(entries_gen):
-            item = entries_gen[i]
-            yt_link = item.get("url", "")
-            if not yt_link or yt_link in known_items:
-                _LOGGER.info("skipping known url: %s", yt_link)
-                i += 1
-                continue
-
-            _LOGGER.info("fetching youtube video: %s", yt_link)
-            sub_info_dict = fetch_info(yt_link, items_num=999)
-            if sub_info_dict is None:
-                continue
-
-            sub_items = sub_info_dict.get("entries")
-            if sub_items is not None:
-                # sublist case - append to current list
-                new_list: List[str] = []
-                new_list.extend( entries_gen[0:i] )
-                new_list.extend( sub_items )
-                new_list.extend( entries_gen[i + 1:] )
-                entries_gen = new_list
-                continue
-
-            entries_list.append(sub_info_dict)
-            fetch_count += 1
             if fetch_count >= max_fetch:
                 _LOGGER.info("max items fetch reached[%s], breaking", max_fetch)
                 break
 
+            item = entries_gen[i]
             i += 1
+
+            yt_link = item.get("url", "")
+            if not yt_link or yt_link in known_items:
+                _LOGGER.info("skipping known url: %s", yt_link)
+                continue
+
+            fetch_count += 1
+
+            _LOGGER.info("%s of %s: fetching youtube url: %s", i, len(entries_gen), yt_link)
+            sub_info_dict = fetch_info(yt_link, items_num=999)
+            if sub_info_dict is None:
+                # error while getting info
+                sub_info_dict = {"link": yt_link}
+                entries_list.append(sub_info_dict)
+                continue
+
+            sub_items = sub_info_dict.get("entries")
+            if sub_items is not None:
+                _LOGGER.info("%s of %s: found sublist items %s", i, len(entries_gen), len(sub_items))
+                # sublist case - append to current list
+                new_list: List[str] = []
+                new_list.extend( entries_gen[0:i - 1] )
+                new_list.extend( sub_items )
+                new_list.extend( entries_gen[i:] )
+                entries_gen = new_list
+                continue
+
+            entries_list.append(sub_info_dict)
 
         info_dict["entries"] = entries_list
 
     # import pprint
     # pprint.pprint(info_dict)
 
-    return convert_info_to_channel(info_dict)
+    return info_dict
 
 
 def convert_info_to_channel(info_dict) -> RSSChannel:

@@ -13,9 +13,10 @@ except ImportError:
     ## in this case __init__ is already loaded
     pass
 
+import sys
 import logging
 
-from rsscast.source.youtube.ytconverter import get_yt_duration, convert_yt
+from rsscast.source.youtube.ytconverter import get_yt_duration, convert_to_audio
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -40,20 +41,22 @@ def test_01():
     output_path = "/tmp/test_convert_00.data"
     _LOGGER.info( "converting video: %s into %s", url, output_path )
 
-    status = convert_yt( url, output_path )
+    status = convert_to_audio( url, output_path )
     _LOGGER.info( "conversion status: %s", status )
     if not status:
         _LOGGER.error( "===== test failed: unable to convert video" )
+        sys.exit(1)
 
 
 def test_02():
     url = "https://www.youtube.com/watch?v=1cpyexbmMyU"
     output_path = "/tmp/test_convert_01.data"
     _LOGGER.info( f"downloading {url}" )
-    status = convert_yt( url, output_path )
+    status = convert_to_audio( url, output_path )
     _LOGGER.info( "conversion status: %s", status )
     if not status:
         _LOGGER.error( "===== test failed: unable to convert video" )
+        sys.exit(1)
 
 
 def test_03():
@@ -61,10 +64,11 @@ def test_03():
     #url = "https://www.youtube.com/watch?v=2p8OTosmFHU"
     output_path = "/tmp/test_convert_02.data"
     _LOGGER.info( f"downloading {url}" )
-    status = convert_yt( url, output_path )
+    status = convert_to_audio( url, output_path )
     _LOGGER.info( "conversion status: %s", status )
     if not status:
         _LOGGER.error( "===== test failed: unable to convert video" )
+        sys.exit(1)
 
 
 # test_01()

@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+#
 # MIT License
 #
 # Copyright (c) 2021 Arkadiusz Netczuk <dev.arnet@gmail.com>
@@ -21,30 +23,31 @@
 # SOFTWARE.
 #
 
-import logging
+try:
+    ## following import success only when file is directly executed from command line
+    ## otherwise will throw exception when executing as parameter for "python -m"
+    # pylint: disable=W0611
+    import __init__
+except ImportError:
+    ## when import fails then it means that the script was executed indirectly
+    ## in this case __init__ is already loaded
+    pass
 
-from rsscast.rss.rsschannel import RSSChannel
-from rsscast.source.youtube.ytfeedparser import parse_rss
-from rsscast.source.youtube.ytconverter import parse_playlist
+import sys
+
+from rsscast import logger
+from rsscast.source.youtube.convert_yt_dlp import convert_yt
 
 
-_LOGGER = logging.getLogger(__name__)
+def main():
+    logger.configure_console()
+
+    converted = convert_yt( "https://www.youtube.com/watch?v=BLRUiVXeZKU", "/tmp/yt_example.mp3" )
+    print("converted:", converted)
+
+    if not converted:
+        sys.exit(1)
 
 
-## ============================================================
-
-
-def parse_url( feedId, feedUrl, write_content=True, known_items=None, max_fetch=10 ) -> RSSChannel:
-    _LOGGER.info("fetching feed data: %s %s", feedId, feedUrl)
-    # 'parse_rss' for backward compatibility
-    channel = parse_rss(feedId, feedUrl, write_content)
-    if channel:
-        return channel
-
-    channel = parse_playlist(feedUrl, known_items=known_items, max_fetch=max_fetch)
-    if channel:
-        return channel
-
-    # no data found
-    _LOGGER.error("unable to fetch data from %s %s", feedId, feedUrl)
-    return RSSChannel()
+if __name__ == '__main__':
+    main()

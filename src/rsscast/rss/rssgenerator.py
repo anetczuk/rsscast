@@ -30,8 +30,7 @@ from typing import List
 from rsscast.utils import write_text
 from rsscast.rss.rsschannel import RSSChannel, RSSItem, get_channel_output_dir
 from rsscast.rss.rssserver import RSSServerManager
-from rsscast.source.youtube.ytconverter import convert_yt
-from rsscast.source.youtube.ytdlpparser import is_video_available
+from rsscast.source.youtube.ytconverter import convert_to_audio, is_video_available
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -202,7 +201,7 @@ def download_items( feedId, itemsList: List[RSSItem], _=None ):
 
             _LOGGER.info( f"{index + 1}/{items_len} feed {feedId}:"
                           f" {rssItem.title} converting video: {postLink} to {postLocalPath}" )
-            converted = convert_yt( postLink, postLocalPath )
+            converted = convert_to_audio( postLink, postLocalPath )
             if converted is False:
                 ## skip elements that failed to convert
                 _LOGGER.info( "feed %s: unable to convert video '%s' -- skipped", feedId, rssItem.title )

@@ -33,7 +33,7 @@ from rsscast import logger
 from rsscast.rss.rsschannel import RSSChannel
 from rsscast.rss.rssgenerator import generate_items_rss
 from rsscast.source.youtube.ytfeedparser import parse_rss_content
-from rsscast.source.youtube.ytdlpparser import reduce_info, convert_info_to_channel
+from rsscast.source.youtube.ytconverter import reduce_info, convert_info_to_channel
 
 
 _LOGGER = logging.getLogger(__name__)

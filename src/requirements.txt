@@ -6,6 +6,7 @@ watchdog
 #youtube-dl
 ## required to read video duration
 pytube
+pytubefix
 filetype
 yt-dlp
 # pydub       # conversion from mp4 to mp3

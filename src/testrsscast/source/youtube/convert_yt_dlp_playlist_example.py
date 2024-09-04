@@ -38,9 +38,7 @@ import json
 import pprint
 
 from rsscast import logger
-from rsscast.rss.rsschannel import RSSChannel
-# from rsscast.rss.rssgenerator import generate_items_rss
-from rsscast.source.youtube.ytdlpparser import parse_playlist
+from rsscast.source.youtube.convert_yt_dlp import parse_playlist_data
 
 
 def get_json(obj):
@@ -52,28 +50,20 @@ def get_json(obj):
 def main():
     logger.configure()
 
-    # ## playlist - gwiazdowski
-    # url = "https://www.youtube.com/playlist?list=PLC9xjKm8G0LpgFgi-eF4YgvtMuogd1dHw"
-    # info_dict = fetch_info(url, items_num=999999)
-    # info_dict["entries"] = "xxx"
-    # pprint.pprint( info_dict )
-    # return
-
     ## playlist - youtube latino
     url = "https://www.youtube.com/playlist?list=PL1ebpFrA3ctH0QN6bribofTNpG4z2loWy"
+    # url = "https://www.youtube.com/@YouTubeLatam/playlists"
     known = ["https://www.youtube.com/watch?v=aAbfzUJLJJE", "https://www.youtube.com/watch?v=3Q1DIHK2AIw"]
 
-    channel_data: RSSChannel = parse_playlist(url, known)
-    channel_data.sort()
-    print("extracted rss channel data:")
-    ret_dict = get_json(channel_data)
-    pprint.pprint( ret_dict )
-    print("playlist case found items:", channel_data.size())
+    list_data = parse_playlist_data(url, known)
+    print("extracted channel data:")
+    pprint.pprint( list_data )
+    # print("playlist case found items:", channel_data.size())
 
-    # rss_content = generate_items_rss(channel_data, host="the_host",
-    #                                  url_dir_path="url_dir", local_dir_path="local_dir",
-    #                                  store=False, check_local=False)
-    # print(rss_content)
+    entries_list = list_data["entries"]
+
+    if len(entries_list) < 1:
+        sys.exit(1)
 
 
 # =============================================================

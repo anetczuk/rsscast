@@ -35,14 +35,10 @@ except ImportError:
 
 import sys
 import json
+import pprint
 
 from rsscast import logger
-from rsscast.rss.rsschannel import RSSChannel
-from rsscast.source.parser import parse_url
-
-
-def parse(url, max_fetch=10) -> RSSChannel:
-    return parse_url("test-channel", url, write_content=False, max_fetch=max_fetch)
+from rsscast.source.youtube.convert_yt_dlp import fetch_info, list_audio_formats, download_audio
 
 
 def get_json(obj):
@@ -51,36 +47,21 @@ def get_json(obj):
     )
 
 
-def test01():
-    channel_data: RSSChannel = parse("http://www.youtube.com/feeds/videos.xml?user=KNPvsUE", max_fetch=2)
-
-    channel_data.sort()
-    print("extracted rss channel data:")
-    # ret_dict = get_json(channel_data)
-    # pprint.pprint( ret_dict )
-    print("playlist case found items:", channel_data.size())
-    if channel_data.size() < 1:
-        sys.exit(1)
-
-
-def test02():
-    channel_data: RSSChannel = parse("https://www.youtube.com/playlist?list=PLvLrA9jH7wQixazuO4ZcAU9eyqVAnpMqi",
-                                     max_fetch=2)
-
-    channel_data.sort()
-    print("extracted rss channel data:")
-    # ret_dict = get_json(channel_data)
-    # pprint.pprint( ret_dict )
-    print("playlist case found items:", channel_data.size())
-    if channel_data.size() < 1:
-        sys.exit(1)
-
-
 def main():
     logger.configure()
 
-    test01()
-    test02()
+    url = "https://www.youtube.com/watch?v=BLRUiVXeZKU"    # exists
+    # url = "https://www.youtube.com/watch?v=1LFHUJO-JvI"    # exists
+    # url = "https://www.youtube.com/watch?v=FwzslavNmDQ"    # not exist
+    # url = "https://www.youtube.com/watch?v=L-ZQSi3gM9U"    # very long
+
+    info_dict = fetch_info(url)
+    pprint.pprint( info_dict )
+
+    audio_formats = list_audio_formats(url)
+    pprint.pprint( audio_formats )
+
+    download_audio(url, "/tmp/yt_audio.mp3", "140")
 
 
 # =============================================================

@@ -23,19 +23,36 @@
 
 import os
 import logging
-
-from pytube import YouTube
+import random
 
 import filetype
 
-from rsscast.source.youtube.ytwebconvert import convert_yt_yt1s, convert_yt_y2down
-from rsscast.source.youtube.ytdlpparser import download_audio
+from rsscast.rss.rsschannel import RSSChannel
+
+from rsscast.source.youtube.convert_pytube import get_yt_duration as get_yt_duration_pytube
+
+from rsscast.source.youtube.convert_yt_dlp import convert_yt as convert_yt_yt_dlp
+from rsscast.source.youtube.convert_yt_dlp import is_video_available as is_video_available_yt_dlp
+from rsscast.source.youtube.convert_yt_dlp import parse_playlist as parse_playlist_yt_dlp
+from rsscast.source.youtube.convert_yt_dlp import reduce_info as reduce_info_yt_dlp
+from rsscast.source.youtube.convert_yt_dlp import convert_info_to_channel as convert_info_to_channel_yt_dlp
+
+from rsscast.source.youtube.convert_ddownr_com import convert_yt as convert_yt_ddownr
+from rsscast.source.youtube.convert_yt1s_com import convert_yt as convert_yt_yt1s
+from rsscast.source.youtube.convert_y2down_cc import convert_yt as convert_yt_y2down
 
 
 _LOGGER = logging.getLogger(__name__)
 
 
+WEB_CONVERTERS = [convert_yt_yt_dlp, convert_yt_ddownr, convert_yt_yt1s, convert_yt_y2down]
+
+
 ## ===================================================================
+
+
+def is_video_available(video_url) -> bool:
+    return is_video_available_yt_dlp(video_url)
 
 
 ## requires "youtube_dl"
@@ -44,71 +61,53 @@ def get_yt_duration( link ):
     # return get_yt_duration_pafy( link )
 
 
-## returns value in seconds
-def get_yt_duration_pytube( link ):
-    try:
-        yt = YouTube( link )
-        # pprint.pprint( yt.vid_info )
-        video_info  = yt.vid_info
-        status_info = video_info.get( "playabilityStatus", {} )
-        status      = status_info.get( "status", "Ok" )
-        if status == "ERROR":
-            reason = status_info.get( "reason", "" )
-            _LOGGER.error( "unable to get length of video, reason: %s", reason )
-            return -1
-
-        return yt.length
-    except TypeError as e:
-        _LOGGER.exception( "unable to get video duration: %s", e )
-    return -1
-
-
 # def get_yt_duration_pafy( link ):
 #     video = pafy.new( link )
 #     return video.length
 
 
+def parse_playlist(page_url, known_items=None, max_fetch=10) -> RSSChannel:
+    return parse_playlist_yt_dlp(page_url, known_items, max_fetch)
+
+
+def convert_info_to_channel(info_dict) -> RSSChannel:
+    return convert_info_to_channel_yt_dlp(info_dict)
+
+
+def reduce_info(info_dict):
+    reduce_info_yt_dlp(info_dict)
+
+
 ## ===================================================================
 
 
-def convert_yt( link, output, mimicHuman=True ):
-    if download_audio(link, output, format_id="233"):
-        return True
-    if download_audio(link, output, format_id="140"):
-        return True
+def convert_to_audio( link, output, mimicHuman=True ) -> bool:
+    converters_list = list(WEB_CONVERTERS)
+    random.shuffle(converters_list)
 
-    _LOGGER.warning( "unable to download data using 'yt_dlp' - using web converter" )
-
-    succeed = convert_yt_yt1s( link, output, mimicHuman )
-    if not succeed:
-        _LOGGER.error( f"failed to convert '{link}' - process failed" )
-        return False
-    if os.path.isfile( output ) is False:
-        _LOGGER.error( f"failed to convert '{link}' - missing file" )
-        return False
-    kind = filetype.guess( output )
-    if kind is None:
-        ## server respond with HTML page instead of audio file
-        _LOGGER.warning( f"failed to convert '{link}' - trying other method" )
-        os.remove( output )
-
-        succeed = convert_yt_y2down( link, output )
+    for converter in converters_list:
+        succeed = converter( link, output, mimicHuman )
         if not succeed:
-            _LOGGER.error( f"failed to convert '{link}' - unable to find type #1" )
-            os.remove( output )
-            return False
+            _LOGGER.error( f"failed to convert '{link}' - process failed" )
+            continue
         if os.path.isfile( output ) is False:
-            _LOGGER.error( f"failed to convert '{link}' - unable to find type #2" )
-            return False
+            _LOGGER.error( f"failed to convert '{link}' - missing file" )
+            continue
+
         kind = filetype.guess( output )
         if kind is None:
-            _LOGGER.error( f"failed to convert '{link}' - unable to find type #3" )
+            ## server respond with HTML page instead of audio file
+            _LOGGER.error( f"failed to convert '{link}' - unable to find type" )
             os.remove( output )
-            return False
+            continue
 
-    if kind.extension != "mp3":
-        _LOGGER.error( f"failed to convert '{link}' - bad type ({kind.extension})" )
-        os.remove( output )
-        return False
+        if kind.extension != "mp3":
+            _LOGGER.error( f"failed to convert '{link}' - bad type ({kind.extension})" )
+            os.remove( output )
+            continue
 
-    return True
+        # succeed
+        return True
+
+    # no more converters
+    return False

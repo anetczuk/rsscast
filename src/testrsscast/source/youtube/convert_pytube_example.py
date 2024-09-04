@@ -34,37 +34,20 @@ except ImportError:
     pass
 
 import sys
-import json
-import pprint
 
 from rsscast import logger
-from rsscast.rss.rsschannel import RSSChannel
-
-from rsscast.source.youtube.ytdlpparser import parse_playlist
-
-
-def get_json(obj):
-    return json.loads(
-        json.dumps(obj, default=lambda o: getattr(o, '__dict__', str(o)))
-    )
+from rsscast.source.youtube.convert_pytube import convert_yt
 
 
 def main():
-    logger.configure()
+    logger.configure_console()
 
-    # przygody przedsiebiorcow
-    url = "https://www.youtube.com/@PrzygodyPrzedsiebiorcow/featured"
-    channel_data: RSSChannel = parse_playlist(url)
-    channel_data.sort()
-    print("extracted rss channel data:")
-    ret_dict = get_json(channel_data)
-    pprint.pprint( ret_dict )
-    print("playlist case found items:", channel_data.size())
+    converted = convert_yt( "https://www.youtube.com/watch?v=BLRUiVXeZKU", "/tmp/yt_example.mp3" )
+    print("converted:", converted)
 
-
-# =============================================================
+    if not converted:
+        sys.exit(1)
 
 
 if __name__ == '__main__':
     main()
-    sys.exit(0)
