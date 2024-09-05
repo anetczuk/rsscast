@@ -58,25 +58,29 @@ def convert_yt( link, output, _mimicHuman=True ) -> bool:
 
     _LOGGER.info( f"waiting for finish of conversion of {link}" )
 
-    recent_progress_value    = 0
+    recent_progress_data = None
     stalled_progress_counter = 0
     while True:
+        time.sleep( 3.0 )
+
         progress_link = f"https://loader.to/ajax/progress.php?id={convert_id}"
         progress_resp = urlretrieve( progress_link )
         progress_data = json.loads( progress_resp )
-        _LOGGER.info( "received progress: %s %s", stalled_progress_counter, progress_data )
-        if progress_data.get("success", 0) != 0:
-            break
-        progress_value = progress_data.get("progress", 0)
-        if recent_progress_value == progress_value:
+
+        if recent_progress_data == progress_data:
             stalled_progress_counter += 1
             if stalled_progress_counter >= 20:
                 _LOGGER.info( "downloading stalled - breaking" )
                 return False
-        else:
-            recent_progress_value = progress_value
-            stalled_progress_counter = 0
-        time.sleep( 3.0 )
+            continue
+
+        if progress_data.get("success", 0) != 0:
+            # finished
+            break
+
+        _LOGGER.info( "received progress: %s %s", stalled_progress_counter, progress_data )
+        recent_progress_data = progress_data
+        stalled_progress_counter = 0
 
     download_link = progress_data.get( "download_url" )
     if not download_link:

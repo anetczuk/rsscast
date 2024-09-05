@@ -86,7 +86,12 @@ def convert_to_audio( link, output, mimicHuman=True ) -> bool:
     random.shuffle(converters_list)
 
     for converter in converters_list:
-        succeed = converter( link, output, mimicHuman )
+        succeed = False
+        try:
+            succeed = converter( link, output, mimicHuman )
+        except Exception:
+            _LOGGER.exception("unable to get audio from %s", link)
+
         if not succeed:
             _LOGGER.error( f"failed to convert '{link}' - process failed" )
             continue

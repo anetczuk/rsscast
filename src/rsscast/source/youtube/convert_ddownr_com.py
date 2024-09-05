@@ -50,16 +50,23 @@ def convert_yt( link, output, _mimicHuman=True ) -> bool:
     status_url = "https://p.oceansaver.in/ajax/progress.php"
     params = {"id": job_id}
     download_url = None
+    recent_response_data = None
     for _ in range(0, 120):
         time.sleep(1.0)
 
         status_response = curl_get(session, status_url, params)
         response = status_response.getvalue()
         response_data = json.loads( response )
+
+        if recent_response_data == response_data:
+            # no change
+            continue
+        recent_response_data = response_data
+
         status = response_data.get("success")
         if status == 0:
             # in progress
-            _LOGGER.debug( f"in progress status: {response_data}" )
+            _LOGGER.debug( f"received progress: {response_data}" )
             continue
         if status == 1:
             # found url
