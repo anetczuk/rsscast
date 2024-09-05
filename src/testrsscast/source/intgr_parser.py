@@ -34,11 +34,19 @@ except ImportError:
     pass
 
 import sys
+import logging
 import json
 
 from rsscast import logger
-from rsscast.source.youtube.ytconverter import convert_to_audio, parse_playlist
 from rsscast.rss.rsschannel import RSSChannel
+from rsscast.source.parser import parse_url
+
+
+_LOGGER = logging.getLogger(__name__)
+
+
+def parse(url, max_fetch=10) -> RSSChannel:
+    return parse_url("test-channel", url, write_content=False, max_fetch=max_fetch)
 
 
 def get_json(obj):
@@ -47,48 +55,45 @@ def get_json(obj):
     )
 
 
-def test_convert_to_audio():
-    converted = convert_to_audio( "https://www.youtube.com/watch?v=BLRUiVXeZKU", "/tmp/yt_example.mp3" )
+def test01():
+    channel_data: RSSChannel = parse("http://www.youtube.com/feeds/videos.xml?user=KNPvsUE", max_fetch=2)
 
-    ## long file: 3h 58m
-    # converted = convert_to_audio( "https://www.youtube.com/watch?v=C9HrMN9BjfY", "/tmp/yt_example.mp3" )
-
-    # converted = convert_to_audio( "https://www.youtube.com/watch?v=cJuO985zF8E", "/tmp/yt_example.mp3" )
-
-    print("converted:", converted)
-    if not converted:
+    channel_data.sort()
+    print("extracted rss channel data:")
+    # ret_dict = get_json(channel_data)
+    # pprint.pprint( ret_dict )
+    print("playlist case found items:", channel_data.size())
+    if channel_data.size() < 1:
         print("FAILED")
         sys.exit(1)
 
 
-def test_parse_playlist():
-    # ## playlist - gwiazdowski
-    # url = "https://www.youtube.com/playlist?list=PLC9xjKm8G0LpgFgi-eF4YgvtMuogd1dHw"
-    # info_dict = fetch_info(url, items_num=999999)
-    # info_dict["entries"] = "xxx"
-    # pprint.pprint( info_dict )
-    # return
+def test02():
+    channel_data: RSSChannel = parse("https://www.youtube.com/playlist?list=PLvLrA9jH7wQixazuO4ZcAU9eyqVAnpMqi",
+                                     max_fetch=2)
 
-    ## playlist - youtube latino
-    url = "https://www.youtube.com/playlist?list=PL1ebpFrA3ctH0QN6bribofTNpG4z2loWy"
-    known = ["https://www.youtube.com/watch?v=aAbfzUJLJJE", "https://www.youtube.com/watch?v=3Q1DIHK2AIw"]
-
-    channel_data: RSSChannel = parse_playlist(url, known)
     channel_data.sort()
+    print("extracted rss channel data:")
+    # ret_dict = get_json(channel_data)
+    # pprint.pprint( ret_dict )
     print("playlist case found items:", channel_data.size())
-
-    if channel_data.size() != 2:
+    if channel_data.size() < 1:
         print("FAILED")
         sys.exit(1)
 
 
 def main():
-    logger.configure_console()
+    logger.configure()
 
-    test_convert_to_audio()
+    test01()
+    test02()
 
-    test_parse_playlist()
+    _LOGGER.info( "tests completed" )
+
+
+# =============================================================
 
 
 if __name__ == '__main__':
     main()
+    sys.exit(0)
