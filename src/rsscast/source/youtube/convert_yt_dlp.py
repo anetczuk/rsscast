@@ -51,14 +51,15 @@ _LOGGER = logging.getLogger(__name__)
 def convert_yt( link, output, _mimicHuman=True ) -> bool:
     _LOGGER.info("yt_dlp: converting youtube video %s", link)
 
-    if not download_audio(link, output, format_id="233"):
-        return False
+    if download_audio(link, output, format_id="233"):
+        # download completed
+        return True
 
-    if not download_audio(link, output, format_id="140"):
-        return False
+    if download_audio(link, output, format_id="140"):
+        # download completed
+        return True
 
-    _LOGGER.info("downloading completed")
-    return True
+    return False
 
 
 ## ============================================================
@@ -221,6 +222,7 @@ def download_audio(link, output_path, format_id="233") -> bool:
             # exception during storage - remove incomplete file
             os.remove(yt_path)
         return False
+
     except BaseException as exc:
         _LOGGER.error("error during download of audio using format %s: %s", format_id, exc)
         if os.path.isfile(yt_path):
@@ -235,6 +237,7 @@ def download_audio(link, output_path, format_id="233") -> bool:
     # # convert in place
     # AudioSegment.from_file(yt_path).export(output_path, format="mp3", bitrate="128k")
 
+    _LOGGER.info("downloading completed")
     return True
 
 
