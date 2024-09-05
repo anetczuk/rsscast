@@ -35,7 +35,6 @@ except ImportError:
 
 import sys
 import json
-import pprint
 
 from rsscast import logger
 from rsscast.source.youtube.convert_yt_dlp import parse_playlist_data
@@ -56,13 +55,14 @@ def main():
     known = ["https://www.youtube.com/watch?v=aAbfzUJLJJE", "https://www.youtube.com/watch?v=3Q1DIHK2AIw"]
 
     list_data = parse_playlist_data(url, known)
-    print("extracted channel data:")
-    pprint.pprint( list_data )
-    # print("playlist case found items:", channel_data.size())
+
+    # print("extracted channel data:")
+    # pprint.pprint( list_data )
+    # # print("playlist case found items:", channel_data.size())
 
     entries_list = list_data["entries"]
-
     if len(entries_list) < 1:
+        print("FAILED")
         sys.exit(1)
 
 

@@ -35,10 +35,9 @@ except ImportError:
 
 import sys
 import json
-import pprint
 
 from rsscast import logger
-from rsscast.source.youtube.convert_yt_dlp import fetch_info, list_audio_formats, download_audio
+from rsscast.source.youtube.convert_yt_dlp import convert_yt
 
 
 def get_json(obj):
@@ -55,13 +54,18 @@ def main():
     # url = "https://www.youtube.com/watch?v=FwzslavNmDQ"    # not exist
     # url = "https://www.youtube.com/watch?v=L-ZQSi3gM9U"    # very long
 
-    info_dict = fetch_info(url)
-    pprint.pprint( info_dict )
+    # info_dict = fetch_info(url)
+    # pprint.pprint( info_dict )
+    #
+    # audio_formats = list_audio_formats(url)
+    # pprint.pprint( audio_formats )
 
-    audio_formats = list_audio_formats(url)
-    pprint.pprint( audio_formats )
+    converted = convert_yt(url, "/tmp/yt_audio.mp3", "140")
 
-    download_audio(url, "/tmp/yt_audio.mp3", "140")
+    print("converted:", converted)
+    if not converted:
+        print("FAILED")
+        sys.exit(1)
 
 
 # =============================================================

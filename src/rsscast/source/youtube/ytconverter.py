@@ -31,21 +31,24 @@ from rsscast.rss.rsschannel import RSSChannel
 
 from rsscast.source.youtube.convert_pytube import get_yt_duration as get_yt_duration_pytube
 
-from rsscast.source.youtube.convert_yt_dlp import convert_yt as convert_yt_yt_dlp
 from rsscast.source.youtube.convert_yt_dlp import is_video_available as is_video_available_yt_dlp
 from rsscast.source.youtube.convert_yt_dlp import parse_playlist as parse_playlist_yt_dlp
 from rsscast.source.youtube.convert_yt_dlp import reduce_info as reduce_info_yt_dlp
 from rsscast.source.youtube.convert_yt_dlp import convert_info_to_channel as convert_info_to_channel_yt_dlp
 
 from rsscast.source.youtube.convert_ddownr_com import convert_yt as convert_yt_ddownr
-from rsscast.source.youtube.convert_yt1s_com import convert_yt as convert_yt_yt1s
+from rsscast.source.youtube.convert_pytube import convert_yt as convert_yt_pytube
 from rsscast.source.youtube.convert_y2down_cc import convert_yt as convert_yt_y2down
+from rsscast.source.youtube.convert_youtube_dl import convert_yt as convert_yt_youtube_dl
+from rsscast.source.youtube.convert_yt_dlp import convert_yt as convert_yt_yt_dlp
+from rsscast.source.youtube.convert_yt1s_com import convert_yt as convert_yt_yt1s
 
 
 _LOGGER = logging.getLogger(__name__)
 
 
-WEB_CONVERTERS = [convert_yt_yt_dlp, convert_yt_ddownr, convert_yt_yt1s, convert_yt_y2down]
+WEB_CONVERTERS = [convert_yt_yt_dlp, convert_yt_pytube, convert_yt_youtube_dl,
+                  convert_yt_ddownr, convert_yt_yt1s, convert_yt_y2down]
 
 
 ## ===================================================================
@@ -89,7 +92,7 @@ def convert_to_audio( link, output, mimicHuman=True ) -> bool:
         succeed = False
         try:
             succeed = converter( link, output, mimicHuman )
-        except Exception:
+        except Exception:           # pylint: disable=broad-except
             _LOGGER.exception("unable to get audio from %s", link)
 
         if not succeed:

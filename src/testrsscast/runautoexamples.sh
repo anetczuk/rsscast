@@ -26,20 +26,17 @@ $SCRIPT_DIR/source/youtube/convert_ddownr_com_example.py
 ## does not work
 #$SCRIPT_DIR/source/youtube/convert_publer_io_example.py
 
-## does not work (bot detection)
-#$SCRIPT_DIR/source/youtube/convert_pytube_example.py
+$SCRIPT_DIR/source/youtube/convert_pytube_example.py
 
 $SCRIPT_DIR/source/youtube/convert_y2down_cc_example.py
 
-## does not work (bot detection)
-#$SCRIPT_DIR/source/youtube/convert_youtube_dl_example.py
+$SCRIPT_DIR/source/youtube/convert_youtube_dl_example.py
 
-## does not work (sign required)
-#$SCRIPT_DIR/source/youtube/convert_yt_dlp_example.py
-#$SCRIPT_DIR/source/youtube/convert_yt_dlp_featured_example.py
-#$SCRIPT_DIR/source/youtube/convert_yt_dlp_playlist_example.py
-#$SCRIPT_DIR/source/youtube/convert_yt_dlp_video_example.py
-#$SCRIPT_DIR/source/youtube/convert_yt_dlp_videos_example.py
+$SCRIPT_DIR/source/youtube/convert_yt_dlp_example.py
+$SCRIPT_DIR/source/youtube/convert_yt_dlp_featured_example.py
+$SCRIPT_DIR/source/youtube/convert_yt_dlp_playlist_example.py
+$SCRIPT_DIR/source/youtube/convert_yt_dlp_video_example.py
+$SCRIPT_DIR/source/youtube/convert_yt_dlp_videos_example.py
 
 $SCRIPT_DIR/source/youtube/convert_yt1s_com_example.py
 

@@ -35,7 +35,6 @@ except ImportError:
 
 import sys
 import json
-import pprint
 
 from rsscast import logger
 from rsscast.rss.rsschannel import RSSChannel
@@ -54,12 +53,17 @@ def main():
 
     # przygody przedsiebiorcow home page
     url = "https://www.youtube.com/c/PrzygodyPrzedsi%C4%99biorc%C3%B3w/featured"
-    channel_data: RSSChannel = parse_playlist(url)
+    channel_data: RSSChannel = parse_playlist(url, max_fetch=2)
     channel_data.sort()
-    print("extracted rss channel data:")
-    ret_dict = get_json(channel_data)
-    pprint.pprint( ret_dict )
+
+    # print("extracted rss channel data:")
+    # ret_dict = get_json(channel_data)
+    # pprint.pprint( ret_dict )
+
     print("playlist case found items:", channel_data.size())
+    if channel_data.size() != 2:
+        print("FAILED")
+        sys.exit(1)
 
 
 # =============================================================

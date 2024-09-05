@@ -56,6 +56,7 @@ echo "flake8 -- no warnings found"
 
 
 echo "code checking using pylint3"
+echo "for inline suppression use: # pylint: disable=<check-code>"
 
 pylint --rcfile=$SCRIPT_DIR/pylint3.config $src_dir/rsscast $src_dir/testrsscast $src_dir/*.py
 exit_code=$?

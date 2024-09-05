@@ -55,37 +55,56 @@ def convert_yt( link, output, mimicHuman=True ) -> bool:
         params = { 'vid': vidId,
                    'k': convertId }
         _LOGGER.debug( "sending convert request to %s\nparams: %s", convert_url, params )
-        dataBuffer = curl_post( session, convert_url, params )
-        bodyOutput = dataBuffer.getvalue().decode('utf-8')
-#         _LOGGER.info( "response:\n%s", bodyOutput )
 
-        if mimicHuman:
-            randTime = random.uniform( 1.0, 3.0 )
-            time.sleep( randTime )
+        download_url = None
+        recent_response_data = None
+        for _ in range(0, 120):
+            if mimicHuman:
+                randTime = random.uniform( 1.0, 3.0 )
+                time.sleep( randTime )
+            else:
+                time.sleep(1.0)
 
-        data = json.loads( bodyOutput )
+            status_response = curl_post( session, convert_url, params )
+            response = status_response.getvalue()
+            response_data = json.loads( response )
 
-#         print( "convert response:", data )
-#         pprint( data )
+    #         print( "convert response:", data )
+    #         pprint( data )
 
-        jsonStatus = data['status']
-        if jsonStatus != "ok":
-            _LOGGER.warning( "invalid status:\n%s", bodyOutput )
-            return False
-        jsonCStatus = data['c_status']
-        if jsonCStatus != "CONVERTED":
-            #TODO: handle case
+            if recent_response_data == response_data:
+                # no change
+                continue
+            recent_response_data = response_data
+
+            jsonStatus = response_data['status']
+            if jsonStatus != "ok":
+                _LOGGER.error( "invalid status:\n%s", jsonStatus )
+                return False
+
+            c_status = response_data['c_status']
+            if c_status == "CONVERTING":
+                # in progress
+                continue
+
+            if c_status == "CONVERTED":
+                # completed
+                download_url = response_data["dlink"]
+                break
+
             ## {"status":"ok","mess":"","c_status":"CONVERTING","b_id":"6004d4c0d684ebb22f8b45ab","e_time":39}
-            _LOGGER.warning( "invalid status:\n%s", bodyOutput )
+            _LOGGER.error( "invalid status:\n%s", response_data )
             return False
 
-        dlink = data["dlink"]
+        if download_url is None:
+            _LOGGER.error( "timeout reached during waiting for conversion" )
+            return False
 
-        _LOGGER.info( "grabbing file: %s to %s", dlink, output )
-        urldownload( dlink, output )
+        _LOGGER.info( "grabbing file: %s to %s", download_url, output )
+        urldownload( download_url, output )
 
-#         simple_download( dlink, output )
-#         curl_download( session, dlink, output )
+#         simple_download( download_url, output )
+#         curl_download( session, download_url, output )
 
 #         if mimicHuman:
 #             randTime = random.uniform( 1.0, 3.0 )

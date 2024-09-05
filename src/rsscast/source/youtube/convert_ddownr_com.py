@@ -77,10 +77,11 @@ def convert_yt( link, output, _mimicHuman=True ) -> bool:
         return False
 
     if download_url is None:
+        _LOGGER.error( "timeout reached during waiting for conversion" )
         return False
 
     _LOGGER.info( f"downloading content from {download_url} to {output}" )
-    urlretrieve( download_url, output, write_empty=False )
+    urlretrieve( download_url, output, timeout=60, write_empty=False )
 
     _LOGGER.info("downloading completed")
     return True

@@ -111,8 +111,9 @@ def parse_playlist_data( page_url, known_items=None, max_fetch=10 ) -> Dict[Any,
 
             sub_items = sub_info_dict.get("entries")
             if sub_items is not None:
-                _LOGGER.info("%s of %s: found sublist items %s", i, len(entries_gen), len(sub_items))
                 # sublist case - append to current list
+                fetch_count -= 1        # reduce - fetch indicates number of videos
+                _LOGGER.info("%s of %s: found sublist items %s", i, len(entries_gen), len(sub_items))
                 new_list: List[str] = []
                 new_list.extend( entries_gen[0:i - 1] )
                 new_list.extend( sub_items )
@@ -191,7 +192,7 @@ def is_video_available(video_url) -> bool:
 
 
 # preferred audio formats: 233, 140
-def download_audio(link, output_path, format_id="233"):
+def download_audio(link, output_path, format_id="233") -> bool:
     _LOGGER.info("downloading audio from: %s format %s", link, format_id)
     yt_path = output_path
     yt_path = yt_path.rstrip(".mp3")

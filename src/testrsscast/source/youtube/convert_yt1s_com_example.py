@@ -43,12 +43,11 @@ def main():
     logger.configure_console()
 
     converted = convert_yt( "https://www.youtube.com/watch?v=BLRUiVXeZKU", "/tmp/yt_example.mp3" )
-
     # converted = convert_yt( "https://www.youtube.com/watch?v=cJuO985zF8E", "/tmp/yt_example.mp3" )
 
     print("converted:", converted)
-
     if not converted:
+        print("FAILED")
         sys.exit(1)
 
 
