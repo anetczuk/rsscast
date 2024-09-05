@@ -198,6 +198,7 @@ class MainWindow( QtBaseClass ):           # type: ignore
         threads.finished.connect( self._refreshingFinished, Qt.QueuedConnection )
 
         feedList: List[ FeedEntry ] = self.data.feed.getList()
+        feedList = sorted(feedList, key=lambda item: item.feedId if item else None)
         for feed in feedList:
             if processDisabled is False and feed.enabled is False:
                 continue
