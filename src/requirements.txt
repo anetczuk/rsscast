@@ -3,10 +3,15 @@ feedparser
 requests_file
 pycurl
 watchdog
-#youtube-dl
+
 ## required to read video duration
 pytube
 pytubefix
-filetype
+
+## version (on RPi) does not work, because is too old
+#youtube-dl
+
 yt-dlp
+filetype
+
 # pydub       # conversion from mp4 to mp3
