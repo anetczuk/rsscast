@@ -21,11 +21,8 @@
 # SOFTWARE.
 #
 
-import os
 import logging
 import random
-
-import filetype
 
 from rsscast.rss.rsschannel import RSSChannel
 
@@ -37,18 +34,19 @@ from rsscast.source.youtube.convert_yt_dlp import reduce_info as reduce_info_yt_
 from rsscast.source.youtube.convert_yt_dlp import convert_info_to_channel as convert_info_to_channel_yt_dlp
 
 from rsscast.source.youtube.convert_ddownr_com import convert_yt as convert_yt_ddownr
-from rsscast.source.youtube.convert_pytube import convert_yt as convert_yt_pytube
+# from rsscast.source.youtube.convert_pytube import convert_yt as convert_yt_pytube
 from rsscast.source.youtube.convert_y2down_cc import convert_yt as convert_yt_y2down
 # from rsscast.source.youtube.convert_youtube_dl import convert_yt as convert_yt_youtube_dl
 from rsscast.source.youtube.convert_yt_dlp import convert_yt as convert_yt_yt_dlp
 from rsscast.source.youtube.convert_yt1s_com import convert_yt as convert_yt_yt1s
+from rsscast.source.youtube.ytwebconvert import check_is_mp3
 
 
 _LOGGER = logging.getLogger(__name__)
 
 
-WEB_CONVERTERS = [convert_yt_yt_dlp, convert_yt_pytube,
-                  # convert_yt_youtube_dl,
+WEB_CONVERTERS = [  # convert_yt_pytube,        # conversion from mp4 to mp3 needed
+                  # convert_yt_youtube_dl,    # too old on RPi
                   convert_yt_ddownr, convert_yt_yt1s, convert_yt_y2down]
 
 
@@ -90,33 +88,37 @@ def convert_to_audio( link, output, mimicHuman=True ) -> bool:
     random.shuffle(converters_list)
 
     for converter in converters_list:
-        succeed = False
         try:
             succeed = converter( link, output, mimicHuman )
+            if not succeed:
+                _LOGGER.error( f"failed to convert '{link}' - process failed" )
+                continue
         except Exception:           # pylint: disable=broad-except
             _LOGGER.exception("unable to get audio from %s", link)
-
-        if not succeed:
-            _LOGGER.error( f"failed to convert '{link}' - process failed" )
-            continue
-        if os.path.isfile( output ) is False:
-            _LOGGER.error( f"failed to convert '{link}' - missing file" )
             continue
 
-        kind = filetype.guess( output )
-        if kind is None:
-            ## server respond with HTML page instead of audio file
-            _LOGGER.error( f"failed to convert '{link}' - unable to find type" )
-            os.remove( output )
-            continue
-
-        if kind.extension != "mp3":
-            _LOGGER.error( f"failed to convert '{link}' - bad type ({kind.extension})" )
-            os.remove( output )
+        if not check_is_mp3(output):
+            _LOGGER.error( f"failed to convert '{link}' - invalid file" )
             continue
 
         # succeed
         return True
 
-    # no more converters
-    return False
+    ## yt_dlp natively stores audio in MP4 format with causes problems
+    ## additional conversion step takes very long, so use the module
+    ## as last possibility
+    try:
+        succeed = convert_yt_yt_dlp( link, output, mimicHuman )
+        if not succeed:
+            _LOGGER.error( f"failed to convert '{link}' - process failed" )
+            return False
+    except Exception:           # pylint: disable=broad-except
+        _LOGGER.exception("unable to get audio from %s", link)
+        return False
+
+    if not check_is_mp3(output):
+        _LOGGER.error( f"failed to convert '{link}' - invalid file" )
+        return False
+
+    # succeed
+    return True

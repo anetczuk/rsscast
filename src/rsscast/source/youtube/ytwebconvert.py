@@ -32,6 +32,7 @@ from urllib.parse import urlencode
 
 import ssl
 import pycurl
+import filetype
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -215,3 +216,20 @@ def urldownload( url, outputPath=None, timeout=45):
 #     r = requests.get( sourceUrl )
 #     with open( outputFile, 'wb' ) as output:
 #         output.write( r.content )
+
+
+def check_is_mp3(output_path) -> bool:
+    if os.path.isfile( output_path ) is False:
+        return False
+
+    kind = filetype.guess( output_path )
+    if kind is None:
+        ## server respond with HTML page instead of audio file
+        os.remove( output_path )
+        return False
+
+    if kind.extension != "mp3":
+        os.remove( output_path )
+        return False
+
+    return True

@@ -37,7 +37,7 @@ import sys
 import json
 
 from rsscast import logger
-from rsscast.source.youtube.convert_yt_dlp import convert_yt
+from rsscast.source.youtube.convert_yt_dlp import convert_yt, fetch_info
 
 
 def get_json(obj):
@@ -54,9 +54,11 @@ def main():
     # url = "https://www.youtube.com/watch?v=FwzslavNmDQ"    # not exist
     # url = "https://www.youtube.com/watch?v=L-ZQSi3gM9U"    # very long
 
-    # info_dict = fetch_info(url)
-    # pprint.pprint( info_dict )
-    #
+    info_dict = fetch_info(url)
+    if not info_dict:
+        print("FAILED")
+        sys.exit(1)
+
     # audio_formats = list_audio_formats(url)
     # pprint.pprint( audio_formats )
 

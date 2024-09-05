@@ -36,7 +36,7 @@ except ImportError:
 import sys
 
 from rsscast import logger
-from rsscast.source.youtube.convert_pytube import convert_yt
+from rsscast.source.youtube.convert_youtube_dl import convert_yt
 
 
 def main():

@@ -42,7 +42,9 @@ from rsscast.source.youtube.convert_pytube import convert_yt
 def main():
     logger.configure_console()
 
-    converted = convert_yt( "https://www.youtube.com/watch?v=BLRUiVXeZKU", "/tmp/yt_example.mp3" )
+    url = "https://www.youtube.com/watch?v=BLRUiVXeZKU"
+    # url = "https://www.youtube.com/watch?v=F_qZQY1dloc"
+    converted = convert_yt( url, "/tmp/yt_example.mp3" )
     print("converted:", converted)
     if not converted:
         print("FAILED")

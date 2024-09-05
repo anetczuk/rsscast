@@ -51,15 +51,50 @@ _LOGGER = logging.getLogger(__name__)
 def convert_yt( link, output, _mimicHuman=True ) -> bool:
     _LOGGER.info("yt_dlp: converting youtube video %s", link)
 
-    if download_audio(link, output, format_id="233"):
-        # download completed
-        return True
+    yt_path = output
+    yt_path = yt_path.rstrip(".mp3")
+    # yt_path = f"{output_path}.yt_audio"
 
-    if download_audio(link, output, format_id="140"):
-        # download completed
-        return True
+    try:
+        # AntennaPod does not like mp4 files (it is unable to fast-forward or play from certain time)
+        ydl_opts = {'extract_audio': True,
+                    'outtmpl': yt_path,
+                    'format': 'bestaudio/best',
+                    # 'format': format_id,
+                    "logger": YTDLPLogger,
+                    'postprocessors': [{
+                        'key': 'FFmpegExtractAudio',
+                        'preferredcodec': 'mp3',
+                        'preferredquality': '128',
+                    }]}
 
-    return False
+        with yt_dlp.YoutubeDL(ydl_opts) as video:
+            video.download(link)
+
+    except yt_dlp.utils.DownloadError as exc:
+        _LOGGER.error("could not download audio: %s", exc)
+        if os.path.isfile(yt_path):
+            _LOGGER.info( "removing incomplete file: %s", yt_path )
+            # exception during storage - remove incomplete file
+            os.remove(yt_path)
+        return False
+
+    except BaseException as exc:
+        _LOGGER.error("error during download of audio: %s", exc)
+        if os.path.isfile(yt_path):
+            _LOGGER.info( "removing incomplete file: %s", yt_path )
+            # exception during storage - remove incomplete file
+            os.remove(yt_path)
+        return False
+
+    ## kills application because of memory consumption
+    # _LOGGER.info("converting YT audio to mp3")
+    # # AntennaPod does not like mp4 files (it is unable to fast-forward or play from certain time)
+    # # convert in place
+    # AudioSegment.from_file(yt_path).export(output_path, format="mp3", bitrate="128k")
+
+    _LOGGER.info("downloading completed")
+    return True
 
 
 ## ============================================================
@@ -192,55 +227,6 @@ def is_video_available(video_url) -> bool:
     return result is not None
 
 
-# preferred audio formats: 233, 140
-def download_audio(link, output_path, format_id="233") -> bool:
-    _LOGGER.info("downloading audio from: %s format %s", link, format_id)
-    yt_path = output_path
-    yt_path = yt_path.rstrip(".mp3")
-    # yt_path = f"{output_path}.yt_audio"
-
-    try:
-        # ydl_opts = {'extract_audio': True, 'format': format_id, 'outtmpl': yt_path}
-
-        # AntennaPod does not like mp4 files (it is unable to fast-forward or play from certain time)
-        ydl_opts = {'extract_audio': True,
-                    'outtmpl': yt_path,
-                    'format': 'bestaudio/best',
-                    'postprocessors': [{
-                        'key': 'FFmpegExtractAudio',
-                        'preferredcodec': 'mp3',
-                        'preferredquality': '128',
-                    }]}
-
-        with yt_dlp.YoutubeDL(ydl_opts) as video:
-            video.download(link)
-
-    except yt_dlp.utils.DownloadError as exc:
-        _LOGGER.error("could not download audio using format %s: %s", format_id, exc)
-        if os.path.isfile(yt_path):
-            _LOGGER.info( "removing incomplete file: %s", yt_path )
-            # exception during storage - remove incomplete file
-            os.remove(yt_path)
-        return False
-
-    except BaseException as exc:
-        _LOGGER.error("error during download of audio using format %s: %s", format_id, exc)
-        if os.path.isfile(yt_path):
-            _LOGGER.info( "removing incomplete file: %s", yt_path )
-            # exception during storage - remove incomplete file
-            os.remove(yt_path)
-        return False
-
-    ## kills application because of memory consumption
-    # _LOGGER.info("converting YT audio to mp3")
-    # # AntennaPod does not like mp4 files (it is unable to fast-forward or play from certain time)
-    # # convert in place
-    # AudioSegment.from_file(yt_path).export(output_path, format="mp3", bitrate="128k")
-
-    _LOGGER.info("downloading completed")
-    return True
-
-
 def list_audio_formats(video_url):
     info_dict = fetch_info(video_url, reduce=False)
     foramts = info_dict.get("formats", [])
@@ -264,20 +250,17 @@ class YTDLPLogger:
 
     @staticmethod
     def error(msg):
-        pass
-        # _LOGGER.error(msg)
+        _LOGGER.error(msg)
         # print("Captured Error: " + msg)
 
     @staticmethod
     def warning(msg):
-        pass
-        # _LOGGER.warning(msg)
+        _LOGGER.warning(msg)
         # print("Captured Warning: " + msg)
 
     @staticmethod
     def debug(msg):
-        pass
-        # _LOGGER.debug(msg)
+        _LOGGER.debug(msg)
         # print("Captured Log: " + msg)
         # if "[download]" in msg:
         #     _LOGGER.debug(msg)

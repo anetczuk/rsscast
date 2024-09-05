@@ -62,12 +62,23 @@ def convert_yt( link, output, _mimicHuman=True ) -> bool:
 
     yt = YouTubeFix(link)
     # yt.streams.first().download(output_path=output)
-    audio_download = yt.streams.get_audio_only()
-    out_file = audio_download.download(output_path="/tmp")
-    os.rename( out_file, output )
+    audio_download = yt.streams.filter(file_extension="mp3").first()
+    if audio_download is not None:
+        # mp3 stream found
+        out_file = audio_download.download(output_path="/tmp")
+        os.rename( out_file, output )
 
-    _LOGGER.info("downloading completed")
-    return True
+        _LOGGER.info("downloading completed")
+        return True
+
+    # audio_download = yt.streams.get_audio_only()
+    # out_file = audio_download.download(output_path="/tmp")
+    # os.rename( out_file, output )
+    #
+    # _LOGGER.info("downloading completed")
+    # return True
+
+    return False
 
 
 # ## crashes with error:

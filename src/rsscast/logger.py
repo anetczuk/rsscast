@@ -122,3 +122,7 @@ class EmptyLineFormatter(logging.Formatter):
             # empty
             return msg
         return super().format( record )
+
+
+def print_log_tree():
+    print(logging.root.manager.loggerDict.keys())       # pylint: disable=no-member
