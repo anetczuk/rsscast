@@ -46,8 +46,8 @@ def process_ytrss(args):
     with open(input_file_path, 'rt', encoding="utf-8") as in_file:
         input_data = in_file.read()
 
-    rssChannel = RSSChannel()
-    if not parse_rss_content(rssChannel, input_data ):
+    rssChannel = parse_rss_content(input_data )
+    if not rssChannel:
         # unable to parse
         return
     write_channel_rss(rssChannel, output_file_path)

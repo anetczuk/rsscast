@@ -24,7 +24,6 @@
 import unittest
 import datetime
 
-from rsscast.rss.rsschannel import RSSChannel
 from rsscast.source.youtube.ytfeedparser import parse_rss_content
 
 from testrsscast.data import read_data
@@ -41,8 +40,7 @@ class YTFeedParserTest(unittest.TestCase):
 
     def test_parse_latino(self):
         feedContent = read_data( "yt_feed_latino_short.xml" )
-        channel = RSSChannel()
-        parse_rss_content(channel, feedContent)
+        channel = parse_rss_content(feedContent)
 
         self.assertTrue( channel is not None )
         self.assertEqual( channel.title, "YouTube Latinoamérica" )
@@ -71,8 +69,7 @@ class YTFeedParserTest(unittest.TestCase):
 
     def test_parse_przygody(self):
         feedContent = read_data( "yt_feed_przygody.xml" )
-        channel = RSSChannel()
-        parse_rss_content(channel, feedContent)
+        channel = parse_rss_content(feedContent)
 
         self.assertTrue( channel is not None )
         self.assertEqual( "Przygody Przedsiębiorców", channel.title )
@@ -101,23 +98,12 @@ class YTFeedParserTest(unittest.TestCase):
 
     def test_parse_404(self):
         feedContent = read_data( "yt_feed_404.xml" )
-        channel = RSSChannel()
-        parse_rss_content(channel, feedContent)
-
-        self.assertTrue( channel is not None )
-        self.assertEqual( channel.title, None )
-        self.assertEqual( channel.link, None )
-        self.assertEqual( channel.publishDate, None )
-        self.assertEqual( channel.getPublishDateRFC(), None )
-
-        items = channel.items
-        self.assertTrue( items is not None )
-        self.assertEqual( len(items), 0 )
+        channel = parse_rss_content(feedContent)
+        self.assertTrue( channel is None )
 
     def test_parse_playlist(self):
         feedContent = read_data( "yt_feed_playlist_gwiazdowski.xml" )
-        channel = RSSChannel()
-        parse_rss_content(channel, feedContent)
+        channel = parse_rss_content(feedContent)
 
         self.assertTrue( channel is not None )
         self.assertEqual( "Gwiazdowski mówi Interii", channel.title )

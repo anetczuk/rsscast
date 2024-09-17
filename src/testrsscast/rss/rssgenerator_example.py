@@ -39,7 +39,6 @@ import logging
 
 from rsscast import logger
 from rsscast.rss.rssgenerator import generate_channel_rss
-from rsscast.rss.rsschannel import RSSChannel
 from rsscast.source.youtube.ytfeedparser import parse_rss_content
 
 from testrsscast.data import read_data
@@ -57,8 +56,7 @@ def main():
     feedContent = read_data( "yt_feed_latino_short.xml" )
     # feedContent = read_data( "yt_feed_konfederacja.xml" )
 
-    rssChannel = RSSChannel()
-    parse_rss_content(rssChannel, feedContent )
+    rssChannel = parse_rss_content(feedContent )
     generate_channel_rss( "test/abc", rssChannel )
 
 

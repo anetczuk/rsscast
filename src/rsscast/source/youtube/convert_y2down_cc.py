@@ -84,7 +84,7 @@ def convert_yt( link, output, _mimicHuman=True ) -> bool:
 
     download_link = progress_data.get( "download_url" )
     if not download_link:
-        _LOGGER.error( "unable to get download link from data: %s", progress_data )
+        _LOGGER.error( "unable to get download link from data: %s from url: %s", progress_data, link )
         return False
 
     _LOGGER.info( f"downloading content from {download_link}" )

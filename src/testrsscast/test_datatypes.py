@@ -25,7 +25,6 @@ import unittest
 from testrsscast.data import read_data
 
 from rsscast.datatypes import FeedEntry
-from rsscast.rss.rsschannel import RSSChannel
 from rsscast.source.youtube.ytfeedparser import parse_rss_content
 
 
@@ -40,8 +39,7 @@ class FeedEntryTest(unittest.TestCase):
 
     def test_fixRepeatedTitles(self):
         feedContent = read_data( "yt_feed_latino_title_repeat.xml" )
-        rssChannel = RSSChannel()
-        parse_rss_content(rssChannel, feedContent )
+        rssChannel = parse_rss_content(feedContent)
         self.entry.update( rssChannel )
 
         self.entry.fixRepeatedTitles()

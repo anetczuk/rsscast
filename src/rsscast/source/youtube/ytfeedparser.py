@@ -53,25 +53,28 @@ def parse_rss( feedId, feedUrl, write_content=True ) -> RSSChannel:
     if write_content:
         write_text( feedContent, sourceRSS )
     _LOGGER.info( "feed %s: parsing rss", feedId )
-    rssChannel = RSSChannel()
-    if not parse_rss_content(rssChannel, feedContent ):
+    rssChannel = parse_rss_content(feedContent )
+    if not rssChannel:
         # unable to parse
-        _LOGGER.warning( "feed[%s]: unable to parse RSS %s", feedId, sourceRSS )
+        _LOGGER.info( "feed[%s]: unable to parse RSS %s from %s", feedId, sourceRSS, feedUrl )
         return None
     _LOGGER.info( "feed %s: parsing done", feedId )
     return rssChannel
 
 
-def parse_rss_content(rss_channel: RSSChannel, feedContent):
+def parse_rss_content(feedContent) -> RSSChannel:
     parsedDict = feedparser.parse( feedContent )
     if parsedDict.get('bozo', False):
-        reason = parsedDict.get('bozo_exception', "<unknown>")
-        _LOGGER.warning( "channel[%s]: malformed rss detected, reason %s\n", rss_channel.title, reason )
-        return False
+        # malformed rss detected, reason :2:101: not well-formed (invalid token)
+        # reason = parsedDict.get('bozo_exception', "<unknown>")
+        # _LOGGER.warning( "malformed rss detected, reason %s", reason )
+        return None
 
     parsedDict = feedparser.parse( feedContent )
     # pprint.pprint( parsedDict )
-    return rss_channel.parseData(parsedDict)
+    rss_channel = RSSChannel()
+    rss_channel.parseData(parsedDict)
+    return rss_channel
 
 
 def read_url( urlpath ):

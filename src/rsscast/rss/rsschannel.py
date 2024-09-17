@@ -268,8 +268,6 @@ class RSSChannel( persist.Versionable ):
 
             self.addItem( rssItem )
 
-        return True
-
     def _sortItems( self ):
 #         def sort_key( rssItem: RSSItem ):
 #             return rssItem.publishDate

@@ -48,8 +48,14 @@ _LOGGER = logging.getLogger(__name__)
 ## ============================================================
 
 
-def convert_yt( link, output, _mimicHuman=True ) -> bool:
+def convert_yt( link, output, _mimicHuman=True, format_id=None ) -> bool:
     _LOGGER.info("yt_dlp: converting youtube video %s", link)
+
+    if format_id is None:
+        # 'format': '140'
+        # 'format': 'bestaudio'
+        # format_id = 'bestaudio/best'
+        format_id = "bestaudio"
 
     yt_path = output
     yt_path = yt_path.rstrip(".mp3")
@@ -59,14 +65,14 @@ def convert_yt( link, output, _mimicHuman=True ) -> bool:
         # AntennaPod does not like mp4 files (it is unable to fast-forward or play from certain time)
         ydl_opts = {'extract_audio': True,
                     'outtmpl': yt_path,
-                    'format': 'bestaudio/best',
-                    # 'format': format_id,
+                    'format': format_id,
                     "logger": YTDLPLogger,
                     'postprocessors': [{
                         'key': 'FFmpegExtractAudio',
                         'preferredcodec': 'mp3',
                         'preferredquality': '128',
-                    }]}
+                    }]
+                    }
 
         with yt_dlp.YoutubeDL(ydl_opts) as video:
             video.download(link)
@@ -188,7 +194,8 @@ def convert_info_to_channel(info_dict) -> RSSChannel:
         if not yt_link:
             yt_link = yt_entry.get("original_url", "")
         if not yt_link:
-            _LOGGER.warning("unable to add item to channel (no ID)")
+            # it happens for private videos
+            _LOGGER.warning("unable to add item to channel (no ID), entries:\n%s", yt_entries)
             continue
         yt_id = yt_entry["id"]
         thumb_dict = get_thumbnail_data(yt_entry)
@@ -215,9 +222,7 @@ def convert_info_to_channel(info_dict) -> RSSChannel:
     _LOGGER.info( "adding feed items %s", len(data_entries) )
 
     rssChannel = RSSChannel()
-    if not rssChannel.parseData( feedContent ):
-        # unable to parse
-        return None
+    rssChannel.parseData( feedContent )
     return rssChannel
 
 
@@ -250,20 +255,33 @@ class YTDLPLogger:
 
     @staticmethod
     def error(msg):
+        if "Private video" in msg:
+            _LOGGER.info(msg)
+            return
+        if "Premieres in " in msg:
+            _LOGGER.info(msg)
+            return
         _LOGGER.error(msg)
-        # print("Captured Error: " + msg)
 
     @staticmethod
     def warning(msg):
+        if "nsig extraction failed: You may experience throttling for some formats" in msg:
+            _LOGGER.info(msg)
+            return
+        if "Incomplete data received. Retrying" in msg:
+            _LOGGER.info(msg)
+            return
+        if "Incomplete data received. Giving up after" in msg:
+            _LOGGER.info(msg)
+            return
+        if "unavailable video is hidden" in msg:
+            _LOGGER.info(msg)
+            return
         _LOGGER.warning(msg)
-        # print("Captured Warning: " + msg)
 
     @staticmethod
     def debug(msg):
         _LOGGER.debug(msg)
-        # print("Captured Log: " + msg)
-        # if "[download]" in msg:
-        #     _LOGGER.debug(msg)
 
 
 # order of items in list seems to be random
@@ -288,8 +306,12 @@ def fetch_info(youtube_url, items_num=15, reduce=True):
     try:
         with yt_dlp.YoutubeDL(params) as ydl:
             info_dict = ydl.extract_info(youtube_url, download=False)
-    except yt_dlp.utils.DownloadError as exc:
-        _LOGGER.error("could not fetch data: %s", exc)
+
+        if info_dict is None:
+            _LOGGER.warning("unable to fetch info from url: %s", youtube_url)
+
+    except yt_dlp.utils.DownloadError:
+        # error already reported by YTDLPLogger
         return None
 
     if reduce:
