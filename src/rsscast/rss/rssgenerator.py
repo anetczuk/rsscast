@@ -30,7 +30,7 @@ from typing import List
 from rsscast.utils import write_text
 from rsscast.rss.rsschannel import RSSChannel, RSSItem, get_channel_output_dir
 from rsscast.rss.rssserver import RSSServerManager
-from rsscast.source.youtube.ytconverter import convert_to_audio, is_video_available
+from rsscast.source.youtube.ytconverter import convert_to_audio, is_video_available, VideoAvailableStatus
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -194,9 +194,13 @@ def download_items( feedId, itemsList: List[RSSItem], _=None ):
             #                       feedId, postLink, video_duration / 60, videoDurationLimit / 60 )
             #         continue
 
-            if not is_video_available(postLink):
+            video_status: VideoAvailableStatus = is_video_available(postLink)
+            if video_status == VideoAvailableStatus.INVALID:
                 _LOGGER.warning( "feed %s: '%s' video unavailable: %s -- disabling", feedId, rssItem.title, postLink )
                 rssItem.disable()
+                continue
+            if video_status == VideoAvailableStatus.UPCOMING:
+                # upcoming video - wait for next time
                 continue
 
             _LOGGER.info( f"{index + 1}/{items_len} feed {feedId}:"
