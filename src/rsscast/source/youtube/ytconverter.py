@@ -28,7 +28,7 @@ from rsscast.rss.rsschannel import RSSChannel
 
 from rsscast.source.youtube.convert_pytube import get_yt_duration as get_yt_duration_pytube
 
-from rsscast.source.youtube.convert_yt_dlp import is_video_available as is_video_available_yt_dlp
+from rsscast.source.youtube.convert_yt_dlp import is_video_available as is_video_available_yt_dlp, VideoAvailableStatus
 from rsscast.source.youtube.convert_yt_dlp import parse_playlist as parse_playlist_yt_dlp
 from rsscast.source.youtube.convert_yt_dlp import reduce_info as reduce_info_yt_dlp
 from rsscast.source.youtube.convert_yt_dlp import convert_info_to_channel as convert_info_to_channel_yt_dlp
@@ -53,7 +53,7 @@ WEB_CONVERTERS = [  # convert_yt_pytube,        # conversion from mp4 to mp3 nee
 ## ===================================================================
 
 
-def is_video_available(video_url) -> bool:
+def is_video_available(video_url) -> VideoAvailableStatus:
     return is_video_available_yt_dlp(video_url)
 
 

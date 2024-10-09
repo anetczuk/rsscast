@@ -24,6 +24,7 @@
 import os
 import logging
 import datetime
+from enum import Enum, unique, auto
 from typing import List, Dict, Any
 
 # import pprint
@@ -226,10 +227,29 @@ def convert_info_to_channel(info_dict) -> RSSChannel:
     return rssChannel
 
 
-def is_video_available(video_url) -> bool:
+@unique
+class VideoAvailableStatus(Enum):
+    OK        = auto()  # video available
+    UPCOMING  = auto()  # video still not available
+    INVALID   = auto()  # some error
+
+
+def is_video_available(video_url) -> VideoAvailableStatus:
     _LOGGER.info( "checking if youtube video is available: %s", video_url )
     result = fetch_info(video_url)
-    return result is not None
+    live_status = result["live_status"]
+
+    if live_status is None:
+        return VideoAvailableStatus.INVALID
+
+    if live_status in ("not_live", "was_live"):
+        return VideoAvailableStatus.OK
+
+    if live_status == "is_upcoming":
+        return VideoAvailableStatus.UPCOMING
+
+    _LOGGER.warning("unhandled live status: %s", live_status)
+    return VideoAvailableStatus.UPCOMING
 
 
 def list_audio_formats(video_url):
@@ -290,6 +310,7 @@ class YTDLPLogger:
 def fetch_info(youtube_url, items_num=15, reduce=True):
     params = {"skip_download": True,
               "simulate": True,
+              "ignore_no_formats_error": True,
               "extract_flat": True,                     # do not download videos from list
               # "dump_single_json": True,                ## will print JSON to stdout
               "playlist_items": f"1:{items_num}",
