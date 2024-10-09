@@ -9,9 +9,11 @@ pytube
 pytubefix
 
 ## version (on RPi) does not work, because is too old
-#youtube-dl
+youtube-dl
 
 yt-dlp
 filetype
 
 # pydub       # conversion from mp4 to mp3
+
+selenium

@@ -306,7 +306,6 @@ class MainWindow( QtBaseClass ):           # type: ignore
 
     ## ====================================================================
 
-    # pylint: disable=R0201
     def closeApplication(self):
         """Close application -- triggered from File->Exit menu."""
         _LOGGER.info("received exit request")

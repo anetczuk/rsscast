@@ -57,7 +57,6 @@ class FeedTableModel( QAbstractTableModel ):
         super().__init__()
         self._rawData: FeedContainer = data
 
-    # pylint: disable=R0201
     def getItem(self, itemIndex: QModelIndex):
         if itemIndex.isValid():
             return itemIndex.internalPointer()

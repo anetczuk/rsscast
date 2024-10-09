@@ -139,12 +139,10 @@ def main():
         ## no command given -- print help message
         parser.print_help()
         sys.exit(1)
-        return 1
 
     logger.configure()
 
     args.func(args)
-
     return 0
 
 

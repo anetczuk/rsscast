@@ -38,7 +38,7 @@ usage: startrsscast [-h] [--minimized] [--fetchRSS] [--refreshRSS]
 
 RSS Cast
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   --minimized           Start minimized
   --fetchRSS            Update RSS channels

@@ -115,7 +115,7 @@ def convert_yt( link, output, mimicHuman=True ) -> bool:
         return True
 
     except Exception as exc:                                               # pylint: disable=W0703
-        _LOGGER.exception("Unexpected exception: %s", exc, exc_info=False)
+        _LOGGER.exception("Unexpected exception on link access '%s': %s", link, exc)
         return False
 
     finally:
@@ -201,7 +201,7 @@ def get_mp3_format_data( mp3FormatDict ):
         return mp3FormatDict['256']
     keys = mp3FormatDict.keys()
     if len( keys ) < 1:
-        raise Exception("There is no data in dictionary")
+        raise RuntimeError("There is no data in dictionary")
     ## get first key
     formatKey = next(iter( keys ))
     return mp3FormatDict[ formatKey ]

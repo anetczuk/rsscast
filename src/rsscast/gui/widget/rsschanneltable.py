@@ -37,7 +37,7 @@ from PyQt5.QtCore import Qt
 from rsscast.rss.rsschannel import RSSChannel, RSSItem
 from rsscast.gui import guistate
 from rsscast.datatypes import FeedEntry
-from rsscast.rss.rssgenerator import generate_channel_rss, download_items,\
+from rsscast.rss.rssgenerator import generate_channel_rss, download_items, \
     remove_item_data
 from rsscast.gui.dataobject import DataObject
 from rsscast.gui.command.rsschannelcommand import RemoveRSSItemCommand
@@ -63,7 +63,6 @@ class RSSChannelTableModel( QAbstractTableModel ):
         super().__init__()
         self._rawData: RSSChannel = data
 
-    # pylint: disable=R0201
     def getItem(self, itemIndex: QModelIndex):
         if itemIndex.isValid():
             return itemIndex.internalPointer()

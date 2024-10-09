@@ -173,7 +173,7 @@ def urlretrieve( url, outputPath=None, timeout=30, write_empty=True ):
 # download URL content directly to file
 def urldownload( url, outputPath=None, timeout=45):
     if not outputPath:
-        return False
+        return
 
     ##
     ## Under Ubuntu 20 SSL configuration has changed causing problems with SSL keys.
