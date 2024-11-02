@@ -297,6 +297,9 @@ class YTDLPLogger:
         if "unavailable video is hidden" in msg:
             _LOGGER.info(msg)
             return
+        if "Video unavailable. This video has been removed by the uploader" in msg:
+            _LOGGER.info(msg)
+            return
         _LOGGER.warning(msg)
 
     @staticmethod

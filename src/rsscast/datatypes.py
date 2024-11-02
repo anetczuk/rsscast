@@ -150,12 +150,8 @@ def fetch_feed( feed: FeedEntry ):
 
 def parse_feed( feed: FeedEntry ):
     """Fetch media and generate converted RSS."""
-    try:
-        fetch_feed( feed )
-        generate_channel_rss( feed.feedId, feed.channel )
-    except Exception as ex:
-        _LOGGER.exception( "unable parse feed: %s reaseon: %s", feed.feedId, ex, exc_info=False )
-        raise
+    fetch_feed( feed )
+    generate_channel_rss( feed.feedId, feed.channel )
 
 
 def get_local_path(channelPath, videoId):

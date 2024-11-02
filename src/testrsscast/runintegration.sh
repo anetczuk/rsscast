@@ -27,7 +27,7 @@ $SCRIPT_DIR/source/youtube/intgr_convert_yt_dlp_playlist.py
 $SCRIPT_DIR/source/youtube/intgr_convert_yt_dlp_video.py
 $SCRIPT_DIR/source/youtube/intgr_convert_yt_dlp_videos.py
 
-$SCRIPT_DIR/source/youtube/intgr_convert_yt1s_com.py
+# $SCRIPT_DIR/source/youtube/intgr_convert_yt1s_com.py		# added human detection
 
 $SCRIPT_DIR/source/youtube/intgr_ytconverter.py
 

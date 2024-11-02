@@ -38,7 +38,7 @@ from rsscast.source.youtube.convert_ddownr_com import convert_yt as convert_yt_d
 from rsscast.source.youtube.convert_y2down_cc import convert_yt as convert_yt_y2down
 # from rsscast.source.youtube.convert_youtube_dl import convert_yt as convert_yt_youtube_dl
 from rsscast.source.youtube.convert_yt_dlp import convert_yt as convert_yt_yt_dlp
-from rsscast.source.youtube.convert_yt1s_com import convert_yt as convert_yt_yt1s
+# from rsscast.source.youtube.convert_yt1s_com import convert_yt as convert_yt_yt1s
 from rsscast.source.youtube.ytwebconvert import check_is_mp3
 
 
@@ -47,7 +47,9 @@ _LOGGER = logging.getLogger(__name__)
 
 WEB_CONVERTERS = [  # convert_yt_pytube,        # conversion from mp4 to mp3 needed
                   # convert_yt_youtube_dl,    # too old on RPi
-                  convert_yt_ddownr, convert_yt_yt1s, convert_yt_y2down]
+                  convert_yt_ddownr, convert_yt_y2down, 
+                  # convert_yt_yt1s    # does not work anymore - human detection
+                  ]
 
 
 ## ===================================================================

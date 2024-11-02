@@ -256,7 +256,11 @@ class RSSChannel( persist.Versionable ):
 
             rssItem.summary = post.get('summary', '')
             publish_date = post['published']
-            rssItem.publishDate = datetime.datetime.fromisoformat( publish_date )
+            try:
+                rssItem.publishDate = datetime.datetime.fromisoformat( publish_date )
+            except TypeError:
+                _LOGGER.error(f"invalid type, expected 'str', got '{type(publish_date)}', value: '{publish_date}' while accessing '{rssItem.link}'")
+                raise
             # if publish_date:
             #     rssItem.publishDate = datetime.datetime.fromisoformat( publish_date )
             # else:
