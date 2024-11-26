@@ -259,8 +259,10 @@ class RSSChannel( persist.Versionable ):
             try:
                 rssItem.publishDate = datetime.datetime.fromisoformat( publish_date )
             except TypeError:
+                # it happens for unavailable videos, eg:
+                # https://www.youtube.com/watch?v=mhLaaiYIbnc
                 _LOGGER.error(f"invalid type, expected 'str', got '{type(publish_date)}', value: '{publish_date}' while accessing '{rssItem.link}'")
-                raise
+                continue
             # if publish_date:
             #     rssItem.publishDate = datetime.datetime.fromisoformat( publish_date )
             # else:

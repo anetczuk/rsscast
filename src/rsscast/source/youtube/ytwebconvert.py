@@ -220,15 +220,18 @@ def urldownload( url, outputPath=None, timeout=45):
 
 def check_is_mp3(output_path) -> bool:
     if os.path.isfile( output_path ) is False:
+        _LOGGER.error( f"file is not a file '{output_path}'" )
         return False
 
     kind = filetype.guess( output_path )
     if kind is None:
         ## server respond with HTML page instead of audio file
+        _LOGGER.error( f"file seems to be a HTML '{output_path}'" )
         os.remove( output_path )
         return False
 
     if kind.extension != "mp3":
+        _LOGGER.error( f"file is not mp3'{output_path}'" )
         os.remove( output_path )
         return False
 
