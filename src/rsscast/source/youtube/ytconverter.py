@@ -47,9 +47,9 @@ _LOGGER = logging.getLogger(__name__)
 
 WEB_CONVERTERS = [  # convert_yt_pytube,        # conversion from mp4 to mp3 needed
                   # convert_yt_youtube_dl,    # too old on RPi
-                  convert_yt_ddownr, convert_yt_y2down, 
+                  convert_yt_ddownr, convert_yt_y2down,
                   # convert_yt_yt1s    # does not work anymore - human detection
-                  ]
+                 ]
 
 
 ## ===================================================================
@@ -93,14 +93,14 @@ def convert_to_audio( link, output, mimicHuman=True ) -> bool:
         try:
             succeed = converter( link, output, mimicHuman )
             if not succeed:
-                _LOGGER.error( f"failed to convert '{link}' - process failed" )
+                _LOGGER.error( f"converter {converter.__name__} failed to convert '{link}'- process failed" )
                 continue
         except Exception:           # pylint: disable=broad-except
-            _LOGGER.exception("unable to get audio from %s", link)
+            _LOGGER.exception("converter %s: unable to get audio from %s", converter.__name__, link)
             continue
 
         if not check_is_mp3(output):
-            _LOGGER.error( f"failed to convert '{link}' - invalid file" )
+            _LOGGER.error( f"failed to convert '{link}' - invalid file '{output}'" )
             continue
 
         # succeed

@@ -51,37 +51,46 @@ def convert_yt( link, output, _mimicHuman=True ) -> bool:
     params = {"id": job_id}
     download_url = None
     recent_response_data = None
-    for _ in range(0, 120):
-        time.sleep(1.0)
+    while True:
 
-        status_response = curl_get(session, status_url, params)
-        response = status_response.getvalue()
-        response_data = json.loads( response )
+        status_timeout = True
+        for _ in range(0, 20):
+            time.sleep(6.0)
 
-        if recent_response_data == response_data:
-            # no change
-            continue
-        recent_response_data = response_data
+            status_response = curl_get(session, status_url, params)
+            response = status_response.getvalue()
+            response_data = json.loads( response )
+
+            if recent_response_data == response_data:
+                # no change
+                continue
+            status_timeout = False
+            recent_response_data = response_data
+            break
+
+        if status_timeout:
+            break
 
         status = response_data.get("success")
         if status == 0:
             # in progress
             _LOGGER.debug( f"received progress: {response_data}" )
             continue
-        if status == 1:
-            # found url
-            download_url = response_data["download_url"]
-            break
 
-        _LOGGER.error(f"unhandled response: {response_data}")
-        return False
+        if status != 1:
+            _LOGGER.error(f"unhandled response: {response_data}")
+            return False
+
+        # found url
+        download_url = response_data.get("download_url")
+        break
 
     if download_url is None:
-        _LOGGER.error( "timeout reached during waiting for conversion" )
+        _LOGGER.error( "timeout reached during waiting for conversion of link %s", link )
         return False
 
     _LOGGER.info( f"downloading content from {download_url} to {output}" )
-    urlretrieve( download_url, output, timeout=60, write_empty=False )
+    urlretrieve( download_url, output, timeout=90, write_empty=False )
 
     _LOGGER.info("downloading completed")
     return True

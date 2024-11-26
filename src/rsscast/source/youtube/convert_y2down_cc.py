@@ -58,37 +58,48 @@ def convert_yt( link, output, _mimicHuman=True ) -> bool:
 
     _LOGGER.info( f"waiting for finish of conversion of {link}" )
 
-    recent_progress_data = None
-    stalled_progress_counter = 0
+    progress_link = f"https://loader.to/ajax/progress.php?id={convert_id}"
+    download_url = None
+    recent_response_data = None
     while True:
-        time.sleep( 3.0 )
 
-        progress_link = f"https://loader.to/ajax/progress.php?id={convert_id}"
-        progress_resp = urlretrieve( progress_link )
-        progress_data = json.loads( progress_resp )
+        status_timeout = True
+        for _ in range(0, 20):
+            time.sleep( 3.0 )
 
-        if recent_progress_data == progress_data:
-            stalled_progress_counter += 1
-            if stalled_progress_counter >= 20:
-                _LOGGER.info( "downloading stalled - breaking" )
-                return False
-            continue
+            progress_resp = urlretrieve( progress_link )
+            response_data = json.loads( progress_resp )
 
-        if progress_data.get("success", 0) != 0:
-            # finished
+            if recent_response_data == response_data:
+                # no change
+                continue
+            status_timeout = False
+            recent_response_data = response_data
             break
 
-        _LOGGER.info( "received progress: %s %s", stalled_progress_counter, progress_data )
-        recent_progress_data = progress_data
-        stalled_progress_counter = 0
+        if status_timeout:
+            break
 
-    download_link = progress_data.get( "download_url" )
-    if not download_link:
-        _LOGGER.error( "unable to get download link from data: %s from url: %s", progress_data, link )
+        status = response_data.get("success")
+        if status == 0:
+            # in progress
+            _LOGGER.debug( f"received progress: {response_data}" )
+            continue
+
+        if status != 1:
+            _LOGGER.error(f"unhandled response: {response_data}")
+            return False
+
+        # found url
+        download_url = response_data.get("download_url")
+        break
+
+    if download_url is None:
+        _LOGGER.error( "timeout reached during waiting for conversion of link %s", link )
         return False
 
-    _LOGGER.info( f"downloading content from {download_link}" )
-    urlretrieve( download_link, output, timeout=60, write_empty=False )
+    _LOGGER.info( f"downloading content from {download_url} to {output}" )
+    urlretrieve( download_url, output, timeout=90, write_empty=False )
 
     _LOGGER.info("downloading completed")
     return True
