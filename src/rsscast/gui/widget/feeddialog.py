@@ -40,7 +40,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 def convert_to_ascii( inputData: str ):
-    """Convert input string removing scpecial characters, whites paces etc."""
+    """Convert input string removing special characters, whites paces etc."""
     data = inputData
     data = data.lower()
     data = unidecode.unidecode( data )

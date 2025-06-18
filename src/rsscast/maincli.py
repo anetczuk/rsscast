@@ -24,10 +24,12 @@
 #
 
 import sys
+import os
 
 import argparse
 import logging
 from typing import List
+import json
 
 from PyQt5.QtCore import QCoreApplication
 
@@ -40,6 +42,9 @@ from rsscast.datatypes import FeedEntry, parse_feed, fetch_feed
 from rsscast.gui.resources import get_user_data_path
 from rsscast.gui.dataobject import DataObject
 from rsscast.filelimit import remove_old_files
+from rsscast.rss.rsschannel import RSSChannel
+from rsscast.source.parser import parse_url
+from rsscast.rss.rssgenerator import download_list
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -95,6 +100,34 @@ class CliApp:
         pass
 
 
+def get_json(obj):
+    return json.loads(
+        json.dumps(obj, default=lambda o: getattr(o, '__dict__', str(o)))
+    )
+
+
+def process_download(args):
+    grab_url = args.url
+
+    channel_data: RSSChannel = parse_url("test-channel", grab_url, write_content=False, max_fetch=999999)
+
+    channel_data.sort()
+    # print("extracted rss channel data:")
+    # ret_dict = get_json(channel_data)
+    # pprint.pprint( ret_dict )
+    print("playlist case found items:", channel_data.size())
+
+    items = channel_data.getItemsEnabled()
+    cwd = os.getcwd()
+    download_list( "direct", items, cwd, use_filename_title=True, prepend_index=True )
+
+    # converted = convert_to_audio( grab_url, "" )
+    # if converted is False:
+    #     ## skip elements that failed to convert
+    #     _LOGGER.info( "feed %s: unable to convert video '%s' -- skipped", feedId, rssItem.title )
+    #     continue
+
+
 def set_app_data( app ):
     app.setApplicationName("RSSCast")
     app.setOrganizationName("arnet")
@@ -141,6 +174,10 @@ def run_cli( args ):
 
         _LOGGER.info( "server closed" )
 
+    if args.func:
+        cli_mode = True
+        args.func(args)
+
     return cli_mode
 
 
@@ -153,7 +190,29 @@ def create_parser( parser: argparse.ArgumentParser = None ):
     parser.add_argument('--reduceFiles', action='store', type=int,
                         help='Remove old files reducing files numbers to given' )
     parser.add_argument('--startServer', action='store_const', const=True, default=False, help='Start RSS server' )
+    parser.set_defaults(func=None)
+
+    subparsers = parser.add_subparsers(help="optional tool", description="optional tool", dest="tool", required=False)
+
+    description = "direct downloader"
+    subparser = subparsers.add_parser(
+        "direct", help=description, formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+    subparser.description = description
+    subparser.set_defaults(func=process_download)
+    subparser.add_argument("url", help="Url to download")
+    # subparser.add_argument(
+    #     "--url",
+    #     action="store",
+    #     required=True,
+    #     default=None,
+    #     help="Path to configuration YAML file",
+    # )
+
     return parser
+
+
+## ==================================================================================
 
 
 def main( args=None ):

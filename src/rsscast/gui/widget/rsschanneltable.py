@@ -307,9 +307,9 @@ class RSSChannelTable( QTableView ):
 
         if action == pullAction:
             feedId  = self.feedObject.feedId
-            channel = self.feedObject.channel
             itemsList = [entry]
             download_items( feedId, itemsList )
+            channel = self.feedObject.channel
             generate_channel_rss( feedId, channel, downloadContent=False )
         elif action == removeFileAction:
             feedId  = self.feedObject.feedId

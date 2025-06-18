@@ -27,8 +27,6 @@ import datetime
 from enum import Enum, unique, auto
 from typing import List, Dict, Any
 
-# import pprint
-
 from xml.sax.saxutils import escape
 import requests
 
@@ -201,13 +199,24 @@ def convert_info_to_channel(info_dict) -> RSSChannel:
         yt_id = yt_entry["id"]
         thumb_dict = get_thumbnail_data(yt_entry)
         item_upload_date = yt_entry.get("upload_date")
+
+        summary_data = yt_entry.get("description", "")
+        # if summary_data is None:
+        #     entry_format = pprint.pformat(yt_entry, indent=4)
+        #     _LOGGER.warning("unable to get summary from link %s from entry:\n%s", yt_link, entry_format)
+
+        published_data = num_date_to_datetime(item_upload_date)
+        if published_data is None:
+            epoch_date = yt_entry.get("epoch")
+            published_data = epoch_to_datetime(epoch_date)
+
         item = {
             "id": f"yt:video:{yt_id}",
             "title": yt_entry.get("title", ""),
             "link": yt_link,
             "media_thumbnail": thumb_dict,
-            "summary": yt_entry.get("description", ""),
-            "published": num_date_to_datetime(item_upload_date)
+            "summary": summary_data,
+            "published": published_data
         }
         data_entries.append(item)
 

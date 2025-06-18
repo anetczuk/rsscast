@@ -174,6 +174,7 @@ class RSSChannel( persist.Versionable ):
     def getPublishDateRFC(self):
         return datetime_to_rfc(self.publishDate)
 
+    ## sort items by publish date (starting from oldest ones)
     def sort(self):
         self._sortItems()
 
@@ -261,7 +262,8 @@ class RSSChannel( persist.Versionable ):
             except TypeError:
                 # it happens for unavailable videos, eg:
                 # https://www.youtube.com/watch?v=mhLaaiYIbnc
-                _LOGGER.error(f"invalid type, expected 'str', got '{type(publish_date)}', value: '{publish_date}' while accessing '{rssItem.link}'")
+                _LOGGER.error(f"invalid type, expected 'str', got '{type(publish_date)}'"
+                              f", value: '{publish_date}' in metadata:\n{post}\nwhile accessing '{rssItem.link}'")
                 continue
             # if publish_date:
             #     rssItem.publishDate = datetime.datetime.fromisoformat( publish_date )

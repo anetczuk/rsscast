@@ -163,16 +163,19 @@ def generate_items_rss( rssChannel: RSSChannel, host, url_dir_path, local_dir_pa
 ## =================================================================================
 
 
-# def download_items( feedId, itemsList: List[RSSItem], videoDurationLimit=None ):
-def download_items( feedId, itemsList: List[RSSItem], _=None ):
+def download_items( feedId, itemsList: List[RSSItem], _videoDurationLimit=None ):
     """Download media."""
     feedId = feedId.replace(":", "_")
     feedId = re.sub( r"\s+", "", feedId )
-
     channelPath = get_channel_output_dir( feedId )
+    download_list(feedId, itemsList, channelPath)
 
+
+def download_list( feedId, itemsList: List[RSSItem], output_dir, use_filename_title=False, prepend_index=False ):
     items_len = len(itemsList)
 #     rssItem: RSSItem = None
+    index_digs_num = len(str(items_len)) + 1
+
     for index, rssItem in enumerate(itemsList):
 #         pprint( rssItem )
         if rssItem.enabled is False:
@@ -180,8 +183,23 @@ def download_items( feedId, itemsList: List[RSSItem], _=None ):
             continue
 
         postLink = rssItem.link
-        videoId = rssItem.videoId()
-        postLocalPath = f"{channelPath}/{videoId}.mp3"
+        filename = rssItem.videoId()
+        if use_filename_title:
+            filename = rssItem.title
+            filename = filename.replace(":", "_")
+            filename = filename.replace(" ", "_")
+            filename = filename.replace("|", "_")
+            filename = filename.replace("?", "_")
+            filename = filename.replace("!", "_")
+            filename = filename.replace("\"", "_")
+            filename = filename.replace("#", "0")
+
+        if prepend_index:
+            item_num = str(index + 1)
+            item_num = item_num.zfill(index_digs_num)
+            filename = f"{item_num}_{filename}"
+
+        postLocalPath = f"{output_dir}/{filename}.mp3"
 
         if not os.path.exists(postLocalPath):
             ## item file not exists -- convert and download

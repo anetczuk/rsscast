@@ -31,10 +31,12 @@ startrsscast
 
 Application accepts following arguments:
 
-<!-- insertstart include="doc/cmdargs.md" -->## <a name="main_help"></a> startrsscast --help
+<!-- insertstart include="doc/cmdargs.md" pre="\n" -->
+## <a name="main_help"></a> startrsscast --help
 ```
 usage: startrsscast [-h] [--minimized] [--fetchRSS] [--refreshRSS]
                     [--reduceFiles REDUCEFILES] [--startServer]
+                    {direct} ...
 
 RSS Cast
 
@@ -46,6 +48,12 @@ options:
   --reduceFiles REDUCEFILES
                         Remove old files reducing files numbers to given
   --startServer         Start RSS server
+
+subcommands:
+  optional tool
+
+  {direct}              optional tool
+    direct              direct downloader
 ```
 <!-- insertend -->
 
