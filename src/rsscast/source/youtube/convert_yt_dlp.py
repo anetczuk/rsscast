@@ -76,8 +76,8 @@ def convert_yt( link, output, _mimicHuman=True, format_id=None ) -> bool:
         with yt_dlp.YoutubeDL(ydl_opts) as video:
             video.download(link)
 
-    except yt_dlp.utils.DownloadError as exc:
-        _LOGGER.error("could not download audio: %s", exc)
+    except yt_dlp.utils.DownloadError:
+        # error already reported by YTDLPLogger
         if os.path.isfile(yt_path):
             _LOGGER.info( "removing incomplete file: %s", yt_path )
             # exception during storage - remove incomplete file
@@ -244,10 +244,11 @@ class VideoAvailableStatus(Enum):
 
 
 def is_video_available(video_url) -> VideoAvailableStatus:
-    _LOGGER.info( "checking if youtube video is available: %s", video_url )
     result = fetch_info(video_url)
-    live_status = result["live_status"]
+    if result is None:
+        return VideoAvailableStatus.INVALID
 
+    live_status = result.get("live_status")
     if live_status is None:
         return VideoAvailableStatus.INVALID
 
@@ -345,6 +346,7 @@ def fetch_info(youtube_url, items_num=15, reduce=True):
 
     except yt_dlp.utils.DownloadError:
         # error already reported by YTDLPLogger
+        _LOGGER.error("unable to download %s", youtube_url)
         return None
 
     if reduce:

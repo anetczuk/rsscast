@@ -26,6 +26,7 @@ import time
 import json
 
 from rsscast.source.youtube.ytwebconvert import urlretrieve, get_curl_session, curl_get
+import urllib
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -76,7 +77,11 @@ def convert_yt( link, output, _mimicHuman=True ) -> bool:
 
     output_video = f"{output}.vid"
     _LOGGER.info( f"downloading content from {download_url} to {output_video}" )
-    urlretrieve( download_url, output_video, timeout=60, write_empty=False )
+    try:
+        urlretrieve( download_url, output, timeout=60, write_empty=False )
+    except urllib.error.HTTPError:
+        _LOGGER.exception("unable to download content from %s", download_url)
+        return False
 
     _LOGGER.info("downloading completed")
     return True

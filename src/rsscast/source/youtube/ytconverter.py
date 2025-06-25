@@ -93,14 +93,14 @@ def convert_to_audio( link, output, mimicHuman=True ) -> bool:
         try:
             succeed = converter( link, output, mimicHuman )
             if not succeed:
-                _LOGGER.error( f"converter {converter.__name__} failed to convert '{link}'- process failed" )
+                _LOGGER.error( f"failed to convert {link} using {converter.__name__} - process failed" )
                 continue
         except Exception:           # pylint: disable=broad-except
             _LOGGER.exception("converter %s: unable to get audio from %s", converter.__name__, link)
             continue
 
         if not check_is_mp3(output):
-            _LOGGER.error( f"failed to convert '{link}' - invalid file '{output}'" )
+            _LOGGER.error( f"failed to convert {link} - invalid file '{output}'" )
             continue
 
         # succeed
@@ -112,14 +112,14 @@ def convert_to_audio( link, output, mimicHuman=True ) -> bool:
     try:
         succeed = convert_yt_yt_dlp( link, output, mimicHuman )
         if not succeed:
-            _LOGGER.error( f"failed to convert '{link}' - process failed" )
+            _LOGGER.error( f"failed to convert {link} - process failed" )
             return False
     except Exception:           # pylint: disable=broad-except
         _LOGGER.exception("unable to get audio from %s", link)
         return False
 
     if not check_is_mp3(output):
-        _LOGGER.error( f"failed to convert '{link}' - invalid file" )
+        _LOGGER.error( f"failed to convert {link} - invalid file" )
         return False
 
     # succeed

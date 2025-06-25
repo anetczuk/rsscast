@@ -26,6 +26,7 @@ import time
 import json
 
 from rsscast.source.youtube.ytwebconvert import urlretrieve, get_curl_session, curl_get
+import urllib
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -41,9 +42,18 @@ def convert_yt( link, output, _mimicHuman=True ) -> bool:
               "url": link, "api": "dfcb6d76f2f6a9894gjkege8a4ab232222"}
     dataBuffer = curl_get( session, service_link, params, header_list=[] )
     bodyOutput = dataBuffer.getvalue().decode('utf-8')
-    response_data = json.loads( bodyOutput )
 
-    job_id = response_data["id"]
+    response_data = None
+    try:
+        response_data = json.loads( bodyOutput )
+    except json.decoder.JSONDecodeError:
+        _LOGGER.error( "invalid response (expected JSON) from link %s - response: %s", link, bodyOutput )
+        return False
+
+    job_id = response_data.get("id")
+    if job_id is None:
+        _LOGGER.error( "invalid JSON from link %s - json: %s", link, response_data )
+        return False
 
     _LOGGER.info( f"waiting for finish of conversion of {link}" )
 
@@ -54,7 +64,7 @@ def convert_yt( link, output, _mimicHuman=True ) -> bool:
     while True:
 
         status_timeout = True
-        for _ in range(0, 20):
+        for _i in range(0, 20):
             time.sleep(6.0)
 
             status_response = curl_get(session, status_url, params)
@@ -90,7 +100,11 @@ def convert_yt( link, output, _mimicHuman=True ) -> bool:
         return False
 
     _LOGGER.info( f"downloading content from {download_url} to {output}" )
-    urlretrieve( download_url, output, timeout=90, write_empty=False )
+    try:
+        urlretrieve( download_url, output, timeout=90, write_empty=False )
+    except urllib.error.HTTPError:
+        _LOGGER.exception("unable to download content from %s", download_url)
+        return False
 
     _LOGGER.info("downloading completed")
     return True

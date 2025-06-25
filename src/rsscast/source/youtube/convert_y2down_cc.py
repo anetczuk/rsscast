@@ -40,15 +40,20 @@ def convert_yt( link, output, _mimicHuman=True ) -> bool:
     ## https://loader.to/ajax/download.php?format=mp3&url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3D1cpyexbmMyU
     escaped_link = urllib.parse.quote( link )
     convert_url = f"https://loader.to/ajax/download.php?format=mp3&url={escaped_link}"
-    convert_response = urlretrieve( convert_url )
+    convert_response = None
+    try:
+        convert_response = urlretrieve( convert_url )
+    except urllib.error.HTTPError:
+        _LOGGER.exception("unable to download content from %s", convert_url)
+        return False
     convert_data = json.loads( convert_response )
     # _LOGGER.info( f"convert data {convert_data}" )
     if convert_data.get( "success", False ) is False:
-        _LOGGER.error( f"failed to convert '{link}' - server response" )
+        _LOGGER.error( f"failed to convert {link} - server response" )
         return False
     convert_id = convert_data.get( "id", None )
     if not convert_id:
-        _LOGGER.error( f"failed to convert '{link}' - missing ID" )
+        _LOGGER.error( f"failed to convert {link} - missing ID" )
         return False
 
     # content = convert_data.get( "content", "" )
@@ -64,10 +69,16 @@ def convert_yt( link, output, _mimicHuman=True ) -> bool:
     while True:
 
         status_timeout = True
-        for _ in range(0, 20):
+        for _i in range(0, 20):
             time.sleep( 3.0 )
 
-            progress_resp = urlretrieve( progress_link )
+            progress_resp = None
+            try:
+                progress_resp = urlretrieve( progress_link )
+            except urllib.error.HTTPError:
+                _LOGGER.exception("unable to download content from %s", download_url)
+                continue
+
             response_data = json.loads( progress_resp )
 
             if recent_response_data == response_data:
@@ -99,7 +110,11 @@ def convert_yt( link, output, _mimicHuman=True ) -> bool:
         return False
 
     _LOGGER.info( f"downloading content from {download_url} to {output}" )
-    urlretrieve( download_url, output, timeout=90, write_empty=False )
+    try:
+        urlretrieve( download_url, output, timeout=90, write_empty=False )
+    except urllib.error.HTTPError:
+        _LOGGER.exception("unable to download content from %s", download_url)
+        return False
 
     _LOGGER.info("downloading completed")
     return True
