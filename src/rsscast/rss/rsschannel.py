@@ -318,6 +318,17 @@ class RSSChannel( persist.Versionable ):
 
         self.items.sort( key=cmp_to_key(compare) )
 
+    def getInfo(self) -> str:
+        content = f"""\
+title: {self.title}
+link: {self.link}
+publish date: {self.publishDate}
+items:
+"""
+        for item in self.items:
+            content += f"""    id: {item.id}  title: {item.title}  link: {item.link}\n"""
+        return content
+
 
 ## ============================================================
 

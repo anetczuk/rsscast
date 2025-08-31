@@ -189,13 +189,16 @@ def convert_info_to_channel(info_dict) -> RSSChannel:
 
     yt_entries = info_dict.get('entries', [])
     for yt_entry in yt_entries:
-        yt_link = yt_entry.get("url", "")
+        yt_link = yt_entry.get("original_url", "")
         if not yt_link:
-            yt_link = yt_entry.get("original_url", "")
+            yt_link = yt_entry.get("webpage_url", "")
+        if not yt_link:
+            yt_link = yt_entry.get("url", "")       ## sometimes returns strange URL
         if not yt_link:
             # it happens for private videos
             _LOGGER.warning("unable to add item to channel (no ID), entries:\n%s", yt_entries)
             continue
+
         yt_id = yt_entry["id"]
         thumb_dict = get_thumbnail_data(yt_entry)
         item_upload_date = yt_entry.get("upload_date")
@@ -225,15 +228,16 @@ def convert_info_to_channel(info_dict) -> RSSChannel:
         "entries": data_entries
     }
 
-    # pprint.pprint(info_dict)
-    # pprint.pprint(feedContent)
+    # _LOGGER.info( "info_dict data:\n%s", pprint.pprint_content(info_dict) )
+    # _LOGGER.info( "feedContent data:\n%s", pprint.pprint_content(feedContent) )
 
     _LOGGER.info( "feed parsing done" )
     _LOGGER.info( "adding feed items %s", len(data_entries) )
 
-    rssChannel = RSSChannel()
-    rssChannel.parseData( feedContent )
-    return rssChannel
+    rss_channel = RSSChannel()
+    rss_channel.parseData( feedContent )
+    # _LOGGER.info("playlist data:\n%s", rss_channel.getInfo())
+    return rss_channel
 
 
 @unique
@@ -246,10 +250,12 @@ class VideoAvailableStatus(Enum):
 def is_video_available(video_url) -> VideoAvailableStatus:
     result = fetch_info(video_url)
     if result is None:
+        _LOGGER.warning("video unavailable: could not fetch info")
         return VideoAvailableStatus.INVALID
 
     live_status = result.get("live_status")
     if live_status is None:
+        _LOGGER.warning("video unavailable: no 'live_status' in fetch info")
         return VideoAvailableStatus.INVALID
 
     if live_status in ("not_live", "was_live"):

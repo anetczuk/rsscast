@@ -76,7 +76,7 @@ def convert_yt( link, output, _mimicHuman=True ) -> bool:
             try:
                 progress_resp = urlretrieve( progress_link )
             except urllib.error.HTTPError:
-                _LOGGER.exception("unable to download content from %s", download_url)
+                _LOGGER.exception("unable to download content from %s", progress_link)
                 continue
 
             response_data = json.loads( progress_resp )

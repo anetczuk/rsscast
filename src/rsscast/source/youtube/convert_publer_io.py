@@ -25,8 +25,9 @@ import logging
 import time
 import json
 
-from rsscast.source.youtube.ytwebconvert import urlretrieve, get_curl_session, curl_get
 import urllib
+
+from rsscast.source.youtube.ytwebconvert import urlretrieve, get_curl_session, curl_get
 
 
 _LOGGER = logging.getLogger(__name__)

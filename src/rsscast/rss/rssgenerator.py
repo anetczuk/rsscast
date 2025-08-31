@@ -171,15 +171,31 @@ def download_items( feedId, itemsList: List[RSSItem], _videoDurationLimit=None )
     download_list(feedId, itemsList, channelPath)
 
 
-def download_list( feedId, itemsList: List[RSSItem], output_dir, use_filename_title=False, prepend_index=False ):
+def download_list( feedId, itemsList: List[RSSItem], output_dir, **kwargs ):
+    start_from = kwargs.get("start_from")
+    end_to = kwargs.get("end_to")
+    recent_items = kwargs.get("recent_items")
+    use_filename_title = kwargs.get("use_filename_title", False)
+    prepend_index = kwargs.get("prepend_index", False)
+
     items_len = len(itemsList)
 #     rssItem: RSSItem = None
     index_digs_num = len(str(items_len)) + 1
+    recent_start = None
+    if recent_items is not None:
+        recent_start = items_len - recent_items + 1
 
     for index, rssItem in enumerate(itemsList):
-#         pprint( rssItem )
+        _LOGGER.info( "downloading item: %s %s %s", feedId, rssItem.title, rssItem.id )
+
         if rssItem.enabled is False:
             _LOGGER.info( "feed %s: video '%s' disabled -- skipped", feedId, rssItem.title )
+            continue
+
+        item_number = index + 1
+        allow = check_num_in_range(item_number, start_from, end_to, recent_start)
+        if allow is False:
+            _LOGGER.info( "feed %s: video skipped '%s'", feedId, rssItem.title )
             continue
 
         postLink = rssItem.link
@@ -195,13 +211,15 @@ def download_list( feedId, itemsList: List[RSSItem], output_dir, use_filename_ti
             filename = filename.replace("#", "0")
 
         if prepend_index:
-            item_num = str(index + 1)
+            item_num = str(item_number)
             item_num = item_num.zfill(index_digs_num)
             filename = f"{item_num}_{filename}"
 
         postLocalPath = f"{output_dir}/{filename}.mp3"
 
-        if not os.path.exists(postLocalPath):
+        if os.path.exists(postLocalPath):
+            _LOGGER.info( "feed %s: item already downloaded '%s'", feedId, rssItem.title )
+        else:
             ## item file not exists -- convert and download
 
             ## is it still needed?
@@ -230,6 +248,33 @@ def download_list( feedId, itemsList: List[RSSItem], output_dir, use_filename_ti
                 continue
 
         rssItem.mediaSize = os.path.getsize( postLocalPath )
+
+
+def check_num_in_range(item_num, start_from, end_to, recent_start) -> bool:
+    ## False (-1), NOT_USED (0), True (1)
+    allow_start_end = 0
+    if start_from is not None or end_to is not None:
+        allow_start_end = 1
+        if start_from is not None and item_num < start_from:
+            allow_start_end = -1
+        if end_to is not None and item_num > end_to:
+            allow_start_end = -1
+
+    ## False (-1), NOT_USED (0), True (1)
+    allow_recent = 0
+    if recent_start is not None:
+        allow_recent = 1
+        if item_num < recent_start:
+            allow_recent = -1
+
+    if allow_start_end == 1 or allow_recent == 1:
+        ## any true
+        return True
+    if allow_start_end == -1 or allow_recent == -1:
+        ## any false
+        return False
+    ## both not set
+    return True
 
 
 def remove_item_data( feedId, rssItem: RSSItem ):

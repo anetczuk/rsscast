@@ -25,13 +25,15 @@ import logging
 import time
 import json
 
-from rsscast.source.youtube.ytwebconvert import urlretrieve, get_curl_session, curl_get
 import urllib
+
+from rsscast.source.youtube.ytwebconvert import urlretrieve, get_curl_session, curl_get
 
 
 _LOGGER = logging.getLogger(__name__)
 
 
+## use https://ddownr.com/
 def convert_yt( link, output, _mimicHuman=True ) -> bool:
     _LOGGER.info("ddownr.com: converting youtube video %s", link)
 

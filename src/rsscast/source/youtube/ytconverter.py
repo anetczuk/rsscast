@@ -85,6 +85,7 @@ def reduce_info(info_dict):
 ## ===================================================================
 
 
+## download and convert link to audio file
 def convert_to_audio( link, output, mimicHuman=True ) -> bool:
     converters_list = list(WEB_CONVERTERS)
     random.shuffle(converters_list)

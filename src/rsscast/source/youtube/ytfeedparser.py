@@ -74,6 +74,7 @@ def parse_rss_content(feedContent) -> RSSChannel:
     # pprint.pprint( parsedDict )
     rss_channel = RSSChannel()
     rss_channel.parseData(parsedDict)
+    # _LOGGER.info("playlist data:\n%s", rss_channel.getInfo())
     return rss_channel
 
 

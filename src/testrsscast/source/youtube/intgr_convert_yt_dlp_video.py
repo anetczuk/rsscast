@@ -37,7 +37,7 @@ import sys
 import json
 
 from rsscast import logger
-from rsscast.source.youtube.convert_yt_dlp import convert_yt, list_audio_formats
+from rsscast.source.youtube.convert_yt_dlp import convert_yt, list_audio_formats, is_video_available
 
 
 def get_json(obj):
@@ -60,9 +60,11 @@ def main():
     # if not info_dict:
     #     print("FAILED")
     #     sys.exit(1)
-
     # print("info:")
     # pprint.pprint( info_dict )
+
+    available = is_video_available(url)
+    print("available:", available)
 
     audio_formats = list_audio_formats(url)
     if not audio_formats:

@@ -25,26 +25,33 @@ from datetime import timedelta
 
 
 def pprint(variable, indent=0):
+    content = pprint_content(variable, indent)
+    print(content)
+
+
+def pprint_content(variable, indent=0):
     if variable is None:
-        print('\t' * indent + "None")
-        return
+        return '\t' * indent + "None"
     if not variable:
         ## empty container
-        print('\t' * indent + "Empty")
-        return
+        return '\t' * indent + "Empty"
 
+    ret_list = []
     if isinstance( variable, dict ):
         for key, value in variable.items():
-            print('\t' * indent + str(key) + ":")
-            pprint( value, indent + 1 )
+            ret_list.append('\t' * indent + str(key) + ":")
+            content = pprint_content( value, indent + 1 )
+            ret_list.append(content)
     elif isinstance( variable, list ):
         # pylint: disable=C0200
         for i in range(0, len(variable)):
             value = variable[i]
-            print('\t' * indent + "[" + str(i) + "]:")
-            pprint( value, indent + 1 )
+            ret_list.append('\t' * indent + "[" + str(i) + "]:")
+            content = pprint_content( value, indent + 1 )
+            ret_list.append(content)
     else:
-        print('\t' * (indent + 1) + str(variable))
+        ret_list.append('\t' * (indent + 1) + str(variable))
+    return "\n".join(ret_list)
 
 
 def print_timedelta( value: timedelta ):

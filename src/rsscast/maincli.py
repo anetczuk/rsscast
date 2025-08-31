@@ -119,7 +119,18 @@ def process_download(args):
 
     items = channel_data.getItemsEnabled()
     cwd = os.getcwd()
-    download_list( "direct", items, cwd, use_filename_title=True, prepend_index=True )
+    args_dict = vars(args)
+    start_from = args_dict.get("from")      ## because "from" is keyword, so "args.from" is invalid syntax
+    if start_from is not None:
+        start_from = int(start_from)
+    end_to = args.to
+    if end_to is not None:
+        end_to = int(end_to)
+    recent_items = args.recent
+    if recent_items is not None:
+        recent_items = int(recent_items)
+    download_list( "direct", items, cwd, start_from=start_from, end_to=end_to, recent_items=recent_items,
+                   use_filename_title=True, prepend_index=True )
 
     # converted = convert_to_audio( grab_url, "" )
     # if converted is False:
@@ -201,13 +212,27 @@ def create_parser( parser: argparse.ArgumentParser = None ):
     subparser.description = description
     subparser.set_defaults(func=process_download)
     subparser.add_argument("url", help="Url to download")
-    # subparser.add_argument(
-    #     "--url",
-    #     action="store",
-    #     required=True,
-    #     default=None,
-    #     help="Path to configuration YAML file",
-    # )
+    subparser.add_argument(
+        "--from",
+        action="store",
+        required=False,
+        default=None,
+        help="Playlist item index to start from",
+    )
+    subparser.add_argument(
+        "--to",
+        action="store",
+        required=False,
+        default=None,
+        help="Playlist item index to end to",
+    )
+    subparser.add_argument(
+        "--recent",
+        action="store",
+        required=False,
+        default=None,
+        help="Get given number of recent items from playlist",
+    )
 
     return parser
 
