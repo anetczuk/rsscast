@@ -34,7 +34,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 def remove_old_files(feedList: List[ FeedEntry ], files_limit):
-    files_list = get_files_list(feedList)
+    files_list = get_files_list(feedList, include_disabled=False)
     files_no = len(files_list)
     rem_num = files_no - files_limit
     if rem_num < 1:
@@ -53,9 +53,14 @@ def remove_old_files(feedList: List[ FeedEntry ], files_limit):
     return True
 
 
-def get_files_list(feedList: List[ FeedEntry ]):
+def get_files_list(feedList: List[ FeedEntry ], include_disabled=True):
     files_list = []
     for feed in feedList:
+        if not include_disabled:
+            if not feed.enabled:
+                _LOGGER.info("feed %s (%s) disabled - skipping", feed.feedName, feed.feedId)
+                continue
+        _LOGGER.info("getting files from feed %s (%s)", feed.feedName, feed.feedId)
         local_paths = feed.getLocalPaths()
         for rss_item, file_path in local_paths:
             try:
