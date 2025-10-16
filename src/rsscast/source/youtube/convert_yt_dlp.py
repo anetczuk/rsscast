@@ -323,16 +323,20 @@ class YTDLPLogger:
         _LOGGER.debug(msg)
 
 
+def fetch_info(youtube_url, items_num=15, reduce=True):
+    return fetch_info_raw(youtube_url, items_num, reduce)
+
+
 # order of items in list seems to be random
 # youtube_url can be URL to channel or playlist or URL to video
 # returns None if failed/invalid url/video not available
-def fetch_info(youtube_url, items_num=15, reduce=True):
+def fetch_info_raw(youtube_url, items_num=15, reduce=True, start_pos=1):
     params = {"skip_download": True,
               "simulate": True,
               "ignore_no_formats_error": True,
               "extract_flat": True,                     # do not download videos from list
               # "dump_single_json": True,                ## will print JSON to stdout
-              "playlist_items": f"1:{items_num}",
+              "playlist_items": f"{start_pos}:{items_num}",
               # "playlistreverse": True,                # reverses all items (videos and playlists)
               "logger": YTDLPLogger,
 
@@ -349,6 +353,7 @@ def fetch_info(youtube_url, items_num=15, reduce=True):
 
         if info_dict is None:
             _LOGGER.warning("unable to fetch info from url: %s", youtube_url)
+            return None
 
     except yt_dlp.utils.DownloadError:
         # error already reported by YTDLPLogger

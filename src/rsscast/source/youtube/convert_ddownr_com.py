@@ -37,9 +37,11 @@ _LOGGER = logging.getLogger(__name__)
 def convert_yt( link, output, _mimicHuman=True ) -> bool:
     _LOGGER.info("ddownr.com: converting youtube video %s", link)
 
+    SERVER_URL = "https://p.savenow.to"
+
     session = get_curl_session( "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/116.0" )
 
-    service_link = "https://p.oceansaver.in/ajax/download.php"
+    service_link = f"{SERVER_URL}/ajax/download.php"
     params = {"copyright": 0, "format": "mp3",
               "url": link, "api": "dfcb6d76f2f6a9894gjkege8a4ab232222"}
     dataBuffer = curl_get( session, service_link, params, header_list=[] )
@@ -59,7 +61,7 @@ def convert_yt( link, output, _mimicHuman=True ) -> bool:
 
     _LOGGER.info( f"waiting for finish of conversion of {link}" )
 
-    status_url = "https://p.oceansaver.in/ajax/progress.php"
+    status_url = f"{SERVER_URL}/ajax/progress.php"
     params = {"id": job_id}
     download_url = None
     recent_response_data = None
